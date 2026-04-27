@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 2 - Power On II</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;600;700&display=swap');
+
+  :root {
+    --green: #C62828;
+    --green-light: #FFCDD2;
+    --green-mid: #C62828cc;
+    --blue: #1565C0;
+    --blue-light: #E3F2FD;
+    --bg: #F9FBF9;
+    --text: #1a1a1a;
+    --muted: #666;
+    --card: #ffffff;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  header {
+    background: var(--green);
+    color: white;
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .tts-bar {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tts-bar label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+
+  .btn-play {
+    background: var(--green);
+    color: white;
+  }
+  .btn-play:hover { background: #1B5E20; }
+  .btn-play:active { transform: scale(0.97); }
+
+  .btn-stop {
+    background: #eee;
+    color: #444;
+  }
+  .btn-stop:hover { background: #ddd; }
+
+  .btn-en, .btn-ja {
+    background: #eee;
+    color: #666;
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border: 2px solid transparent;
+  }
+  .btn-en:hover, .btn-ja:hover { background: #ddd; }
+  .btn-en.active {
+    background: #1565C0;
+    color: white;
+    border-color: #0D47A1;
+  }
+  .btn-ja.active {
+    background: #C62828;
+    color: white;
+    border-color: #B71C1C;
+  }
+
+  .speed-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .speed-wrap input[type=range] {
+    width: 80px;
+    accent-color: var(--green);
+  }
+
+  .speed-wrap span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-width: 32px;
+  }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  .part {
+    margin-bottom: 40px;
+  }
+
+  .part-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-light);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 5px solid var(--blue);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 16px 0 8px;
+  }
+
+  .text-block {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .sentence {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    border-radius: 6px;
+    padding-left: 6px;
+    transition: background 0.1s;
+  }
+  .sentence:last-child { border-bottom: none; }
+  .sentence:hover { background: #f5fdf5; }
+  .sentence.speaking { background: #E8F5E9; border-left: 3px solid var(--green-mid); padding-left: 10px; }
+
+  .sentence.en { font-family: 'Nunito', sans-serif; font-size: 1rem; line-height: 1.9; }
+  .sentence.ja { font-size: 0.95rem; color: #333; line-height: 1.9; }
+
+  .vocab-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-size: 0.92rem;
+  }
+
+  .vocab-table thead tr {
+    background: var(--green-light);
+  }
+
+  .vocab-table th {
+    padding: 10px 14px;
+    font-weight: 700;
+    text-align: left;
+    font-size: 0.82rem;
+    color: var(--green);
+    letter-spacing: 0.04em;
+  }
+
+  .vocab-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .vocab-table tr:last-child td { border-bottom: none; }
+  .vocab-table tr:nth-child(even) { background: #fafafa; }
+
+  .pos { color: var(--muted); font-size: 0.82rem; }
+
+  .tap-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .part-nav {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .part-nav-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 2px;
+  }
+
+  .btn-part {
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 0.88rem;
+    padding: 7px 18px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+  }
+  .btn-part:hover { background: var(--green-mid); color: white; }
+  .btn-part.playing {
+    background: var(--green);
+    color: white;
+    border-color: #1B5E20;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.1rem; }
+    .tts-bar { padding: 10px 16px; gap: 8px; }
+    .speed-wrap { margin-left: 0; }
+    main { padding: 16px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 Lesson 2　ファストファッション</h1>
+  <p>Power On English Communication II</p>
+</header>
+
+<div class="tts-bar">
+  <label>読み上げ</label>
+  <button class="btn btn-play" onclick="playAll()">▶ 全文再生</button>
+  <button class="btn btn-stop" onclick="stopAll()">⏹ 停止</button>
+  <button class="btn btn-en" onclick="setMode('en')">英語のみ</button>
+  <button class="btn btn-ja" onclick="setMode('ja')">日本語のみ</button>
+  <div class="speed-wrap">
+    <label>速度</label>
+    <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateSpeed(this.value)">
+    <span id="speedVal">0.9x</span>
+  </div>
+</div>
+
+<div class="part-nav">
+  <span class="part-nav-label">ジャンプ</span>
+  <button class="btn btn-part" onclick="jumpAndPlay('p1')">Part 1</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p2')">Part 2</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p3')">Part 3</button>
+</div>
+
+<main>
+
+<!-- PART 1 -->
+<div class="part">
+  <div class="p1-anchor"></div>
+  <div class="part-title">Part 1　ファストファッションとは</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p1en">
+    <div class="sentence en" onclick="speakThis(this)">What is most important when you buy clothes? Price, design, or color? Recently, fast fashion has become very popular all over the world. It makes the production of clothes quick and cheap. Its products are also based on the latest fashion trends. Many of us like buying fashionable but inexpensive products. However, some people say fast fashion products can cause problems.</div>
+    <div class="sentence en" onclick="speakThis(this)">A company in the U.K. reports the low prices of clothes are creating a huge amount of waste. According to one report, more than half of all fast fashion products are thrown away within a year. And one garbage truck of clothes is burned or sent to landfills every second!</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p1ja">
+    <div class="sentence ja" onclick="speakThis(this)">服を買うとき一番大切なのは何ですか？価格、デザイン、それとも色？最近、ファストファッションが世界中でとても人気になっています。服の生産を速く安くします。その製品は最新のファッショントレンドに基づいています。私たちの多くは、おしゃれでも安価な製品を買うのが好きです。しかし、ファストファッション製品が問題を引き起こすと言う人もいます。</div>
+    <div class="sentence ja" onclick="speakThis(this)">イギリスのある会社は、服の低価格が大量のゴミを生み出していると報告しています。ある報告によると、ファストファッション製品の半数以上が1年以内に捨てられています。そして毎秒1台のゴミ収集車分の服が燃やされるか、埋立地に送られています！</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>fast fashion</td><td class="pos">名詞</td><td>ファストファッション</td></tr>
+      <tr><td>based(d)</td><td class="pos">動詞</td><td>〜に基づく</td></tr>
+      <tr><td>trend(s)</td><td class="pos">名詞</td><td>トレンド、流行</td></tr>
+      <tr><td>fashionable</td><td class="pos">形容詞</td><td>流行の、おしゃれな</td></tr>
+      <tr><td>inexpensive</td><td class="pos">形容詞</td><td>安価な</td></tr>
+      <tr><td>cause</td><td class="pos">動詞</td><td>引き起こす</td></tr>
+      <tr><td>within</td><td class="pos">前置詞</td><td>〜以内に</td></tr>
+      <tr><td>landfill(s)</td><td class="pos">名詞</td><td>埋立地</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 2 -->
+<div class="part">
+  <div class="p2-anchor"></div>
+  <div class="part-title">Part 2　ファストファッションの裏側</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p2en">
+    <div class="sentence en" onclick="speakThis(this)">A factory manager in Bangladesh talks about a problem. He says factory workers in developing countries suffer due to the low prices of clothes. Clothing companies in advanced countries are competing in price. For example, one company wants to sell a T-shirt at a cheaper price than other companies. Therefore, it forces a factory in a developing country to produce the shirt cheaply. If the factory doesn't accept the order, the company places the order with a different factory. This deal makes the factory workers work at low pay.</div>
+    <div class="sentence en" onclick="speakThis(this)">An environmental activist in India complains about mass production of cotton. In order to produce cotton for fast fashion products, farmers use chemical fertilizers and pesticides. These damage the environment and farmers' health.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p2ja">
+    <div class="sentence ja" onclick="speakThis(this)">バングラデシュの工場長がある問題について話しています。彼は、途上国の工場労働者は服の低価格のために苦しんでいると言います。先進国の衣料品企業は価格で競争しています。例えば、ある会社が他の会社より安い価格でTシャツを売りたいとします。そのため、途上国の工場に安く生産させます。もし工場が注文を受け入れなければ、会社は別の工場に注文します。この取引が工場労働者を低賃金で働かせることになります。</div>
+    <div class="sentence ja" onclick="speakThis(this)">インドの環境活動家が綿花の大量生産について不満を言っています。ファストファッション製品のための綿花を生産するために、農家は化学肥料や農薬を使います。これらは環境や農家の健康を損ないます。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>factory</td><td class="pos">名詞</td><td>工場</td></tr>
+      <tr><td>developing</td><td class="pos">形容詞</td><td>発展途上の</td></tr>
+      <tr><td>advanced</td><td class="pos">形容詞</td><td>先進の</td></tr>
+      <tr><td>cheaply</td><td class="pos">副詞</td><td>安く</td></tr>
+      <tr><td>deal</td><td class="pos">名詞</td><td>取引</td></tr>
+      <tr><td>environmental</td><td class="pos">形容詞</td><td>環境の</td></tr>
+      <tr><td>activist</td><td class="pos">名詞</td><td>活動家</td></tr>
+      <tr><td>mass production</td><td class="pos">名詞</td><td>大量生産</td></tr>
+      <tr><td>fertilizer(s)</td><td class="pos">名詞</td><td>肥料</td></tr>
+      <tr><td>pesticide(s)</td><td class="pos">名詞</td><td>農薬</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 3 -->
+<div class="part">
+  <div class="p3-anchor"></div>
+  <div class="part-title">Part 3　エシカルファッション</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p3en">
+    <div class="sentence en" onclick="speakThis(this)">Today more and more people pay attention to ethical fashion. "Ethical" means morally right. Ethical fashion companies often see the whole fast fashion industry causing problems. They make environment-friendly products and pay workers a living wage. However, ethical fashion companies alone cannot solve all the problems. Each of us needs to cooperate. Just look at what you have now, and then decide what to buy next. Most importantly, keep in mind that there are always workers behind each product and the product is always linked to the environment.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p3ja">
+    <div class="sentence ja" onclick="speakThis(this)">今日、ますます多くの人がエシカルファッションに注目しています。「エシカル」とは道徳的に正しいという意味です。エシカルファッション企業は、ファストファッション業界全体が問題を引き起こしていると見ていることが多いです。彼らは環境に優しい製品を作り、労働者にリビングワーク（生活できる賃金）を支払います。しかし、エシカルファッション企業だけではすべての問題を解決することはできません。私たち一人ひとりが協力する必要があります。今持っているものを見て、次に何を買うかを決めましょう。最も大切なのは、すべての製品の背後には常に労働者がいて、その製品は常に環境とつながっているということを心に留めておくことです。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>ethical</td><td class="pos">形容詞</td><td>倫理的な、道徳的に正しい</td></tr>
+      <tr><td>morally</td><td class="pos">副詞</td><td>道徳的に</td></tr>
+      <tr><td>living wage</td><td class="pos">名詞</td><td>生活できる賃金</td></tr>
+      <tr><td>cooperate</td><td class="pos">動詞</td><td>協力する</td></tr>
+      <tr><td>linked</td><td class="pos">形容詞</td><td>つながっている</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+</main>
+
+<script>
+let mode = 'en'; // 'both', 'en', 'ja'
+let speed = 0.9;
+let speaking = false;
+let allSentences = [];
+let currentIndex = 0;
+let currentUtterance = null;
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.btn-en, .btn-ja').forEach(b => b.classList.remove('active'));
+  if (m === 'en') document.querySelector('.btn-en').classList.add('active');
+  if (m === 'ja') document.querySelector('.btn-ja').classList.add('active');
+  if (m === 'both') {
+    document.querySelector('.btn-en').classList.remove('active');
+    document.querySelector('.btn-ja').classList.remove('active');
+  }
+}
+
+function updateSpeed(val) {
+  speed = parseFloat(val);
+  document.getElementById('speedVal').textContent = val + 'x';
+}
+
+function getLang(el) {
+  return el.classList.contains('en') ? 'en-US' : 'ja-JP';
+}
+
+function speakThis(el) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  el.classList.add('speaking');
+  const u = new SpeechSynthesisUtterance(el.textContent);
+  u.lang = getLang(el);
+  u.rate = speed;
+  u.onend = () => el.classList.remove('speaking');
+  window.speechSynthesis.speak(u);
+}
+
+function playAll() {
+  window.speechSynthesis.cancel();
+  const parts = ['p1', 'p2', 'p3'];
+  let queue = [];
+  parts.forEach(p => {
+    if (mode !== 'ja') {
+      document.querySelectorAll(`#${p}en .sentence`).forEach(el => queue.push(el));
+    }
+    if (mode !== 'en') {
+      document.querySelectorAll(`#${p}ja .sentence`).forEach(el => queue.push(el));
+    }
+  });
+  if (queue.length === 0) return;
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) return;
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function jumpAndPlay(partId) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+
+  // highlight active part button
+  const btnMap = { p1: 0, p2: 1, p3: 2 };
+  document.querySelectorAll('.btn-part')[btnMap[partId]].classList.add('playing');
+
+  // scroll to part
+  const partEl = document.querySelector('.' + partId + '-anchor');
+  if (partEl) partEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // build queue for this part only
+  let queue = [];
+  if (mode !== 'ja') document.querySelectorAll(`#${partId}en .sentence`).forEach(el => queue.push(el));
+  if (mode !== 'en') document.querySelectorAll(`#${partId}ja .sentence`).forEach(el => queue.push(el));
+  if (mode === 'both') {
+    queue = [];
+    const enSents = [...document.querySelectorAll(`#${partId}en .sentence`)];
+    const jaSents = [...document.querySelectorAll(`#${partId}ja .sentence`)];
+    const max = Math.max(enSents.length, jaSents.length);
+    for (let i = 0; i < max; i++) {
+      if (enSents[i]) queue.push(enSents[i]);
+      if (jaSents[i]) queue.push(jaSents[i]);
+    }
+  }
+
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) {
+      document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+      return;
+    }
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function stopAll() {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+}
+// 初期状態
+setMode('en');
+</script>
+</body>
+</html>

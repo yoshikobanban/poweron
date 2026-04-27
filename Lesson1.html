@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1 - Power On II</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;600;700&display=swap');
+
+  :root {
+    --green: #2E7D32;
+    --green-light: #C8E6C9;
+    --green-mid: #66BB6A;
+    --blue: #1565C0;
+    --blue-light: #E3F2FD;
+    --bg: #F9FBF9;
+    --text: #1a1a1a;
+    --muted: #666;
+    --card: #ffffff;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  header {
+    background: var(--green);
+    color: white;
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .tts-bar {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tts-bar label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+
+  .btn-play {
+    background: var(--green);
+    color: white;
+  }
+  .btn-play:hover { background: #1B5E20; }
+  .btn-play:active { transform: scale(0.97); }
+
+  .btn-stop {
+    background: #eee;
+    color: #444;
+  }
+  .btn-stop:hover { background: #ddd; }
+
+  .btn-en, .btn-ja {
+    background: #eee;
+    color: #666;
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border: 2px solid transparent;
+  }
+  .btn-en:hover, .btn-ja:hover { background: #ddd; }
+  .btn-en.active {
+    background: #1565C0;
+    color: white;
+    border-color: #0D47A1;
+  }
+  .btn-ja.active {
+    background: #C62828;
+    color: white;
+    border-color: #B71C1C;
+  }
+
+  .speed-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .speed-wrap input[type=range] {
+    width: 80px;
+    accent-color: var(--green);
+  }
+
+  .speed-wrap span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-width: 32px;
+  }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  .part {
+    margin-bottom: 40px;
+  }
+
+  .part-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-light);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 5px solid var(--blue);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 16px 0 8px;
+  }
+
+  .text-block {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .sentence {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    border-radius: 6px;
+    padding-left: 6px;
+    transition: background 0.1s;
+  }
+  .sentence:last-child { border-bottom: none; }
+  .sentence:hover { background: #f5fdf5; }
+  .sentence.speaking { background: #E8F5E9; border-left: 3px solid var(--green-mid); padding-left: 10px; }
+
+  .sentence.en { font-family: 'Nunito', sans-serif; font-size: 1rem; line-height: 1.9; }
+  .sentence.ja { font-size: 0.95rem; color: #333; line-height: 1.9; }
+
+  .vocab-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-size: 0.92rem;
+  }
+
+  .vocab-table thead tr {
+    background: var(--green-light);
+  }
+
+  .vocab-table th {
+    padding: 10px 14px;
+    font-weight: 700;
+    text-align: left;
+    font-size: 0.82rem;
+    color: var(--green);
+    letter-spacing: 0.04em;
+  }
+
+  .vocab-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .vocab-table tr:last-child td { border-bottom: none; }
+  .vocab-table tr:nth-child(even) { background: #fafafa; }
+
+  .pos { color: var(--muted); font-size: 0.82rem; }
+
+  .tap-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .part-nav {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .part-nav-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 2px;
+  }
+
+  .btn-part {
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 0.88rem;
+    padding: 7px 18px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+  }
+  .btn-part:hover { background: var(--green-mid); color: white; }
+  .btn-part.playing {
+    background: var(--green);
+    color: white;
+    border-color: #1B5E20;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.1rem; }
+    .tts-bar { padding: 10px 16px; gap: 8px; }
+    .speed-wrap { margin-left: 0; }
+    main { padding: 16px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 Lesson 1　ストリートピアノ</h1>
+  <p>Power On English Communication II</p>
+</header>
+
+<div class="tts-bar">
+  <label>読み上げ</label>
+  <button class="btn btn-play" onclick="playAll()">▶ 全文再生</button>
+  <button class="btn btn-stop" onclick="stopAll()">⏹ 停止</button>
+  <button class="btn btn-en" onclick="setMode('en')">英語のみ</button>
+  <button class="btn btn-ja" onclick="setMode('ja')">日本語のみ</button>
+  <div class="speed-wrap">
+    <label>速度</label>
+    <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateSpeed(this.value)">
+    <span id="speedVal">0.9x</span>
+  </div>
+</div>
+
+<div class="part-nav">
+  <span class="part-nav-label">ジャンプ</span>
+  <button class="btn btn-part" onclick="jumpAndPlay('p1')">Part 1</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p2')">Part 2</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p3')">Part 3</button>
+</div>
+
+<main>
+
+<!-- PART 1 -->
+<div class="part">
+  <div class="p1-anchor"></div>
+  <div class="part-title">Part 1　国立市でのレポート</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p1en">
+    <div class="sentence en" onclick="speakThis(this)">TV Reporter: This is Jane Johnson reporting from Kunitachi, Tokyo. Look at all those people. They are playing music, singing, or dancing.</div>
+    <div class="sentence en" onclick="speakThis(this)">Why are these beautiful pianos here? Because they are "street pianos." You can touch and play them. You can now find them all over the world.</div>
+    <div class="sentence en" onclick="speakThis(this)">Let's interview that lady. Uh, excuse me, but could I ask a couple of questions? You are a great piano player.</div>
+    <div class="sentence en" onclick="speakThis(this)">Piano Player: Thank you. I love the audience and interaction among various people. With a street piano, people start to chat with strangers and make new friends.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p1ja">
+    <div class="sentence ja" onclick="speakThis(this)">テレビレポーター：こちらは東京都国立市からお伝えしているジェーン・ジョンソンです。あの人たちを見てください。音楽を演奏したり、歌ったり、踊ったりしています。</div>
+    <div class="sentence ja" onclick="speakThis(this)">なぜここにこんなに美しいピアノがあるのでしょうか？それらは「ストリートピアノ」だからです。触れて演奏することができます。今では世界中で見つけることができます。</div>
+    <div class="sentence ja" onclick="speakThis(this)">あの女性にインタビューしましょう。あの、すみませんが、いくつか質問してもいいですか？あなたは素晴らしいピアノの演奏者ですね。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ピアノを弾いている人：ありがとうございます。私は観客やさまざまな人々との交流が大好きです。ストリートピアノがあると、見知らぬ人と話すようになり、新しい友達ができます。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>interaction</td><td class="pos">名詞</td><td>交流、やりとり</td></tr>
+      <tr><td>chat</td><td class="pos">動詞/名詞</td><td>おしゃべりする、雑談</td></tr>
+      <tr><td>stranger(s)</td><td class="pos">名詞</td><td>見知らぬ人</td></tr>
+      <tr><td>audience</td><td class="pos">名詞</td><td>観客、聴衆</td></tr>
+      <tr><td>various</td><td class="pos">形容詞</td><td>さまざまな</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 2 -->
+<div class="part">
+  <div class="p2-anchor"></div>
+  <div class="part-title">Part 2　ストリートピアノの広がり</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p2en">
+    <div class="sentence en" onclick="speakThis(this)">News Anchor: Back to the studio. What else can you tell us, Amy?</div>
+    <div class="sentence en" onclick="speakThis(this)">Anchor Assistant: Well, Peter, it is not clear exactly when street pianos first appeared. But one thing is certain: British artist Luke Jerram spread the idea all over the world. He and his team installed over 2,000 street pianos in over 65 cities across the globe. Their project is called "Play Me, I'm Yours." It started in 2008.</div>
+    <div class="sentence en" onclick="speakThis(this)">According to Mr. Jerram, some people met at a piano, fell in love, and married.</div>
+    <div class="sentence en" onclick="speakThis(this)">News Anchor: Amazing!</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p2ja">
+    <div class="sentence ja" onclick="speakThis(this)">ニュースアンカー：スタジオに戻ります。他に何か教えてもらえますか、エイミー？</div>
+    <div class="sentence ja" onclick="speakThis(this)">アンカーアシスタント：ええ、ピーター、ストリートピアノが最初に現れたのが正確にいつかははっきりしません。しかし一つ確かなことがあります。イギリス人アーティストのルーク・ジェラムがそのアイデアを世界中に広めました。彼とチームは世界65以上の都市に2,000台以上のストリートピアノを設置しました。そのプロジェクトは「Play Me, I'm Yours」と呼ばれています。2008年に始まりました。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ジェラムさんによると、ピアノのところで出会い、恋に落ち、結婚した人たちもいるそうです。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ニュースアンカー：すごい！</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>anchor</td><td class="pos">名詞</td><td>（ニュースの）キャスター</td></tr>
+      <tr><td>certain</td><td class="pos">形容詞</td><td>確かな</td></tr>
+      <tr><td>spread</td><td class="pos">動詞</td><td>広める、広がる</td></tr>
+      <tr><td>install(ed)</td><td class="pos">動詞</td><td>設置する</td></tr>
+      <tr><td>married</td><td class="pos">形容詞/動詞</td><td>結婚した（marry の過去形）</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 3 -->
+<div class="part">
+  <div class="p3-anchor"></div>
+  <div class="part-title">Part 3　プロジェクトの始まり</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p3en">
+    <div class="sentence en" onclick="speakThis(this)">Anchor Assistant: Why did Mr. Jerram start the project? Let's listen to his recorded comments.</div>
+    <div class="sentence en" onclick="speakThis(this)">Luke Jerram: The idea for it was born when I visited a local laundromat. Customers were spending time in silence. "Placing a piano here may break the silence and lead to a conversation among them. And that in turn may change our community," I thought. We all want to feel connected, after all.</div>
+    <div class="sentence en" onclick="speakThis(this)">Anchor Assistant: There's more to the project, according to Mr. Jerram. It is not only a performance project but also a form of public art. That's why we can see so many beautiful pianos in his project.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p3ja">
+    <div class="sentence ja" onclick="speakThis(this)">アンカーアシスタント：なぜジェラムさんはこのプロジェクトを始めたのでしょうか？彼の録音されたコメントを聞いてみましょう。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ルーク・ジェラム：このアイデアは、地元のコインランドリーを訪れたときに生まれました。お客さんたちは無言で時間を過ごしていました。「ここにピアノを置けば、沈黙を破り、彼らの間で会話が生まれるかもしれない。そしてそれが地域社会を変えることにつながるかもしれない」と私は思いました。結局、私たちは皆、つながっていると感じたいのです。</div>
+    <div class="sentence ja" onclick="speakThis(this)">アンカーアシスタント：ジェラムさんによると、このプロジェクトにはさらに多くの意味があります。パフォーマンスプロジェクトであるだけでなく、パブリックアートの一形態でもあります。だからこそ、彼のプロジェクトには多くの美しいピアノが見られるのです。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>laundromat</td><td class="pos">名詞</td><td>コインランドリー</td></tr>
+      <tr><td>silence</td><td class="pos">名詞</td><td>沈黙、静寂</td></tr>
+      <tr><td>connected</td><td class="pos">形容詞</td><td>つながっている</td></tr>
+      <tr><td>public</td><td class="pos">形容詞</td><td>公共の</td></tr>
+      <tr><td>community</td><td class="pos">名詞</td><td>地域社会、コミュニティ</td></tr>
+      <tr><td>performance</td><td class="pos">名詞</td><td>パフォーマンス、演奏</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</main>
+
+<script>
+let mode = 'en'; // 'both', 'en', 'ja'
+let speed = 0.9;
+let speaking = false;
+let allSentences = [];
+let currentIndex = 0;
+let currentUtterance = null;
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.btn-en, .btn-ja').forEach(b => b.classList.remove('active'));
+  if (m === 'en') document.querySelector('.btn-en').classList.add('active');
+  if (m === 'ja') document.querySelector('.btn-ja').classList.add('active');
+  if (m === 'both') {
+    document.querySelector('.btn-en').classList.remove('active');
+    document.querySelector('.btn-ja').classList.remove('active');
+  }
+}
+
+function updateSpeed(val) {
+  speed = parseFloat(val);
+  document.getElementById('speedVal').textContent = val + 'x';
+}
+
+function getLang(el) {
+  return el.classList.contains('en') ? 'en-US' : 'ja-JP';
+}
+
+function speakThis(el) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  el.classList.add('speaking');
+  const u = new SpeechSynthesisUtterance(el.textContent);
+  u.lang = getLang(el);
+  u.rate = speed;
+  u.onend = () => el.classList.remove('speaking');
+  window.speechSynthesis.speak(u);
+}
+
+function playAll() {
+  window.speechSynthesis.cancel();
+  const parts = ['p1', 'p2', 'p3'];
+  let queue = [];
+  parts.forEach(p => {
+    if (mode !== 'ja') {
+      document.querySelectorAll(`#${p}en .sentence`).forEach(el => queue.push(el));
+    }
+    if (mode !== 'en') {
+      document.querySelectorAll(`#${p}ja .sentence`).forEach(el => queue.push(el));
+    }
+  });
+  if (queue.length === 0) return;
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) return;
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function jumpAndPlay(partId) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+
+  // highlight active part button
+  const btnMap = { p1: 0, p2: 1, p3: 2 };
+  document.querySelectorAll('.btn-part')[btnMap[partId]].classList.add('playing');
+
+  // scroll to part
+  const partEl = document.querySelector('.' + partId + '-anchor');
+  if (partEl) partEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // build queue for this part only
+  let queue = [];
+  if (mode !== 'ja') document.querySelectorAll(`#${partId}en .sentence`).forEach(el => queue.push(el));
+  if (mode !== 'en') document.querySelectorAll(`#${partId}ja .sentence`).forEach(el => queue.push(el));
+  if (mode === 'both') {
+    queue = [];
+    const enSents = [...document.querySelectorAll(`#${partId}en .sentence`)];
+    const jaSents = [...document.querySelectorAll(`#${partId}ja .sentence`)];
+    const max = Math.max(enSents.length, jaSents.length);
+    for (let i = 0; i < max; i++) {
+      if (enSents[i]) queue.push(enSents[i]);
+      if (jaSents[i]) queue.push(jaSents[i]);
+    }
+  }
+
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) {
+      document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+      return;
+    }
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function stopAll() {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+}
+// 初期状態
+setMode('en');
+</script>
+</body>
+</html>

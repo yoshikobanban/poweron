@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 3 - Power On II</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Nunito:wght@400;600;700&display=swap');
+
+  :root {
+    --green: #1565C0;
+    --green-light: #BBDEFB;
+    --green-mid: #1565C0cc;
+    --blue: #1565C0;
+    --blue-light: #E3F2FD;
+    --bg: #F9FBF9;
+    --text: #1a1a1a;
+    --muted: #666;
+    --card: #ffffff;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-size: 16px;
+  }
+
+  header {
+    background: var(--green);
+    color: white;
+    padding: 20px 24px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  header h1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .tts-bar {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .tts-bar label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  .btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+  }
+
+  .btn-play {
+    background: var(--green);
+    color: white;
+  }
+  .btn-play:hover { background: #1B5E20; }
+  .btn-play:active { transform: scale(0.97); }
+
+  .btn-stop {
+    background: #eee;
+    color: #444;
+  }
+  .btn-stop:hover { background: #ddd; }
+
+  .btn-en, .btn-ja {
+    background: #eee;
+    color: #666;
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border: 2px solid transparent;
+  }
+  .btn-en:hover, .btn-ja:hover { background: #ddd; }
+  .btn-en.active {
+    background: #1565C0;
+    color: white;
+    border-color: #0D47A1;
+  }
+  .btn-ja.active {
+    background: #C62828;
+    color: white;
+    border-color: #B71C1C;
+  }
+
+  .speed-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .speed-wrap input[type=range] {
+    width: 80px;
+    accent-color: var(--green);
+  }
+
+  .speed-wrap span {
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-width: 32px;
+  }
+
+  main {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  .part {
+    margin-bottom: 40px;
+  }
+
+  .part-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-light);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 5px solid var(--blue);
+  }
+
+  .section-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 16px 0 8px;
+  }
+
+  .text-block {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .sentence {
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    border-radius: 6px;
+    padding-left: 6px;
+    transition: background 0.1s;
+  }
+  .sentence:last-child { border-bottom: none; }
+  .sentence:hover { background: #f5fdf5; }
+  .sentence.speaking { background: #E8F5E9; border-left: 3px solid var(--green-mid); padding-left: 10px; }
+
+  .sentence.en { font-family: 'Nunito', sans-serif; font-size: 1rem; line-height: 1.9; }
+  .sentence.ja { font-size: 0.95rem; color: #333; line-height: 1.9; }
+
+  .vocab-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    font-size: 0.92rem;
+  }
+
+  .vocab-table thead tr {
+    background: var(--green-light);
+  }
+
+  .vocab-table th {
+    padding: 10px 14px;
+    font-weight: 700;
+    text-align: left;
+    font-size: 0.82rem;
+    color: var(--green);
+    letter-spacing: 0.04em;
+  }
+
+  .vocab-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .vocab-table tr:last-child td { border-bottom: none; }
+  .vocab-table tr:nth-child(even) { background: #fafafa; }
+
+  .pos { color: var(--muted); font-size: 0.82rem; }
+
+  .tap-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  .part-nav {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .part-nav-label {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 600;
+    margin-right: 2px;
+  }
+
+  .btn-part {
+    background: var(--green-light);
+    color: var(--green);
+    font-size: 0.88rem;
+    padding: 7px 18px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+  }
+  .btn-part:hover { background: var(--green-mid); color: white; }
+  .btn-part.playing {
+    background: var(--green);
+    color: white;
+    border-color: #1B5E20;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 1.1rem; }
+    .tts-bar { padding: 10px 16px; gap: 8px; }
+    .speed-wrap { margin-left: 0; }
+    main { padding: 16px 12px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 Lesson 3　マイケル・リーチ選手</h1>
+  <p>Power On English Communication II</p>
+</header>
+
+<div class="tts-bar">
+  <label>読み上げ</label>
+  <button class="btn btn-play" onclick="playAll()">▶ 全文再生</button>
+  <button class="btn btn-stop" onclick="stopAll()">⏹ 停止</button>
+  <button class="btn btn-en" onclick="setMode('en')">英語のみ</button>
+  <button class="btn btn-ja" onclick="setMode('ja')">日本語のみ</button>
+  <div class="speed-wrap">
+    <label>速度</label>
+    <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateSpeed(this.value)">
+    <span id="speedVal">0.9x</span>
+  </div>
+</div>
+
+<div class="part-nav">
+  <span class="part-nav-label">ジャンプ</span>
+  <button class="btn btn-part" onclick="jumpAndPlay('p1')">Part 1</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p2')">Part 2</button>
+  <button class="btn btn-part" onclick="jumpAndPlay('p3')">Part 3</button>
+</div>
+
+<main>
+
+<!-- PART 1 -->
+<div class="part">
+  <div class="p1-anchor"></div>
+  <div class="part-title">Part 1　ラジオインタビュー①</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p1en">
+    <div class="sentence en" onclick="speakThis(this)">Radio Personality: Hello and welcome to Power On Radio. Today's guest is Mr. Michael Leitch. Under his leadership, the Japan national rugby team advanced to the quarterfinals in the 2019 Rugby World Cup for the first time.</div>
+    <div class="sentence en" onclick="speakThis(this)">Mr. Leitch, thank you for joining us today.</div>
+    <div class="sentence en" onclick="speakThis(this)">Leitch: It's my pleasure.</div>
+    <div class="sentence en" onclick="speakThis(this)">Radio Personality: You started playing rugby in New Zealand, right? How long have you played it?</div>
+    <div class="sentence en" onclick="speakThis(this)">Leitch: Let's see. When I was five, my mother recommended it. That was the beginning of my rugby career. So, I've played it for 26 years.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p1ja">
+    <div class="sentence ja" onclick="speakThis(this)">ラジオパーソナリティ：こんにちは、パワーオンラジオへようこそ。今日のゲストはマイケル・リーチさんです。彼のリーダーシップのもと、日本のラグビー代表チームは2019年ラグビーワールドカップで初めて準々決勝に進出しました。</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチさん、今日はご参加いただきありがとうございます。</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチ：こちらこそ光栄です。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ラジオパーソナリティ：ニュージーランドでラグビーを始めたのですよね？どのくらいプレーしていますか？</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチ：そうですね。5歳のとき、母が勧めてくれました。それが私のラグビーキャリアの始まりです。だから26年間プレーしています。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>radio personality</td><td class="pos">名詞</td><td>ラジオパーソナリティ、司会者</td></tr>
+      <tr><td>leadership</td><td class="pos">名詞</td><td>リーダーシップ、指導力</td></tr>
+      <tr><td>advance(d)</td><td class="pos">動詞</td><td>進出する、前進する</td></tr>
+      <tr><td>quarterfinal(s)</td><td class="pos">名詞</td><td>準々決勝</td></tr>
+      <tr><td>Rugby World Cup</td><td class="pos">名詞</td><td>ラグビーワールドカップ</td></tr>
+      <tr><td>recommend</td><td class="pos">動詞</td><td>勧める、推薦する</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 2 -->
+<div class="part">
+  <div class="p2-anchor"></div>
+  <div class="part-title">Part 2　北海道での高校生活</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p2en">
+    <div class="sentence en" onclick="speakThis(this)">Radio Personality: You applied for an exchange program at your school in New Zealand at the age of 15, and you entered a high school in Hokkaido, Japan. How did you like the school life there?</div>
+    <div class="sentence en" onclick="speakThis(this)">Leitch: Well, I liked it, but I had a problem learning written Japanese. I had taken Japanese classes in New Zealand, but I couldn't read or write well. To overcome my weakness, I read picture books and elementary school textbooks.</div>
+    <div class="sentence en" onclick="speakThis(this)">The team culture was also difficult to get used to. There was a rigid hierarchy within the rugby team. The first-year students had to do tasks for the older students. I even did the laundry for them. I couldn't understand their way, but I followed it.</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p2ja">
+    <div class="sentence ja" onclick="speakThis(this)">ラジオパーソナリティ：15歳のとき、ニュージーランドの学校で交換留学プログラムに応募し、日本の北海道の高校に入学しましたね。そこでの学校生活はいかがでしたか？</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチ：そうですね、楽しかったのですが、日本語の読み書きに苦労しました。ニュージーランドで日本語の授業を受けていましたが、読んだり書いたりがうまくできませんでした。弱点を克服するために、絵本や小学校の教科書を読みました。</div>
+    <div class="sentence ja" onclick="speakThis(this)">チームの文化に慣れるのも大変でした。ラグビー部には厳しい上下関係がありました。1年生は上級生のために雑用をしなければなりませんでした。洗濯までしました。彼らのやり方は理解できませんでしたが、従いました。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>exchange program</td><td class="pos">名詞</td><td>交換留学プログラム</td></tr>
+      <tr><td>weakness</td><td class="pos">名詞</td><td>弱点</td></tr>
+      <tr><td>get used to</td><td class="pos">熟語</td><td>〜に慣れる</td></tr>
+      <tr><td>rigid</td><td class="pos">形容詞</td><td>厳格な、厳しい</td></tr>
+      <tr><td>hierarchy</td><td class="pos">名詞</td><td>階層、上下関係</td></tr>
+      <tr><td>laundry</td><td class="pos">名詞</td><td>洗濯物</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PART 3 -->
+<div class="part">
+  <div class="p3-anchor"></div>
+  <div class="part-title">Part 3　日本代表を選んだ理由</div>
+
+  <div class="section-label">本文（English）</div>
+  <div class="text-block" id="p3en">
+    <div class="sentence en" onclick="speakThis(this)">Radio Personality: What made you decide to become a member of the Japanese national team?</div>
+    <div class="sentence en" onclick="speakThis(this)">Leitch: While I was studying at the high school in Hokkaido, I had an unforgettable experience. In 2005, one year after I came to Japan, my house in New Zealand burned down. I was totally at a loss. A few days later, all my teammates gathered around me, and one of them handed me a thick envelope. Inside it, there was a lot of money. It had been secretly collected by the coach. I was moved to tears. I promised myself I would repay their kindness by playing for the team, and later for Japan.</div>
+    <div class="sentence en" onclick="speakThis(this)">Radio Personality: What is special about rugby for you?</div>
+    <div class="sentence en" onclick="speakThis(this)">Leitch: If I didn't play it, I wouldn't know the true meaning of teamwork: "One for all, all for one."</div>
+  </div>
+  <p class="tap-hint">👆 文をタップすると、その部分だけ読み上げます</p>
+
+  <div class="section-label">日本語訳</div>
+  <div class="text-block" id="p3ja">
+    <div class="sentence ja" onclick="speakThis(this)">ラジオパーソナリティ：日本代表チームのメンバーになろうと決めたのはなぜですか？</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチ：北海道の高校で勉強していた頃、忘れられない経験をしました。2005年、日本に来て1年後、ニュージーランドの家が全焼しました。完全に途方に暮れました。数日後、チームメイト全員が私の周りに集まり、その一人が分厚い封筒を手渡してくれました。中にはたくさんのお金が入っていました。コーチがこっそり集めていたものでした。感動して泣きました。チームのために、そして後に日本のためにプレーすることで彼らの親切に報いることを自分に約束しました。</div>
+    <div class="sentence ja" onclick="speakThis(this)">ラジオパーソナリティ：あなたにとってラグビーの特別なところは何ですか？</div>
+    <div class="sentence ja" onclick="speakThis(this)">リーチ：もしラグビーをしていなければ、チームワークの本当の意味「一人はみんなのために、みんなは一人のために」を知らなかったでしょう。</div>
+  </div>
+
+  <div class="section-label">単語リスト</div>
+  <table class="vocab-table">
+    <thead><tr><th>英語</th><th>品詞</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td>unforgettable</td><td class="pos">形容詞</td><td>忘れられない</td></tr>
+      <tr><td>teammate(s)</td><td class="pos">名詞</td><td>チームメイト</td></tr>
+      <tr><td>secretly</td><td class="pos">副詞</td><td>こっそりと、秘密に</td></tr>
+      <tr><td>promise(d)</td><td class="pos">動詞</td><td>約束する</td></tr>
+      <tr><td>repay</td><td class="pos">動詞</td><td>恩返しをする、返す</td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+</main>
+
+<script>
+let mode = 'en'; // 'both', 'en', 'ja'
+let speed = 0.9;
+let speaking = false;
+let allSentences = [];
+let currentIndex = 0;
+let currentUtterance = null;
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.btn-en, .btn-ja').forEach(b => b.classList.remove('active'));
+  if (m === 'en') document.querySelector('.btn-en').classList.add('active');
+  if (m === 'ja') document.querySelector('.btn-ja').classList.add('active');
+  if (m === 'both') {
+    document.querySelector('.btn-en').classList.remove('active');
+    document.querySelector('.btn-ja').classList.remove('active');
+  }
+}
+
+function updateSpeed(val) {
+  speed = parseFloat(val);
+  document.getElementById('speedVal').textContent = val + 'x';
+}
+
+function getLang(el) {
+  return el.classList.contains('en') ? 'en-US' : 'ja-JP';
+}
+
+function speakThis(el) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  el.classList.add('speaking');
+  const u = new SpeechSynthesisUtterance(el.textContent);
+  u.lang = getLang(el);
+  u.rate = speed;
+  u.onend = () => el.classList.remove('speaking');
+  window.speechSynthesis.speak(u);
+}
+
+function playAll() {
+  window.speechSynthesis.cancel();
+  const parts = ['p1', 'p2', 'p3'];
+  let queue = [];
+  parts.forEach(p => {
+    if (mode !== 'ja') {
+      document.querySelectorAll(`#${p}en .sentence`).forEach(el => queue.push(el));
+    }
+    if (mode !== 'en') {
+      document.querySelectorAll(`#${p}ja .sentence`).forEach(el => queue.push(el));
+    }
+  });
+  if (queue.length === 0) return;
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) return;
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function jumpAndPlay(partId) {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+  document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+
+  // highlight active part button
+  const btnMap = { p1: 0, p2: 1, p3: 2 };
+  document.querySelectorAll('.btn-part')[btnMap[partId]].classList.add('playing');
+
+  // scroll to part
+  const partEl = document.querySelector('.' + partId + '-anchor');
+  if (partEl) partEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // build queue for this part only
+  let queue = [];
+  if (mode !== 'ja') document.querySelectorAll(`#${partId}en .sentence`).forEach(el => queue.push(el));
+  if (mode !== 'en') document.querySelectorAll(`#${partId}ja .sentence`).forEach(el => queue.push(el));
+  if (mode === 'both') {
+    queue = [];
+    const enSents = [...document.querySelectorAll(`#${partId}en .sentence`)];
+    const jaSents = [...document.querySelectorAll(`#${partId}ja .sentence`)];
+    const max = Math.max(enSents.length, jaSents.length);
+    for (let i = 0; i < max; i++) {
+      if (enSents[i]) queue.push(enSents[i]);
+      if (jaSents[i]) queue.push(jaSents[i]);
+    }
+  }
+
+  let i = 0;
+  function next() {
+    document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+    if (i >= queue.length) {
+      document.querySelectorAll('.btn-part').forEach(b => b.classList.remove('playing'));
+      return;
+    }
+    const el = queue[i++];
+    el.classList.add('speaking');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = new SpeechSynthesisUtterance(el.textContent);
+    u.lang = getLang(el);
+    u.rate = speed;
+    u.onend = () => { el.classList.remove('speaking'); next(); };
+    window.speechSynthesis.speak(u);
+  }
+  next();
+}
+
+function stopAll() {
+  window.speechSynthesis.cancel();
+  document.querySelectorAll('.sentence.speaking').forEach(s => s.classList.remove('speaking'));
+}
+// 初期状態
+setMode('en');
+</script>
+</body>
+</html>
