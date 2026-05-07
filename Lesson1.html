@@ -260,6 +260,230 @@
     .speed-wrap { margin-left: 0; }
     main { padding: 16px 12px 60px; }
   }
+
+  /* ===== QUIZ MODE ===== */
+  .mode-toggle {
+    background: white;
+    border-bottom: 2px solid var(--green-light);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .btn-mode {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    transition: all 0.15s;
+    background: #eee;
+    color: #666;
+    border: 2px solid transparent;
+  }
+  .btn-mode.active {
+    background: var(--green);
+    color: white;
+  }
+
+  #quiz-section {
+    display: none;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  .quiz-header {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--blue);
+    background: var(--blue-light);
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 5px solid var(--blue);
+  }
+
+  .quiz-block {
+    background: white;
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  .quiz-q {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    line-height: 1.7;
+  }
+
+  .quiz-q-num {
+    display: inline-block;
+    background: var(--green);
+    color: white;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    text-align: center;
+    line-height: 26px;
+    font-size: 0.85rem;
+    margin-right: 8px;
+  }
+
+  .quiz-choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-choice {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    background: #fafafa;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    line-height: 1.6;
+  }
+  .quiz-choice:hover { border-color: var(--green-mid); background: #f1fdf1; }
+  .quiz-choice.correct { border-color: #2E7D32; background: #E8F5E9; color: #1B5E20; font-weight: 700; }
+  .quiz-choice.wrong { border-color: #C62828; background: #FFEBEE; color: #B71C1C; }
+  .quiz-choice.disabled { cursor: default; }
+
+  .quiz-feedback {
+    margin-top: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .quiz-feedback.correct { background: #E8F5E9; color: #2E7D32; display: block; }
+  .quiz-feedback.wrong { background: #FFEBEE; color: #C62828; display: block; }
+
+  /* flashcard */
+  .flashcard {
+    perspective: 1000px;
+    margin-bottom: 20px;
+    cursor: pointer;
+  }
+  .flashcard-inner {
+    position: relative;
+    width: 100%;
+    min-height: 140px;
+    transition: transform 0.5s;
+    transform-style: preserve-3d;
+  }
+  .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+  .flashcard-front, .flashcard-back {
+    position: absolute;
+    width: 100%;
+    min-height: 140px;
+    backface-visibility: hidden;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 24px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .flashcard-front {
+    background: white;
+    border: 2px solid var(--green-light);
+  }
+  .flashcard-back {
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    transform: rotateY(180deg);
+  }
+  .flashcard-word {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .flashcard-pos {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .flashcard-meaning {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1B5E20;
+  }
+  .flashcard-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+  .flashcard-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .btn-nav {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    background: var(--green-light);
+    color: var(--green);
+  }
+  .btn-nav:hover { background: var(--green-mid); color: white; }
+  .card-counter {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .score-box {
+    background: var(--green-light);
+    border: 2px solid var(--green);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .score-box .score-num {
+    font-family: 'Nunito', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+  .score-box .score-label {
+    font-size: 0.9rem;
+    color: #444;
+    margin-top: 4px;
+  }
+  .btn-retry {
+    margin-top: 12px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
 </style>
 </head>
 <body>
@@ -282,7 +506,14 @@
   </div>
 </div>
 
-<div class="part-nav">
+
+<div class="mode-toggle">
+  <button class="btn-mode active" id="btn-study" onclick="switchMode('study')">📖 学習モード</button>
+  <button class="btn-mode" id="btn-flash" onclick="switchMode('flash')">🃏 単語カード</button>
+  <button class="btn-mode" id="btn-quiz" onclick="switchMode('quiz')">✏️ 練習問題</button>
+</div>
+
+<div class="part-nav" id="part-nav-bar">
   <span class="part-nav-label">ジャンプ</span>
   <button class="btn btn-part" onclick="jumpAndPlay('p1')">Part 1</button>
   <button class="btn btn-part" onclick="jumpAndPlay('p2')">Part 2</button>
@@ -518,6 +749,281 @@ function stopAll() {
 }
 // 初期状態
 setMode('en');
+
+// ===== MODE SWITCH =====
+function switchMode(mode) {
+  document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + mode).classList.add('active');
+
+  const studyEl = document.querySelector('main');
+  const quizEl = document.getElementById('quiz-section');
+  const partNav = document.getElementById('part-nav-bar');
+  const ttsBar = document.querySelector('.tts-bar');
+  const flashEl = document.getElementById('flash-section');
+  const quizEl2 = document.getElementById('quiz-questions');
+
+  if (mode === 'study') {
+    studyEl.style.display = '';
+    quizEl.style.display = 'none';
+    partNav.style.display = '';
+    ttsBar.style.display = '';
+  } else {
+    studyEl.style.display = 'none';
+    quizEl.style.display = 'block';
+    partNav.style.display = 'none';
+    ttsBar.style.display = 'none';
+    window.speechSynthesis.cancel();
+
+    if (mode === 'flash') {
+      flashEl.style.display = 'block';
+      quizEl2.style.display = 'none';
+      initFlash();
+    } else {
+      flashEl.style.display = 'none';
+      quizEl2.style.display = 'block';
+    }
+  }
+}
+
+// ===== FLASHCARDS =====
+const allCards = [
+  { word: 'interaction', pos: '名詞', meaning: '交流、やりとり' },
+  { word: 'chat', pos: '動詞/名詞', meaning: 'おしゃべりする、雑談' },
+  { word: 'stranger(s)', pos: '名詞', meaning: '見知らぬ人' },
+  { word: 'audience', pos: '名詞', meaning: '観客、聴衆' },
+  { word: 'various', pos: '形容詞', meaning: 'さまざまな' },
+  { word: 'anchor', pos: '名詞', meaning: '（ニュースの）キャスター' },
+  { word: 'certain', pos: '形容詞', meaning: '確かな' },
+  { word: 'spread', pos: '動詞', meaning: '広める、広がる' },
+  { word: 'install(ed)', pos: '動詞', meaning: '設置する' },
+  { word: 'laundromat', pos: '名詞', meaning: 'コインランドリー' },
+  { word: 'silence', pos: '名詞', meaning: '沈黙、静寂' },
+  { word: 'connected', pos: '形容詞', meaning: 'つながっている' },
+  { word: 'community', pos: '名詞', meaning: '地域社会、コミュニティ' },
+  { word: 'performance', pos: '名詞', meaning: 'パフォーマンス、演奏' },
+];
+
+let cardIndex = 0;
+
+function initFlash() {
+  cardIndex = 0;
+  showCard();
+}
+
+function showCard() {
+  const card = allCards[cardIndex];
+  document.getElementById('fc-word').textContent = card.word;
+  document.getElementById('fc-pos').textContent = card.pos;
+  document.getElementById('fc-meaning').textContent = card.meaning;
+  document.getElementById('card-counter').textContent = (cardIndex + 1) + ' / ' + allCards.length;
+  document.getElementById('flashcard').classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function nextCard() {
+  cardIndex = (cardIndex + 1) % allCards.length;
+  showCard();
+}
+
+function prevCard() {
+  cardIndex = (cardIndex - 1 + allCards.length) % allCards.length;
+  showCard();
+}
+
+// ===== QUIZ =====
+let correctAnswers = {};
+let totalQ = 10;
+
+function answer(btn, isCorrect, qNum) {
+  if (correctAnswers[qNum] !== undefined) return;
+
+  const choices = btn.parentElement.querySelectorAll('.quiz-choice');
+  choices.forEach(c => c.classList.add('disabled'));
+
+  const fb = document.getElementById('fb' + qNum);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    fb.textContent = '⭕ 正解！';
+    fb.className = 'quiz-feedback correct';
+    correctAnswers[qNum] = true;
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '❌ 不正解。もう一度確認しよう！';
+    fb.className = 'quiz-feedback wrong';
+    correctAnswers[qNum] = false;
+    // Show correct answer
+    choices.forEach(c => {
+      if (c.onclick.toString().includes('true')) c.classList.add('correct');
+    });
+  }
+
+  if (Object.keys(correctAnswers).length === totalQ) {
+    const score = Object.values(correctAnswers).filter(v => v).length;
+    document.getElementById('score-num').textContent = score + ' / ' + totalQ;
+    document.getElementById('score-box').style.display = 'block';
+    document.getElementById('score-box').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+function retryQuiz() {
+  correctAnswers = {};
+  document.querySelectorAll('.quiz-choice').forEach(c => {
+    c.classList.remove('correct', 'wrong', 'disabled');
+  });
+  document.querySelectorAll('.quiz-feedback').forEach(f => {
+    f.className = 'quiz-feedback';
+  });
+  document.getElementById('score-box').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 </script>
+
+<div id="quiz-section">
+
+  <!-- FLASHCARDS -->
+  <div id="flash-section" style="display:none">
+    <div class="quiz-header">🃏 単語フラッシュカード</div>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:16px;text-align:center;">カードをタップして意味を確認しよう！</p>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">
+          <div class="flashcard-word" id="fc-word"></div>
+          <div class="flashcard-pos" id="fc-pos"></div>
+          <div class="flashcard-hint">👆 タップして意味を見る</div>
+        </div>
+        <div class="flashcard-back">
+          <div class="flashcard-meaning" id="fc-meaning"></div>
+        </div>
+      </div>
+    </div>
+    <div class="flashcard-nav">
+      <button class="btn-nav" onclick="prevCard()">◀ 前へ</button>
+      <span class="card-counter" id="card-counter"></span>
+      <button class="btn-nav" onclick="nextCard()">次へ ▶</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-questions" style="display:none">
+    <div class="quiz-header">✏️ 練習問題</div>
+    <div class="score-box" id="score-box">
+      <div class="score-num" id="score-num"></div>
+      <div class="score-label">問正解！</div>
+      <button class="btn-retry" onclick="retryQuiz()">もう一度チャレンジ</button>
+    </div>
+
+    <!-- Part1 T/F -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 1　内容確認</div>
+
+      <div class="quiz-q"><span class="quiz-q-num">1</span>Jane Johnson is reporting about beautiful pianos.<br><small style="font-weight:400;color:#555">ジェーン・ジョンソンは美しいピアノについてレポートしている。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, true, 1)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, false, 1)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">2</span>People can't play street pianos in Kunitachi.<br><small style="font-weight:400;color:#555">国立市ではストリートピアノを弾くことができない。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 2)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, true, 2)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">3</span>People start to chat with strangers thanks to the street pianos.<br><small style="font-weight:400;color:#555">ストリートピアノのおかげで、見知らぬ人と話すようになる。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, true, 3)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, false, 3)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+
+    <!-- Part2 T/F -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　内容確認</div>
+
+      <div class="quiz-q"><span class="quiz-q-num">4</span>The Anchor Assistant told viewers when street pianos first appeared.<br><small style="font-weight:400;color:#555">アンカーアシスタントはいつストリートピアノが現れたか視聴者に伝えた。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 4)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, true, 4)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">5</span>Thanks to the project "Play Me, I'm Yours," some people married.<br><small style="font-weight:400;color:#555">「Play Me, I'm Yours」プロジェクトがきっかけで結婚した人もいる。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, true, 5)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, false, 5)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+
+    <!-- Part3 T/F -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　内容確認</div>
+
+      <div class="quiz-q"><span class="quiz-q-num">6</span>Mr. Jerram got the idea when he visited a local supermarket.<br><small style="font-weight:400;color:#555">ジェラムさんは地元のスーパーを訪れたときにアイデアを思いついた。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 6)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, true, 6)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb6"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">7</span>"Play Me, I'm Yours" is only a performance project.<br><small style="font-weight:400;color:#555">「Play Me, I'm Yours」はパフォーマンスプロジェクトだけである。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 7)">⭕ True（正しい）</button>
+        <button class="quiz-choice" onclick="answer(this, true, 7)">❌ False（違う）</button>
+      </div>
+      <div class="quiz-feedback" id="fb7"></div>
+    </div>
+
+    <!-- Vocab quiz -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">単語の意味</div>
+
+      <div class="quiz-q"><span class="quiz-q-num">8</span>「interaction」の意味は？</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 8)">見知らぬ人</button>
+        <button class="quiz-choice" onclick="answer(this, true, 8)">交流、やりとり</button>
+        <button class="quiz-choice" onclick="answer(this, false, 8)">観客、聴衆</button>
+      </div>
+      <div class="quiz-feedback" id="fb8"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">9</span>「silence」の意味は？</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, false, 9)">つながっている</button>
+        <button class="quiz-choice" onclick="answer(this, false, 9)">地域社会</button>
+        <button class="quiz-choice" onclick="answer(this, true, 9)">沈黙、静寂</button>
+      </div>
+      <div class="quiz-feedback" id="fb9"></div>
+    </div>
+
+    <div class="quiz-block">
+      <div class="quiz-q"><span class="quiz-q-num">10</span>「certain」の意味は？</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this, true, 10)">確かな</button>
+        <button class="quiz-choice" onclick="answer(this, false, 10)">広める</button>
+        <button class="quiz-choice" onclick="answer(this, false, 10)">設置する</button>
+      </div>
+      <div class="quiz-feedback" id="fb10"></div>
+    </div>
+
+  </div>
+</div>
+
 </body>
 </html>
