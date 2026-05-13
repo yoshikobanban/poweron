@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本史クイズ｜旧石器・縄文・弥生</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d2e;
+  --surface2: #252840;
+  --accent: #6c63ff;
+  --accent2: #ff6584;
+  --success: #43d9ad;
+  --danger: #ff6b6b;
+  --text: #e8eaf6;
+  --text-muted: #8b90b8;
+  --border: #2e3256;
+  --radius: 14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(108,99,255,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(255,101,132,0.08) 0%, transparent 50%);
+}
+.container {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ===== START ===== */
+#start-screen {
+  text-align: center;
+  animation: fadeUp 0.5s ease;
+}
+.logo {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 2.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6c63ff, #ff6584);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 2.5rem;
+}
+.unit-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+.badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.start-btn {
+  background: linear-gradient(135deg, var(--accent), #9c63ff);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 1rem 3rem;
+  font-size: 1.1rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+}
+.start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(108,99,255,0.5); }
+.start-btn:active { transform: scale(0.97); }
+.info-text { color: var(--text-muted); font-size: 0.85rem; margin-top: 1.5rem; }
+
+/* ===== QUIZ ===== */
+#quiz-screen { display: none; animation: fadeUp 0.4s ease; }
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+}
+.q-counter {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.progress-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--surface2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #9c63ff);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.score-badge {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 0.85rem;
+  color: var(--success);
+  white-space: nowrap;
+}
+
+.category-label {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.question-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+}
+.question-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+.opt-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.2rem;
+  text-align: left;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.opt-btn .opt-letter {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+.opt-btn:hover:not(:disabled) {
+  background: var(--surface2);
+  border-color: var(--accent);
+  transform: translateX(3px);
+}
+.opt-btn:hover:not(:disabled) .opt-letter { background: var(--accent); color: #fff; }
+.opt-btn:disabled { cursor: default; transform: none; }
+.opt-btn.correct { background: rgba(67,217,173,0.12); border-color: var(--success); color: var(--success); }
+.opt-btn.correct .opt-letter { background: var(--success); color: var(--bg); }
+.opt-btn.wrong { background: rgba(255,107,107,0.12); border-color: var(--danger); color: var(--danger); }
+.opt-btn.wrong .opt-letter { background: var(--danger); color: #fff; }
+.opt-btn.show-correct { background: rgba(67,217,173,0.08); border-color: var(--success); color: var(--success); }
+.opt-btn.show-correct .opt-letter { background: var(--success); color: var(--bg); }
+
+.feedback {
+  border-radius: var(--radius);
+  padding: 0.9rem 1.2rem;
+  font-size: 0.95rem;
+  margin-bottom: 1.25rem;
+  display: none;
+  line-height: 1.6;
+}
+.feedback.ok { background: rgba(67,217,173,0.12); border: 1px solid rgba(67,217,173,0.3); color: var(--success); }
+.feedback.ng { background: rgba(255,107,107,0.12); border: 1px solid rgba(255,107,107,0.3); color: var(--danger); }
+
+.next-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #9c63ff);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  font-size: 1rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+  transition: transform 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.35);
+}
+.next-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+.next-btn:active { transform: scale(0.98); }
+
+/* ===== RESULT ===== */
+#result-screen {
+  display: none;
+  text-align: center;
+  animation: fadeUp 0.5s ease;
+}
+.result-icon { font-size: 4rem; margin-bottom: 1rem; }
+.result-title {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+.result-score {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #6c63ff, #ff6584);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
+}
+.result-pct { color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem; }
+
+.rank-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.result-btns { display: flex; gap: 10px; }
+.result-btn {
+  flex: 1;
+  padding: 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.result-btn:hover { transform: translateY(-2px); }
+.result-btn.primary {
+  background: linear-gradient(135deg, var(--accent), #9c63ff);
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 16px rgba(108,99,255,0.35);
+}
+.result-btn.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop 0.25s ease; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- START -->
+  <div id="start-screen">
+    <div class="logo">日本史クイズ</div>
+    <div class="subtitle">教科書ノートから出題！全50問に挑戦しよう</div>
+    <div class="unit-badges">
+      <span class="badge">🪨 旧石器時代</span>
+      <span class="badge">🏺 縄文文化</span>
+      <span class="badge">🌾 弥生文化</span>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">スタート！</button>
+    <p class="info-text">毎回問題の順番がランダムに変わります</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-screen">
+    <div class="top-bar">
+      <span class="q-counter" id="q-counter">1 / 50</span>
+      <div class="progress-wrap"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+      <span class="score-badge" id="score-live">✓ 0</span>
+    </div>
+    <div class="category-label" id="q-cat">旧石器時代</div>
+    <div class="question-box">
+      <div class="question-text" id="q-text"></div>
+    </div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQ()">次の問題 →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result-screen">
+    <div class="result-icon" id="r-icon">🎉</div>
+    <div class="result-title" id="r-title">お疲れさまでした！</div>
+    <div class="result-score" id="r-score"></div>
+    <div class="result-pct" id="r-pct"></div>
+    <div class="rank-card" id="r-comment"></div>
+    <div class="result-btns">
+      <button class="result-btn primary" onclick="startQuiz()">もう一度！</button>
+      <button class="result-btn secondary" onclick="showStart()">トップへ</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const LETTERS = ['A','B','C','D'];
+const ALL = [
+  {c:"旧石器時代",q:"地球の誕生はおよそ何億年前か？",a:"約46億年前",w:["約6億年前","約46万年前","約460億年前"]},
+  {c:"旧石器時代",q:"人類の誕生はおよそ何万年前か？",a:"約650万年前",w:["約65万年前","約6500万年前","約150万年前"]},
+  {c:"旧石器時代",q:"約500万年前に出現した最初の人類の段階を何というか？",a:"猿人",w:["原人","旧人","新人"]},
+  {c:"旧石器時代",q:"猿人の代表例として知られる人類は？",a:"アウストラロピテクス",w:["ジャワ原人","クロマニョン人","ネアンデルタール人"]},
+  {c:"旧石器時代",q:"約50万年前に出現し、火や言語を使い始めた段階の人類を何というか？",a:"原人",w:["猿人","旧人","新人"]},
+  {c:"旧石器時代",q:"ジャワ原人・北京原人が属する人類の段階は？",a:"原人",w:["猿人","旧人","新人"]},
+  {c:"旧石器時代",q:"約20万年前に出現し、死者を埋葬する習慣を持った人類を何というか？",a:"旧人",w:["猿人","原人","新人"]},
+  {c:"旧石器時代",q:"旧人の代表例として知られる人類は？",a:"ネアンデルタール人",w:["クロマニョン人","アウストラロピテクス","北京原人"]},
+  {c:"旧石器時代",q:"現代人と同じ体質を持つ、約5万年前に出現した人類を何というか？",a:"新人",w:["猿人","原人","旧人"]},
+  {c:"旧石器時代",q:"新人の代表例として知られる人類は？",a:"クロマニョン人",w:["ジャワ原人","ネアンデルタール人","アウストラロピテクス"]},
+  {c:"旧石器時代",q:"旧石器時代の地質学上の呼び名は？",a:"更新世",w:["中新世","完新世","鮮新世"]},
+  {c:"旧石器時代",q:"北から日本に南下してきた大型動物の組み合わせはどれか？",a:"マンモス・ヘラジカ",w:["ナウマンゾウ・オオツノジカ","マンモス・ナウマンゾウ","ヘラジカ・オオツノジカ"]},
+  {c:"旧石器時代",q:"南から日本に北上してきた大型動物の組み合わせはどれか？",a:"ナウマンゾウ・オオツノジカ",w:["マンモス・ヘラジカ","マンモス・ナウマンゾウ","ヘラジカ・オオツノジカ"]},
+  {c:"旧石器時代",q:"打製石器とナウマン象・オオツノジカの化石が発見された長野県の遺跡は？",a:"野尻湖遺跡",w:["岩宿遺跡","早水台遺跡","三内丸山遺跡"]},
+  {c:"旧石器時代",q:"土器が使われる以前の文化を何というか？",a:"先土器文化",w:["縄文文化","弥生文化","石器文化"]},
+  {c:"旧石器時代",q:"1946年に群馬県岩宿の関東ローム層から黒曜石を発見した人物は？",a:"相沢忠洋",w:["モース","森本六爾","本居宣長"]},
+  {c:"旧石器時代",q:"日本最古の化石人骨として知られる沖縄県の人骨は？",a:"山下町人",w:["港川人","浜北人","明石人"]},
+  {c:"旧石器時代",q:"中国南部の柳江人に相似するとされる、約1万8000年前の沖縄県の人骨は？",a:"港川人",w:["山下町人","浜北人","明石人"]},
+  {c:"旧石器時代",q:"小石器を木の柄にはめ込んで使う細石器の別名（英語名）は？",a:"マイクロリス",w:["ハンドアックス","ポイント","ブレード"]},
+  {c:"旧石器時代",q:"旧石器時代の人々の住居として主に使われたのはどれか？",a:"洞穴・岩陰",w:["竪穴住居","高床倉庫","環濠集落"]},
+  {c:"縄文文化",q:"縄文時代の地質学上の呼び名は？",a:"完新世",w:["更新世","中新世","鮮新世"]},
+  {c:"縄文文化",q:"氷河期が終わり気候が温暖化したことで起きた地理的変化は？",a:"海面上昇による日本列島の形成",w:["大陸との地続きが続いた","大型動物が増加した","列島が大陸と分離しなかった"]},
+  {c:"縄文文化",q:"縄文土器の特徴として正しいものはどれか？",a:"厚手・黒褐色・低温",w:["薄手・赤褐色・高温","厚手・赤褐色・高温","薄手・黒褐色・低温"]},
+  {c:"縄文文化",q:"縄文時代に動きの速い中小動物を捕るために使われた道具は？",a:"弓矢",w:["石槍","石包丁","釣針"]},
+  {c:"縄文文化",q:"縄文時代に漁網のおもりとして使われた磨製石器は？",a:"石錘",w:["石鏃","石匙","石皿"]},
+  {c:"縄文文化",q:"縄文時代の主な住居の形式は？",a:"竪穴住居",w:["高床式住居","掘立柱建物","石造りの家"]},
+  {c:"縄文文化",q:"縄文時代のゴミ捨て場の痕跡を何というか？",a:"貝塚",w:["遺構","環濠","土塁"]},
+  {c:"縄文文化",q:"1877年にアメリカ人モースが発見した東京都の貝塚は？",a:"大森貝塚",w:["加曾利貝塚","夏島貝塚","姥山貝塚"]},
+  {c:"縄文文化",q:"千葉県にある国内最大級の貝塚は？",a:"加曾利貝塚",w:["大森貝塚","夏島貝塚","大湯遺跡"]},
+  {c:"縄文文化",q:"縄文中期の大集落遺跡として知られる青森県の遺跡は？",a:"三内丸山遺跡",w:["亀ヶ岡遺跡","板付遺跡","野尻湖遺跡"]},
+  {c:"縄文文化",q:"縄文時代に新潟県で産出し、遠隔地交易に使われた宝石は？",a:"ヒスイ",w:["黒曜石","サヌカイト","メノウ"]},
+  {c:"縄文文化",q:"あらゆる自然物・自然現象に霊が宿ると考えた縄文時代の信仰を何というか？",a:"アニミズム",w:["シャーマニズム","仏教","神道"]},
+  {c:"縄文文化",q:"縄文時代に死体を折り曲げて埋葬する方法を何というか？",a:"屈葬",w:["伸展葬","再葬","抱石葬"]},
+  {c:"縄文文化",q:"縄文時代に成人になるための通過儀礼として行われたのは？",a:"抜歯",w:["屈葬","土偶の奉納","アニミズムの儀式"]},
+  {c:"縄文文化",q:"豊作や繁殖を祈るために作られた土製の人形を何というか？",a:"土偶",w:["埴輪","土器人形","石偶"]},
+  {c:"縄文文化",q:"土偶が主に表しているとされるものは？",a:"女性",w:["男性","子供","動物"]},
+  {c:"縄文文化",q:"縄文時代の食生活の中心は何か？",a:"狩猟・漁撈・採集",w:["稲作農業","畑作農業","牧畜"]},
+  {c:"縄文文化",q:"縄文時代に動物の皮をはぐために使われた磨製石器は？",a:"石匙",w:["石鏃","石錘","石皿"]},
+  {c:"縄文文化",q:"弓矢の先につけて使われた磨製石器は？",a:"石鏃",w:["石匙","石錘","石皿"]},
+  {c:"縄文文化",q:"縄文時代に木の実（ドングリなど）をつぶすために使われた石器は？",a:"石皿・磨石",w:["石鏃","石匙","石錘"]},
+  {c:"弥生文化",q:"弥生文化が始まったのはいつ頃か？",a:"紀元前4・3世紀頃",w:["紀元前10世紀頃","紀元1世紀頃","紀元前1世紀頃"]},
+  {c:"弥生文化",q:"弥生文化はどの地方から始まったか？",a:"西日本（九州北部）",w:["東日本（関東）","北海道","沖縄"]},
+  {c:"弥生文化",q:"弥生時代に稲の穂首を刈るために使われた石器は？",a:"石包丁",w:["石斧","石鏃","石錘"]},
+  {c:"弥生文化",q:"弥生土器の特徴として正しいものはどれか？",a:"薄手・赤褐色・高温",w:["厚手・黒褐色・低温","厚手・赤褐色・高温","薄手・黒褐色・低温"]},
+  {c:"弥生文化",q:"弥生時代に近畿地方を中心に分布した青銅器は？",a:"銅鐸",w:["銅矛","銅剣","銅鏡"]},
+  {c:"弥生文化",q:"弥生時代に瀬戸内海沿岸を中心に分布した青銅器は？",a:"銅矛",w:["銅鐸","銅剣","銅鏡"]},
+  {c:"弥生文化",q:"弥生時代に九州を中心に分布した青銅器は？",a:"銅剣",w:["銅鐸","銅矛","銅鏡"]},
+  {c:"弥生文化",q:"弥生時代の集落で、周囲を濠や土塁で囲んだ防御的な集落を何というか？",a:"環濠集落",w:["高地性集落","竪穴集落","掘立柱集落"]},
+  {c:"弥生文化",q:"環濠集落の代表例として知られる佐賀県の遺跡は？",a:"吉野ヶ里遺跡",w:["板付遺跡","荒神谷遺跡","唐古遺跡"]},
+  {c:"弥生文化",q:"弥生時代に穀物の貯蔵に使われた建物は？",a:"高床倉庫",w:["竪穴住居","石造り倉庫","環濠"]},
+  {c:"弥生文化",q:"島根県荒神谷遺跡で大量に発見されたのはどれか？",a:"銅剣358本・銅鐸6個",w:["銅矛・銅鐸のみ","鉄剣・銅鐸","石剣・石鐸"]},
+  {c:"弥生文化",q:"弥生時代に甕や壺を棺として使う埋葬法を何というか？",a:"甕棺墓",w:["箱式石棺墓","方形周溝墓","墳丘墓"]},
+  {c:"弥生文化",q:"弥生時代後期に大規模化し、古墳につながる埋葬施設を何というか？",a:"墳丘墓",w:["甕棺墓","方形周溝墓","箱式石棺墓"]},
+];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+let questions, idx, score, answered;
+
+function showStart() {
+  document.getElementById('start-screen').style.display='block';
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+}
+
+function startQuiz() {
+  questions = shuffle(ALL).slice(0, 50);
+  idx = 0; score = 0; answered = false;
+  document.getElementById('start-screen').style.display='none';
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('quiz-screen').style.display='block';
+  renderQ();
+}
+
+function renderQ() {
+  const q = questions[idx];
+  const total = questions.length;
+  document.getElementById('prog').style.width = ((idx/total)*100)+'%';
+  document.getElementById('q-counter').textContent = `${idx+1} / ${total}`;
+  document.getElementById('score-live').textContent = `✓ ${score}`;
+  document.getElementById('q-cat').textContent = q.c;
+  document.getElementById('q-text').textContent = q.q;
+
+  const opts = shuffle([q.a, ...q.w]);
+  const container = document.getElementById('options');
+  container.innerHTML = '';
+  opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-letter">${LETTERS[i]}</span>${o}`;
+    btn.onclick = () => answer(o, q.a);
+    container.appendChild(btn);
+  });
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback';
+  document.getElementById('next-btn').style.display = 'none';
+  answered = false;
+}
+
+function answer(chosen, correct) {
+  if(answered) return;
+  answered = true;
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => {
+    b.disabled = true;
+    const label = b.textContent.replace(/^[ABCD]/,'');
+    if(label === correct) b.classList.add('show-correct');
+    if(label === chosen && chosen !== correct) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+  if(chosen === correct) {
+    score++;
+    fb.className = 'feedback ok';
+    fb.textContent = '⭕ 正解！すばらしい！';
+    document.getElementById('score-live').textContent = `✓ ${score}`;
+  } else {
+    fb.className = 'feedback ng';
+    fb.textContent = `❌ 不正解…　正解は「${correct}」でした。`;
+  }
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = idx + 1 >= questions.length ? '結果を見る 🎯' : '次の問題 →';
+}
+
+function nextQ() {
+  idx++;
+  if(idx >= questions.length) showResult();
+  else { renderQ(); document.getElementById('quiz-screen').classList.remove('pop'); void document.getElementById('quiz-screen').offsetWidth; document.getElementById('quiz-screen').classList.add('pop'); }
+}
+
+function showResult() {
+  document.getElementById('quiz-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  const pct = Math.round((score/questions.length)*100);
+  document.getElementById('r-score').textContent = `${score} / ${questions.length}`;
+  document.getElementById('r-pct').textContent = `正答率 ${pct}%`;
+  let icon, title, comment;
+  if(pct >= 90) {
+    icon='🏆'; title='完璧な出来！';
+    comment='すごい！ほぼ全問正解です。この調子でテスト本番も頑張ろう！';
+  } else if(pct >= 70) {
+    icon='🎉'; title='よくできました！';
+    comment='かなり理解できています。間違えた問題を確認してもう一度挑戦してみよう！';
+  } else if(pct >= 50) {
+    icon='📚'; title='もう少し！';
+    comment='半分以上は正解できました。苦手な単元を重点的に復習しよう！';
+  } else {
+    icon='💪'; title='復習が必要！';
+    comment='まだ覚えることがたくさんあります。ノートを見直してから再挑戦しよう！';
+  }
+  document.getElementById('r-icon').textContent = icon;
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-comment').textContent = comment;
+}
+</script>
+</body>
+</html>
