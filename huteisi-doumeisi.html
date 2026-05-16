@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不定詞・動名詞 練習クイズ</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #2563EB;
+  --blue-light: #EFF6FF;
+  --blue-mid: #BFDBFE;
+  --green: #16A34A;
+  --green-light: #F0FDF4;
+  --red: #DC2626;
+  --red-light: #FEF2F2;
+  --yellow: #D97706;
+  --yellow-light: #FFFBEB;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-400: #9CA3AF;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'BIZ UDPGothic', 'Noto Sans JP', sans-serif;
+  background: #F0F4FF;
+  min-height: 100vh;
+  padding: 16px;
+  color: var(--gray-900);
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ヘッダー */
+.header {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--blue);
+  flex: 1;
+}
+.header-sub {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 1px;
+}
+.score-badge {
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* プログレス */
+.progress-wrap {
+  background: white;
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gray-600);
+  margin-bottom: 8px;
+}
+.progress-bar {
+  background: var(--gray-200);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.progress-fill {
+  background: linear-gradient(90deg, var(--blue), #60A5FA);
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* 問題カード */
+.question-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.q-tag {
+  display: inline-block;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+.q-en {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+.blank {
+  display: inline-block;
+  border-bottom: 3px solid var(--blue);
+  min-width: 100px;
+  text-align: center;
+  color: var(--blue);
+  font-weight: 700;
+  padding: 0 4px;
+}
+.q-ja {
+  font-size: 13px;
+  color: var(--gray-400);
+  padding: 8px 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  line-height: 1.6;
+}
+
+/* 選択肢 */
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+.choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  background: white;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--gray-800);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  line-height: 1.5;
+  width: 100%;
+}
+.choice-btn:hover:not(:disabled) {
+  border-color: var(--blue);
+  background: var(--blue-light);
+  transform: translateX(2px);
+}
+.choice-btn:disabled { cursor: default; }
+.choice-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--gray-600);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.choice-btn.show-answer { border-color: var(--green); background: var(--green-light); }
+.choice-btn.show-answer .choice-label { background: var(--green); color: white; }
+
+/* 解説 */
+.explanation {
+  display: none;
+  margin-top: 14px;
+  padding: 14px;
+  background: #F8F9FF;
+  border-left: 4px solid var(--blue);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.explanation.show { display: block; }
+.ex-correct {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 6px;
+}
+.ex-text {
+  font-size: 13px;
+  color: var(--gray-600);
+  line-height: 1.7;
+}
+
+/* ナビボタン */
+.nav-wrap {
+  display: none;
+  margin-top: 14px;
+}
+.nav-wrap.show { display: block; }
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.next-btn:hover { background: #1D4ED8; transform: translateY(-1px); }
+.next-btn:active { transform: translateY(0) scale(0.99); }
+
+/* 結果画面 */
+.result-screen { display: none; }
+.result-screen.show { display: block; }
+.quiz-area { display: block; }
+.quiz-area.hide { display: none; }
+
+.result-hero {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.result-icon { font-size: 48px; margin-bottom: 8px; }
+.result-score {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--blue);
+  line-height: 1;
+}
+.result-denom { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result-pct { font-size: 18px; color: var(--gray-600); margin: 6px 0; }
+.result-msg { font-size: 16px; font-weight: 700; color: var(--gray-800); margin-top: 10px; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.stat-card {
+  background: white;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.stat-num { font-size: 26px; font-weight: 700; }
+.stat-lbl { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.correct-c { color: var(--green); }
+.wrong-c { color: var(--red); }
+.blue-c { color: var(--blue); }
+
+.miss-section {
+  background: white;
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.miss-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.miss-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray-100);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.miss-item:last-child { border-bottom: none; }
+.miss-qnum { color: var(--gray-400); font-size: 12px; }
+.miss-en { color: var(--gray-800); }
+.miss-ans { color: var(--green); font-weight: 700; font-size: 12px; margin-top: 2px; }
+.miss-tag { display: inline-block; background: var(--gray-100); color: var(--gray-600); font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+.retry-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 8px;
+}
+.retry-btn:hover { background: #1D4ED8; }
+.shuffle-btn {
+  border: 2px solid var(--blue);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.shuffle-btn.off { background: white; color: var(--blue); }
+.shuffle-btn.on  { background: var(--blue); color: white; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="flex:1">
+      <div class="header-title">不定詞・動名詞 練習クイズ</div>
+      <div class="header-sub">Vision Quest 1 Lesson 7-1〜8-1</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="score-badge" id="scoreBadge">0点</div>
+      <button class="shuffle-btn off" id="shuffleBtn" onclick="toggleShuffle()">🔀 シャッフル</button>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span id="progressText">1 / 40</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="quiz-area" id="quizArea">
+    <div class="question-card" id="qCard"></div>
+    <div class="nav-wrap" id="navWrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">次の問題 →</button>
+    </div>
+  </div>
+
+  <div class="result-screen" id="resultScreen"></div>
+</div>
+
+<script>
+const questions = [
+  {tag:"名詞的用法",en:"It is important ___ enough sleep.",ja:"十分な睡眠をとることが大切だ。",choices:["to get","getting","get","for get"],ans:0,ex:"It is ＋ 形容詞 ＋ to do の形式主語構文。「〜することは…だ」。It = to get enough sleep。"},
+  {tag:"名詞的用法",en:"Her dream is ___ a singer.",ja:"彼女の夢は歌手になることだ。",choices:["to be","being","be","to being"],ans:0,ex:"補語になる不定詞。Her dream = to be a singer の関係。"},
+  {tag:"名詞的用法",en:"I hope ___ to university.",ja:"私は大学に行くことを希望しています。",choices:["to go","going","go","for going"],ans:0,ex:"hope は不定詞だけを目的語にする動詞。hope to do「〜することを希望する」。"},
+  {tag:"名詞的用法",en:"___ English is very important.",ja:"英語を学ぶことはとても大切です。",choices:["Studying","To studying","Study","Studies"],ans:0,ex:"主語になる動名詞。文頭では Studying（動名詞）か To study（不定詞）が使える。"},
+  {tag:"名詞的用法",en:"She decided ___ her job.",ja:"彼女は仕事を辞めることを決めた。",choices:["to quit","quitting","quit","for quit"],ans:0,ex:"decide は不定詞だけを目的語にする動詞。decide to do「〜することを決める」。"},
+  {tag:"名詞的用法",en:"It is exciting ___ sports.",ja:"スポーツを観戦するのはわくわくする。",choices:["to watch","watching","watch","watched"],ans:0,ex:"It is ＋ 形容詞 ＋ to do の形式主語構文。to watch sports が本当の主語。"},
+  {tag:"名詞的用法",en:"My great-grandfather lived ___ 90.",ja:"私のひいおじいさんは90歳まで生きた。",choices:["to be","being","be","to being"],ans:0,ex:"live to be 〜「〜歳まで生きる」。副詞的用法（結果）でも使われる表現。"},
+  {tag:"形容詞的用法",en:"Luckily, he had friends ___ him.",ja:"幸運にも、彼には助けてくれる友人がいた。",choices:["to help","helping","help","helped"],ans:0,ex:"friends を修飾する形容詞的用法。「彼を助けてくれる友人」= friends to help him。"},
+  {tag:"形容詞的用法",en:"I have a lot of things ___ today.",ja:"私には今日するべきことがたくさんある。",choices:["to do","doing","do","for do"],ans:0,ex:"things を修飾する形容詞的用法。things to do「するべきこと」。"},
+  {tag:"形容詞的用法",en:"Bring something ___ with.",ja:"何か書くものを持ってきてください。",choices:["to write","to writing","writing","write"],ans:0,ex:"something to write with「書くもの（ペンなど）」。write with a pen の with を忘れずに！"},
+  {tag:"形容詞的用法",en:"I need a chair ___.",ja:"私は座るための椅子が必要だ。",choices:["to sit on","to sit","sitting","sat on"],ans:0,ex:"a chair to sit on「座るための椅子」。sit on a chair の on が残る。前置詞忘れず！"},
+  {tag:"形容詞的用法",en:"I made a promise ___ to the movies with her.",ja:"私は彼女と映画に行く約束をした。",choices:["to go","going","go","for going"],ans:0,ex:"a promise を修飾する不定詞。promise to go「映画に行く約束」。"},
+  {tag:"形容詞的用法",en:"I need a pen ___ with.",ja:"書くためのペンが必要です。",choices:["to write","writing","write","to writing"],ans:0,ex:"a pen to write with「書くためのペン」。write with a pen の with を残す。"},
+  {tag:"形容詞的用法",en:"We decided ___ on a picnic this weekend.",ja:"私たちは今週末ピクニックに行くことに決めた。",choices:["to go","going","go","for go"],ans:0,ex:"decide to do「〜することを決める」。不定詞を目的語にとる動詞。"},
+  {tag:"副詞的用法",en:"I got up early ___ the 6:30 train.",ja:"私は6時30分の列車に乗るために早く起きた。",choices:["to catch","catching","catch","for catch"],ans:0,ex:"目的を表す不定詞「〜するために」。got up early to catch「乗るために起きた」。"},
+  {tag:"副詞的用法",en:"I'm glad ___ you.",ja:"私はあなたに会えてうれしいです。",choices:["to see","seeing","see","for see"],ans:0,ex:"感情の原因を表す不定詞。glad to see「会えてうれしい」。感情形容詞＋to do。"},
+  {tag:"副詞的用法",en:"He must be clever ___ that question.",ja:"あの問題を解くなんて彼は賢いに違いない。",choices:["to answer","answering","answer","for answer"],ans:0,ex:"性質を表す不定詞「〜するなんて…」。clever to answer「解くなんて賢い」。"},
+  {tag:"副詞的用法",en:"Lisa stayed up late ___ for the test.",ja:"リサはテスト勉強をするために夜更かしした。",choices:["to prepare","preparing","prepare","for prepare"],ans:0,ex:"目的を表す不定詞。stayed up late to prepare「準備するために夜更かし」。"},
+  {tag:"副詞的用法",en:"She was sorry ___ the movie.",ja:"彼女はその映画を見逃して後悔しました。",choices:["to miss","missing","miss","for miss"],ans:0,ex:"感情の原因を表す不定詞。sorry to miss「見逃して残念」。sorry / glad / happy + to do。"},
+  {tag:"副詞的用法",en:"They left in the morning ___ the meeting.",ja:"その会議に出席するために、彼らは朝早くに出発した。",choices:["to attend","attending","attend","for attend"],ans:0,ex:"目的を表す不定詞。left in the morning to attend「出席するために出発した」。"},
+  {tag:"意味上の主語",en:"It is important ___ to get enough sleep.",ja:"私たちが十分な睡眠をとることが大切だ。",choices:["for us","of us","for we","of we"],ans:0,ex:"important は人の性質の形容詞ではない → for を使う。for us to do の形。"},
+  {tag:"意味上の主語",en:"It was kind ___ to help me.",ja:"私を助けてくれるなんてあなたは親切だった。",choices:["of you","for you","of your","for your"],ans:0,ex:"kind は人の性質を表す形容詞 → of を使う。It was kind of you to do。"},
+  {tag:"意味上の主語",en:"It is difficult ___ to solve this problem.",ja:"私たちがこの問題を解くのは難しい。",choices:["for us","of us","for we","of we"],ans:0,ex:"difficult は人の性質の形容詞ではない → for。for us to solve「私たちが解くこと」。"},
+  {tag:"意味上の主語",en:"It was careless ___ to leave the light on.",ja:"電気をつけっぱなしにするとはあなたは不注意だった。",choices:["of you","for you","of your","for your"],ans:0,ex:"careless は人の性質を表す形容詞 → of。It was careless of you to do。"},
+  {tag:"意味上の主語",en:"It's nice ___ to invite me to dinner.",ja:"夕食に招待してくれるなんてあなたは親切だった。",choices:["of you","for you","of your","for your"],ans:0,ex:"nice は人の性質を表す形容詞 → of。It was nice of you to do。"},
+  {tag:"SVO+to不定詞",en:"Our teacher told us ___ each other.",ja:"先生は私たちにお互いを助け合うように言った。",choices:["to help","help","helping","helped"],ans:0,ex:"tell ＋ O ＋ to do「Oに〜するように言う」。told us to help の語順。"},
+  {tag:"SVO+to不定詞",en:"My mother asked me ___ to the supermarket.",ja:"母は私にスーパーへ行くよう頼んだ。",choices:["to go","going","go","for go"],ans:0,ex:"ask ＋ O ＋ to do「Oに〜するよう頼む」。asked me to go の語順。"},
+  {tag:"SVO+to不定詞",en:"I would like you ___ the meeting.",ja:"あなたに会議に出席していただきたい。",choices:["to attend","attending","attend","for attend"],ans:0,ex:"would like ＋ O ＋ to do「Oに〜してほしい」。want の丁寧表現。"},
+  {tag:"SVO+to不定詞",en:"My parents allowed me ___ abroad.",ja:"両親は私が留学するのを許してくれた。",choices:["to study","studying","study","for study"],ans:0,ex:"allow ＋ O ＋ to do「Oが〜するのを許す」。allowed me to study。"},
+  {tag:"SVO+to不定詞",en:"Our teacher asked us ___ quiet during class.",ja:"先生は私たちに授業中静かにするよう頼んだ。",choices:["to be","be","being","for be"],ans:0,ex:"ask ＋ O ＋ to do。be quiet「静かにする」。asked us to be quiet。"},
+  {tag:"原形不定詞",en:"My mother made me ___ my room.",ja:"母は私に部屋の掃除をさせた。",choices:["clean","to clean","cleaning","cleaned"],ans:0,ex:"make ＋ O ＋ 原形（to なし）。「強制的に〜させる」。make me clean（○）make me to clean（✕）。"},
+  {tag:"原形不定詞",en:"My father let me ___ to the movies.",ja:"父は私を映画に行かせてくれた。",choices:["go","to go","going","went"],ans:0,ex:"let ＋ O ＋ 原形（to なし）。「許可して〜させる」。let me go（○）let me to go（✕）。"},
+  {tag:"原形不定詞",en:"I saw the man ___ out of the car.",ja:"私はその男が車から降りるのを見た。",choices:["get","to get","getting","got"],ans:0,ex:"知覚動詞 see ＋ O ＋ 原形「Oが〜するのを見る」。to は不要。saw the man get。"},
+  {tag:"原形不定詞",en:"I had the porter ___ my baggage.",ja:"私はポーターに荷物を運んでもらった。",choices:["carry","to carry","carrying","carried"],ans:0,ex:"have ＋ O ＋ 原形「Oに〜してもらう（依頼）」。to は不要。had the porter carry。"},
+  {tag:"原形不定詞",en:"She heard someone ___ her name.",ja:"彼女は誰かが自分の名前を呼ぶのを聞いた。",choices:["call","to call","calling","called"],ans:0,ex:"知覚動詞 hear ＋ O ＋ 原形「Oが〜するのを聞く」。to は不要。heard someone call。"},
+  {tag:"疑問詞+to不定詞",en:"I don't know ___ to do.",ja:"私は何をするべきかわからない。",choices:["what","how","where","when"],ans:0,ex:"what to do「何をするべきか」。疑問詞＋to不定詞は名詞句を作り、動詞の目的語になる。"},
+  {tag:"疑問詞+to不定詞",en:"He knew ___ to use the software.",ja:"彼はそのソフトウェアの使い方を知っていた。",choices:["how","what","where","when"],ans:0,ex:"how to do「どのように〜するか／〜する方法」。how to use「使い方」。"},
+  {tag:"疑問詞+to不定詞",en:"I can't decide ___ dictionary to buy.",ja:"私はどの辞書を買うべきか決められない。",choices:["which","what","how","where"],ans:0,ex:"which ＋ 名詞 ＋ to do「どちらの〜を…するか」。which dictionary to buy。"},
+  {tag:"不定詞の否定形",en:"She told me ___ late.",ja:"彼女は私に遅刻しないように言った。",choices:["not to be","to not be","not be","don't be"],ans:0,ex:"不定詞の否定形は not を to の直前に置く。not to be「〜しないように」。to not be は誤り！"},
+  {tag:"too...to / enough to",en:"I'm too tired ___ walk.",ja:"私はあまりにも疲れていて歩けない。",choices:["to","for","that","of"],ans:0,ex:"too ＋ 形容詞 ＋ to do「〜するには…すぎる」「あまりに…なので〜できない」。"},
+  {tag:"too...to / enough to",en:"He is smart enough ___ the puzzle.",ja:"彼はそのパズルを解くほど頭が良い。",choices:["to solve","solving","solve","for solve"],ans:0,ex:"形容詞 ＋ enough to do「〜するほど（十分）…」。enough は形容詞の後に置く！"},
+  {tag:"動名詞・主語",en:"___ basketball is fun.",ja:"バスケットボールをすることは楽しい。",choices:["Playing","To playing","Play","Played"],ans:0,ex:"動名詞が主語（S）になる。Playing basketball is fun.「〜することは楽しい」。"},
+  {tag:"動名詞・補語",en:"My favorite pastime is ___ movies.",ja:"私のいちばんの気晴らしは映画を見ることです。",choices:["watching","to watching","watch","watched"],ans:0,ex:"動名詞が補語（C）になる。My pastime is watching「趣味は〜すること」。"},
+  {tag:"動名詞・目的語",en:"I like ___ to music.",ja:"私は音楽を聴くことが好きです。",choices:["listening","to listening","listen","listened"],ans:0,ex:"動名詞が目的語（O）になる。like doing「〜することが好き」。前置詞の後は動名詞のみ。"},
+  {tag:"動名詞・前置詞",en:"Thank you for ___ today.",ja:"今日は来てくれてありがとう。",choices:["coming","to come","come","came"],ans:0,ex:"前置詞（for）の後は動名詞。thank you for doing「〜してくれてありがとう」。"},
+  {tag:"動名詞・意味上の主語",en:"My mother doesn't like ___ short skirts.",ja:"母は私がミニスカートをはくのが好きではない。",choices:["me wearing","me to wear","I wearing","my to wear"],ans:0,ex:"動名詞の意味上の主語は所有格（my）か目的格（me）。me wearing / my wearing どちらもOK。"},
+  {tag:"動名詞・否定形",en:"I'm sorry for ___ sooner.",ja:"もっと早く手紙を書かなくてすみません。",choices:["not writing","writing not","not to write","don't writing"],ans:0,ex:"動名詞の否定形は not ＋ doing の形。not の位置は動名詞の直前！"},
+  {tag:"動名詞・look forward to",en:"I am looking forward ___ from you.",ja:"あなたからの便りを楽しみに待っています。",choices:["to hearing","to hear","hearing","hear"],ans:0,ex:"look forward to doing「〜を楽しみに待つ」。to は前置詞なので後ろは動名詞！to hear は誤り。"},
+  {tag:"動名詞・be used to",en:"I'm used to ___ up early.",ja:"私は早起きに慣れている。",choices:["getting","get","to get","got"],ans:0,ex:"be used to doing「〜することに慣れている」。to は前置詞なので後ろは動名詞！"},
+  {tag:"動名詞・動詞の使い分け",en:"She is good at ___ the guitar.",ja:"彼女はギターを演奏することが得意だ。",choices:["playing","to play","play","played"],ans:0,ex:"be good at doing「〜するのが得意」。at は前置詞 → 動名詞。to play は誤り。"},
+  {tag:"動名詞・動詞の使い分け",en:"He finished ___ his homework.",ja:"彼は宿題をし終えた。",choices:["doing","to do","do","done"],ans:0,ex:"finish は動名詞だけを目的語にとる動詞。finish doing「〜し終える」。finish to do は誤り！"},
+  {tag:"動名詞・動詞の使い分け",en:"She enjoys ___ detective stories.",ja:"彼女は探偵小説を読むことを楽しんでいる。",choices:["reading","to read","read","reads"],ans:0,ex:"enjoy は動名詞だけを目的語にとる動詞。enjoy doing「〜することを楽しむ」。"},
+  {tag:"動名詞・動詞の使い分け",en:"Would you mind ___ five minutes?",ja:"5分待っていただけますか。",choices:["waiting","to wait","wait","waited"],ans:0,ex:"mind は動名詞だけを目的語にとる動詞。Would you mind doing?「〜していただけますか？」"},
+  {tag:"動名詞・動詞の使い分け",en:"I'm sure of ___ the exam.",ja:"私は試験に合格すると確信している。",choices:["passing","to pass","pass","passed"],ans:0,ex:"sure of doing「〜すると確信している」。of は前置詞 → 後ろは動名詞。"},
+];
+
+let cur = 0, score = 0, answered = false, wrongList = [];
+let shuffleMode = false;
+let activeQuestions = [...questions];
+
+function toggleShuffle() {
+  shuffleMode = !shuffleMode;
+  const btn = document.getElementById('shuffleBtn');
+  btn.className = 'shuffle-btn ' + (shuffleMode ? 'on' : 'off');
+  btn.textContent = shuffleMode ? '🔀 シャッフル中' : '🔀 シャッフル';
+  init();
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function init() {
+  cur = 0; score = 0; answered = false; wrongList = [];
+  activeQuestions = shuffleMode ? shuffleArray(questions) : [...questions];
+  document.getElementById('quizArea').classList.remove('hide');
+  document.getElementById('resultScreen').classList.remove('show');
+  renderQ();
+}
+
+function renderQ() {
+  const q = activeQuestions[cur];
+  const pct = Math.round((cur / activeQuestions.length) * 100);
+  document.getElementById('progressText').textContent = (cur + 1) + ' / ' + activeQuestions.length;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('scoreBadge').textContent = score + '点';
+  answered = false;
+
+  const labels = ['A', 'B', 'C', 'D'];
+  const choicesHTML = q.choices.map((c, i) => `
+    <button class="choice-btn" id="choice${i}" onclick="answer(${i})">
+      <span class="choice-label">${labels[i]}</span>
+      <span>${c}</span>
+    </button>
+  `).join('');
+
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag" id="qtag" style="visibility:hidden">${q.tag}</span>
+    <div class="q-en">${q.en.replace('___', '<span class="blank">　　　　</span>')}</div>
+    <div class="q-ja">${q.ja}</div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="explanation" id="explanation">
+      <div class="ex-correct">✓ 正解：${q.choices[q.ans]}</div>
+      <div class="ex-text">${q.ex}</div>
+    </div>
+  `;
+
+  document.getElementById('navWrap').classList.remove('show');
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) nextBtn.textContent = cur + 1 < activeQuestions.length ? '次の問題 →' : '結果を見る';
+}
+
+function answer(i) {
+  if (answered) return;
+  answered = true;
+  const q = activeQuestions[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+
+  if (i === q.ans) {
+    btns[i].classList.add('correct');
+    score++;
+  } else {
+    btns[i].classList.add('wrong');
+    btns[q.ans].classList.add('show-answer');
+    wrongList.push(cur);
+  }
+
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('qtag').style.visibility = 'visible';
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+}
+
+function nextQ() {
+  cur++;
+  if (cur >= activeQuestions.length) {
+    showResult();
+  } else {
+    renderQ();
+  }
+}
+
+function showResult() {
+  document.getElementById('quizArea').classList.add('hide');
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  const pct = Math.round((score / activeQuestions.length) * 100);
+  let icon, msg;
+  if (pct >= 90) { icon = '🏆'; msg = 'すごい！ほぼ完璧！'; }
+  else if (pct >= 70) { icon = '⭐'; msg = 'よくできました！'; }
+  else if (pct >= 50) { icon = '💪'; msg = 'もう少しで合格ライン！'; }
+  else { icon = '📖'; msg = '復習してまた挑戦しよう！'; }
+
+  const missHTML = wrongList.length > 0 ? `
+    <div class="miss-section">
+      <div class="miss-title">✗ 間違えた問題（${wrongList.length}問）</div>
+      ${wrongList.map(idx => {
+        const wq = activeQuestions[idx];
+        return `<div class="miss-item">
+          <span class="miss-qnum">問${idx + 1}</span><span class="miss-tag">${wq.tag}</span>
+          <div class="miss-en">${wq.en.replace('___', '＿＿＿')}</div>
+          <div class="miss-ans">正解：${wq.choices[wq.ans]}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  ` : '<div style="background:white;border-radius:12px;padding:16px;text-align:center;color:#16A34A;font-weight:700;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.08)">全問正解！パーフェクト！</div>';
+
+  rs.innerHTML = `
+    <div class="result-hero">
+      <div class="result-icon">${icon}</div>
+      <div class="result-score">${score}<span class="result-denom"> / ${activeQuestions.length}</span></div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num correct-c">${score}</div><div class="stat-lbl">正解</div></div>
+      <div class="stat-card"><div class="stat-num wrong-c">${activeQuestions.length - score}</div><div class="stat-lbl">不正解</div></div>
+      <div class="stat-card"><div class="stat-num blue-c">${pct}%</div><div class="stat-lbl">正解率</div></div>
+    </div>
+    ${missHTML}
+    <button class="retry-btn" onclick="init()">もう一度挑戦する 🔄</button>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>
