@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公共 政治制度 学習アプリ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@700&display=swap');
+  :root {
+    --navy:#1E2D5A; --navy-l:#2B3F7A;
+    --teal:#1D9E75; --teal-l:#E1F5EE;
+    --blue:#185FA5; --blue-l:#E6F1FB;
+    --amber:#BA7517; --amber-l:#FAEEDA;
+    --red:#A32D2D; --red-l:#FCEBEB;
+    --purple:#534AB7;
+    --bg:#F4F6FB; --card:#FFFFFF;
+    --text:#1A1A2E; --muted:#5A6580; --border:#D8E0EF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  header{background:var(--navy);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .tag{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  header h1{font-family:'Shippori Mincho',serif;color:#fff;font-size:17px;}
+  .tabs{display:flex;background:var(--navy-l);padding:5px;margin:0 20px;border-radius:0 0 10px 10px;width:fit-content;gap:4px;}
+  .tab{padding:7px 20px;border-radius:7px;border:none;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;color:#9AAFCF;background:transparent;transition:all .2s;}
+  .tab.active{background:#fff;color:var(--navy);}
+  main{max-width:720px;margin:0 auto;padding:20px 14px 60px;}
+  .sec-sel{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .sec-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;}
+  .sec-btn.active{border-color:var(--navy);background:var(--navy);color:#fff;}
+  .prog-area{margin-bottom:16px;}
+  .prog-info{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px;}
+  .prog-bg{height:6px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .prog-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .4s;}
+  .qcard{background:var(--card);border-radius:14px;padding:24px 24px 20px;box-shadow:0 2px 10px rgba(30,45,90,.07);margin-bottom:14px;border:1.5px solid var(--border);animation:up .25s ease;}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .qmeta{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .qnum{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;}
+  .ctag{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;}
+  .uk{background:#E1F5EE;color:#0F6E56;} .us{background:#E6F1FB;color:#0C447C;}
+  .cn{background:#FCEBEB;color:#791F1F;} .asia{background:#FAEEDA;color:#633806;}
+  .kiho{background:#EEEDFE;color:#3C3489;}
+  .qtext{font-size:15px;font-weight:500;line-height:1.8;margin-bottom:18px;}
+  .choices{display:flex;flex-direction:column;gap:7px;}
+  .cbtn{padding:11px 15px;border-radius:9px;border:1.5px solid var(--border);background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:14px;cursor:pointer;text-align:left;transition:all .15s;color:var(--text);line-height:1.6;}
+  .cbtn:hover:not(:disabled){border-color:var(--navy);background:var(--blue-l);}
+  .cbtn.ok{border-color:var(--teal);background:var(--teal-l);color:#0F6E56;font-weight:700;}
+  .cbtn.ng{border-color:var(--red);background:var(--red-l);color:var(--red);}
+  .fb{margin-top:12px;padding:11px 14px;border-radius:9px;font-size:13px;line-height:1.7;display:none;}
+  .fb.ok{background:var(--teal-l);color:#0F6E56;border-left:4px solid var(--teal);}
+  .fb.ng{background:var(--red-l);color:var(--red);border-left:4px solid var(--red);}
+  .fb.show{display:block;}
+  .nav{display:flex;gap:8px;justify-content:flex-end;margin-top:14px;}
+  .btn{padding:9px 20px;border-radius:8px;border:none;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+  .p{background:var(--navy);color:#fff;} .p:hover{background:var(--navy-l);}
+  .s{background:var(--border);color:var(--muted);}
+  .btn:disabled{opacity:.35;cursor:not-allowed;}
+  .scard{background:var(--card);border-radius:14px;padding:32px 24px;text-align:center;box-shadow:0 2px 10px rgba(30,45,90,.07);border:1.5px solid var(--border);}
+  .sbig{font-size:52px;font-weight:700;color:var(--navy);line-height:1;}
+  .slbl{font-size:13px;color:var(--muted);margin:6px 0 18px;}
+  .smsg{font-size:15px;color:var(--text);margin-bottom:22px;line-height:1.7;}
+  .mdesc{background:var(--card);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--muted);border:1.5px solid var(--border);line-height:1.7;}
+  .ycard{background:var(--card);border-radius:14px;padding:22px 24px;box-shadow:0 2px 10px rgba(30,45,90,.07);margin-bottom:12px;border:1.5px solid var(--border);animation:up .25s ease;}
+  .yqn{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;margin-bottom:6px;}
+  .ydiff{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:10px;}
+  .easy{background:var(--teal-l);color:#0F6E56;} .med{background:var(--amber-l);color:var(--amber);}
+  .yq{font-size:15px;font-weight:500;line-height:1.8;margin-bottom:10px;white-space:pre-line;}
+  .yhint{font-size:12px;color:var(--muted);margin-bottom:10px;}
+  .atbtn{padding:7px 16px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;}
+  .atbtn:hover{border-color:var(--navy);color:var(--navy);}
+  .abox{margin-top:10px;padding:12px 14px;background:var(--blue-l);border-radius:9px;border-left:4px solid var(--blue);font-size:13px;line-height:1.8;color:#0C447C;display:none;white-space:pre-line;}
+  .abox.show{display:block;}
+</style>
+</head>
+<body>
+<header>
+  <span class="tag">高2・公共</span>
+  <h1>世界の政治制度 ＆ 民主政治の基本原理</h1>
+</header>
+<div style="padding:0 20px">
+  <div class="tabs">
+    <button class="tab active" onclick="switchMode('quiz')">📝 クイズ</button>
+    <button class="tab" onclick="switchMode('yoso')">🎯 予想問題</button>
+  </div>
+</div>
+<main>
+  <div id="quiz-mode">
+    <div class="sec-sel">
+      <button class="sec-btn active" onclick="sel('all',event)">すべて</button>
+      <button class="sec-btn" onclick="sel('uk',event)">🇬🇧 イギリス</button>
+      <button class="sec-btn" onclick="sel('us',event)">🇺🇸 アメリカ</button>
+      <button class="sec-btn" onclick="sel('cn',event)">🇨🇳 中国</button>
+      <button class="sec-btn" onclick="sel('asia',event)">🌏 アジア</button>
+      <button class="sec-btn" onclick="sel('kiho',event)">⚖️ 基本原理</button>
+    </div>
+    <div class="prog-area">
+      <div class="prog-info"><span id="qprog">問題 1/20</span><span id="qsc">正解 0問</span></div>
+      <div class="prog-bg"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+    </div>
+    <div id="qc"></div>
+  </div>
+  <div id="yoso-mode" style="display:none">
+    <div class="mdesc">💡 テストに出そうな問題です。まず自分で考えてから「解答例を見る」を押してください。</div>
+    <div id="yc"></div>
+  </div>
+</main>
+<script>
+const QD=[
+  // ===== イギリス（10問）=====
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスの政治体制を何というか。',c:['大統領制','立憲君主制','共和制','社会主義制'],a:1,e:'国王が存在するが「君臨すれども統治せず」。実際の政治は内閣・議会が行う。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスで首相を形式上任命するのは誰か。',c:['国民','議会','国王','最高裁判所長官'],a:2,e:'形式上は国王が任命する。実質的には庶民院（下院）で多数を占める党の党首が首相になる。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'内閣が議会の信任に基づいて成立する制度を何というか。',c:['大統領制','議院内閣制','連邦制','一党独裁制'],a:1,e:'議院内閣制では内閣は議会の信任に基づく。不信任決議が可決されると、内閣は総辞職か議会解散を選ぶ。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリス議会の2院のうち、選挙で選ばれる院はどれか。',c:['貴族院','枢密院','庶民院','元老院'],a:2,e:'庶民院（下院）は選挙で選ばれる。任期5年・定員650名。貴族院（上院）は非民選。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスの最高裁判所が持たない権限はどれか。',c:['民事訴訟の最終審','刑事訴訟の最終審','法律の解釈','違憲立法審査権'],a:3,e:'イギリスでは議会主権が強いため、最高裁は違憲立法審査権を持たない。アメリカとの大きな違い。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスで野党が政権交代に備えて組織するものを何というか。',c:['連立内閣','影の内閣（シャドーキャビネット）','枢密院','貴族院委員会'],a:1,e:'野党第一党が「もし政権を取ったら」という体制を準備しておく仕組み。政権交代がスムーズに行える。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスの庶民院（下院）の定員は何名か。',c:['約300名','約500名','650名','約800名'],a:2,e:'庶民院（下院）の定員は650名。任期は5年。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'内閣不信任決議が可決されたとき、イギリスの内閣がとれる行動として正しいのはどれか。',c:['そのまま続投する','総辞職か議会解散を選ぶ','国王に判断を委ねる','最高裁判所が決定する'],a:1,e:'議院内閣制では不信任可決→総辞職か議会解散のいずれかを内閣が選択する。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスで首相は実質的に何によって決まるか。',c:['国民の直接選挙','国王の指名','庶民院で過半数を占める党の党首','貴族院の推薦'],a:2,e:'選挙で庶民院（下院）の多数を占めた政党の党首が、国王により首相に任命される。'},
+  {cat:'uk',cl:'イギリス',cc:'uk',q:'イギリスの貴族院（上院）の特徴として正しいのはどれか。',c:['選挙で選ばれる','任期が5年','非民選で定員不定','全員が国王の親族'],a:2,e:'貴族院は非民選で定員が定まっていない（約800名前後）。実権は庶民院（下院）が持つ。'},
+
+  // ===== アメリカ（10問）=====
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ大統領の任期は何年か。',c:['3年','4年','5年','6年'],a:1,e:'任期4年、3選禁止（最大2期8年）。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ大統領が持つ権限はどれか。',c:['法案提出権','議会解散権','議会可決法案への拒否権','予算案提出権'],a:2,e:'大統領は拒否権（ベトー）を持つ。法案提出権や議会解散権はない。三権が厳格に分離されている。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ上院の議席配分として正しいのはどれか。',c:['人口比例','各州2名','各州1名','各州10名'],a:1,e:'上院は各州2名（任期6年）。下院は人口比例（任期2年）。上院は州の代表、下院は国民の代表。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカの二大政党はどれか。',c:['保守党と労働党','自民党と民主党','民主党と共和党','連邦党と国民党'],a:2,e:'民主党と共和党の二大政党制。小選挙区制のため第三党が議席を得にくい構造。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'多くの州で採用されている「1票でも多く得た候補がその州の選挙人を全員獲得する」方式を何というか。',c:['比例代表制','ウィナー・テイク・オール','小選挙区制','連記投票制'],a:1,e:'ウィナー・テイク・オール（勝者総取り）方式。全国総得票数で負けた候補が大統領になることもある。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ下院（代議院）の任期は何年か。',c:['2年','4年','6年','8年'],a:0,e:'下院（代議院）の任期は2年。人口比例で各州から選出される。上院は任期6年。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ大統領は何の長を兼ねるか。',c:['議会の議長','最高裁判所長官','合衆国陸海空軍の最高司令官','州知事会議の議長'],a:2,e:'大統領は行政府の長であるとともに、軍の最高司令官（シビリアンコントロール）でもある。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカの大統領選挙の仕組みとして正しいのはどれか。',c:['国民が直接大統領を選ぶ','国民が選挙人を選び選挙人が大統領を選ぶ','議会が大統領を選ぶ','州知事が投票で選ぶ'],a:1,e:'制度上は間接選挙（選挙人制度）。多くの州でウィナー・テイク・オール方式を採用している。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカで立法・行政・司法の三権を厳格に分離し互いに抑制・均衡させる原則を何というか。',c:['議院内閣制','三権分立','連邦制','大統領制'],a:1,e:'三権分立（チェックス・アンド・バランシーズ）。モンテスキューの思想をもとに制度化された。'},
+  {cat:'us',cl:'アメリカ',cc:'us',q:'アメリカ大統領が議会に政策の方針を示す文書を何というか。',c:['大統領令','一般教書','拒否権行使通知','条約案'],a:1,e:'一般教書（State of the Union）。議会への法案提出権はないが、この演説で政策方針を示す。'},
+
+  // ===== 中国（8問）=====
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国の政治体制で、国政全体に指導力を持つのはどれか。',c:['全国人民代表大会','中国共産党','国務院','最高人民法院'],a:1,e:'中国共産党による一党支配体制。党の指導が憲法に明記されている。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国の国家最高権力機関（立法機関）は何か。',c:['国務院','最高人民法院','全国人民代表大会','中央軍事委員会'],a:2,e:'全国人民代表大会（全人代）。定員約3000名、任期5年。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国で行政府にあたる機関は何か。',c:['全国人民代表大会','最高人民法院','国務院','常務委員会'],a:2,e:'国務院が行政府。首相（国務院総理）が率いる。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国の全国人民代表大会の任期と定員として正しいのはどれか。',c:['3年・約1000名','5年・約3000名','4年・約500名','6年・約2000名'],a:1,e:'任期5年、定員約3000名。実権は常務委員会が持つ。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国で司法（裁判）を担う機関は何か。',c:['国務院','全国人民代表大会','最高人民法院','中央軍事委員会'],a:2,e:'最高人民法院が司法機関にあたる。ただし共産党の指導のもとに置かれている。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国の政治体制「民主集中制」の特徴として正しいのはどれか。',c:['三権が厳格に分立している','すべての権力が一つの機関に集中する','国民が直接政策を決定する','複数政党が自由に競争する'],a:1,e:'民主集中制では、全国人民代表大会にすべての権力が集中し、共産党がその全体を指導する。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国で国家主席を選出するのはどの機関か。',c:['国民による直接選挙','全国人民代表大会','国務院','常務委員会'],a:1,e:'国家主席は全国人民代表大会によって選出される。事実上は共産党が候補者を決定する。'},
+  {cat:'cn',cl:'中国',cc:'cn',q:'中国の全国人民代表大会常務委員会の役割として正しいのはどれか。',c:['全人代の閉会中に権限を行使する','軍を指揮する','外交政策を決定する','経済計画を立案する'],a:0,e:'全人代は年1回しか開かれないため、常務委員会が閉会中も日常的な立法・行政を担う。'},
+
+  // ===== アジア（4問）=====
+  {cat:'asia',cl:'アジア',cc:'asia',q:'韓国・フィリピンの政治体制はどれか。',c:['議院内閣制','立憲君主制','大統領制','一党独裁制'],a:2,e:'両国とも民主的な大統領制を採用している。'},
+  {cat:'asia',cl:'アジア',cc:'asia',q:'タイの政治体制はどれか。',c:['共和制','大統領制','立憲君主制','社会主義共和制'],a:2,e:'タイは立憲君主制。国王が存在し、憲法に基づいて統治される。'},
+  {cat:'asia',cl:'アジア',cc:'asia',q:'イランの政治体制の特徴として正しいのはどれか。',c:['世俗的な大統領が最高権力を持つ','宗教上の最高指導者が最高権力を持つ','議会が唯一の権力機関','軍が直接政治を支配する'],a:1,e:'イスラム法学者の統治原理に基づき、宗教上の最高指導者（ハメネイ師など）が国の最高権力を持つ。'},
+  {cat:'asia',cl:'アジア',cc:'asia',q:'アジアの政治体制について、民主的な大統領制をとる国の組み合わせとして正しいのはどれか。',c:['タイ・イラン','韓国・フィリピン','中国・北朝鮮','日本・イギリス'],a:1,e:'韓国・フィリピンが民主的大統領制。タイは立憲君主制、イランは宗教指導者体制、中国・北朝鮮は一党支配。'},
+
+  // ===== 民主政治の基本原理（8問）=====
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'すべての人・権力者も法に従うという考え方を何というか。',c:['人の支配','法治主義','法の支配','立憲主義'],a:2,e:'法の支配は「人の支配（権力者が恣意的に支配）」を排し、万人が法に従う原則。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'憲法に従って政治をおこなうべきとする考え方を何というか。',c:['法治主義','法の支配','立憲主義','民主主義'],a:2,e:'立憲主義。フランス人権宣言第16条が「権利保障と権力分立のない社会は憲法を持たない」と表現。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'社会契約論で「抵抗権・革命権」を主張した思想家はだれか。',c:['ホッブズ','ルソー','ロック','モンテスキュー'],a:2,e:'ロックは政府が自然権の保護（信託）に反した場合、人民は抵抗権・革命権を持つと主張した。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'「万人の万人に対する闘争」という自然状態を述べた思想家はだれか。',c:['ロック','ルソー','ホッブズ','モンテスキュー'],a:2,e:'ホッブズは自然状態を戦争状態と捉え、平和のため強力な主権者に全権を委ねるべきと主張（絶対王政を擁護）。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'「人民主権」「一般意志」を重視し、直接民主主義を理想とした思想家はだれか。',c:['ホッブズ','ロック','モンテスキュー','ルソー'],a:3,e:'ルソーは人民主権・一般意志（公共の利益）を重視。フランス革命に大きな影響を与えた。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'フランス人権宣言第16条が示す立憲主義の2要素として正しい組み合わせはどれか。',c:['権利の保障と権力の分立','自由と平等','人民主権と直接民主主義','法の支配と三権分立'],a:0,e:'「権利の保障が確保されず、権力の分立が規定されないすべての社会は、憲法を持つものでない」（第16条）'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'国家権力の行使は議会が制定した法律に基づかなければならないという原則を何というか。',c:['法の支配','立憲主義','法治主義','社会契約論'],a:2,e:'法治主義。法の内容よりも「法律に基づいていること」を重視する形式的な原則。'},
+  {cat:'kiho',cl:'基本原理',cc:'kiho',q:'「人の支配」と「法の支配」を比べたとき、「法の支配」の特徴として正しいのはどれか。',c:['権力者が自由に法をつくれる','権力者も含む全員が法に従う','議会だけが例外的に法に従わなくてよい','法は国民を従わせるための道具である'],a:1,e:'法の支配では権力者も含む全員が法に従う。法は国民の権利・自由を守るためのものとされる。'},
+];
+
+const YD=[
+  {d:'easy',dl:'基本',q:'イギリスの「立憲君主制」とはどのような体制か、「国王」と「議会」という言葉を使って説明しなさい。',h:'ヒント：君臨すれども統治せず',a:'国王が存在するが、実際の政治は議会と内閣が行う体制。国王は「君臨すれども統治せず」とされ、政治的な実権を持たない。'},
+  {d:'easy',dl:'基本',q:'「議院内閣制」と「大統領制」のちがいを、内閣（政府）と議会の関係に注目して説明しなさい。',h:'ヒント：信任・不信任・分離',a:'議院内閣制では内閣は議会の信任に基づいて成立し、不信任決議で倒閣される。大統領制では大統領と議会は独立しており、不信任決議はできない。'},
+  {d:'easy',dl:'基本',q:'「法の支配」と「人の支配」はどのように異なるか、「権力者」と「法の役割」に注目して説明しなさい。',h:'ヒント：権力者も法に従う・道具',a:'人の支配では権力者が自由に支配し、法はその道具にすぎない。法の支配では権力者も含む全員が法に従い、法は国民の権利・自由を守るものである。'},
+  {d:'easy',dl:'基本',q:'ホッブズ・ロック・ルソーをそれぞれ一言で特徴づけなさい。',h:'ヒント：自然状態の見方・国家論',a:'ホッブズ→「万人の万人に対する闘争」。強力な主権者に権力を委ねるべき（絶対王政擁護）。\nロック→自然権保護のため政府に権力を信託。信託違反なら抵抗権あり（議会主権・権力分立）。\nルソー→人民主権・一般意志を重視。直接民主主義を理想とし、フランス革命に影響。'},
+  {d:'med',dl:'応用',q:'アメリカの「ウィナー・テイク・オール」方式とはどのような仕組みか説明し、どのような問題が起きる可能性があるか答えなさい。',h:'ヒント：選挙人・総得票数',a:'各州で1票でも多く得た候補がその州の選挙人を全員獲得する方式。問題点として、全国の総得票数では負けた候補が大統領になる場合がある（2000年・2016年大統領選）。また、少数意見が反映されにくい。'},
+  {d:'med',dl:'応用',q:'フランス人権宣言第16条が示す「立憲主義」の2つの要素を答えなさい。また、それぞれが必要な理由を簡単に説明しなさい。',h:'ヒント：権利の保障・権力の分立',a:'①権利の保障：国民の基本的人権が守られるようにするため。\n②権力の分立：一つの機関に権力が集中して独裁が生まれるのを防ぐため。\nこの2つが揃って初めて憲法を持つ社会といえる。'},
+];
+
+let mode='quiz', sec='all', qs=[], idx=0, sc=0, done=false;
+
+function switchMode(m){
+  mode=m;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&m==='quiz')||(i===1&&m==='yoso')));
+  document.getElementById('quiz-mode').style.display=m==='quiz'?'':'none';
+  document.getElementById('yoso-mode').style.display=m==='yoso'?'':'none';
+  if(m==='yoso') renderY();
+}
+function sel(s,e){
+  sec=s;
+  document.querySelectorAll('.sec-btn').forEach(b=>b.classList.remove('active'));
+  e.target.classList.add('active');
+  start();
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function start(){
+  qs=shuffle([...(sec==='all'?QD:QD.filter(q=>q.cat===sec))]);
+  idx=0;sc=0;renderQ();
+}
+function renderQ(){
+  const c=document.getElementById('qc'),n=qs.length;
+  if(idx>=n){renderS(n);return;}
+  const q=qs[idx];done=false;
+  document.getElementById('qprog').textContent=`問題 ${idx+1}/${n}`;
+  document.getElementById('qsc').textContent=`正解 ${sc}問`;
+  document.getElementById('pfill').style.width=`${idx/n*100}%`;
+  const wi=q.c.map((t,i)=>({t,o:i}));
+  const sh=shuffle([...wi]);
+  const na=sh.findIndex(x=>x.o===q.a);
+  c.dataset.ca=na; c.dataset.ex=q.e;
+  c.innerHTML=`<div class="qcard">
+    <div class="qmeta"><span class="qnum">Q${idx+1}</span><span class="ctag ${q.cc}">${q.cl}</span></div>
+    <p class="qtext">${q.q}</p>
+    <div class="choices">${sh.map((x,i)=>`<button class="cbtn" onclick="pick(${i},${na},this)">${'アイウエ'[i]}．${x.t}</button>`).join('')}</div>
+    <div class="fb" id="fb"></div>
+    <div class="nav">
+      <button class="btn s" id="sb" onclick="next()">スキップ</button>
+      <button class="btn p" id="nb" onclick="next()" disabled>次へ →</button>
+    </div>
+  </div>`;
+}
+function pick(chosen,correct,btn){
+  if(done)return; done=true;
+  document.querySelectorAll('.cbtn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fb');
+  const ex=document.getElementById('qc').dataset.ex;
+  if(chosen===correct){btn.classList.add('ok');sc++;fb.className='fb ok show';fb.innerHTML=`✅ 正解！ ${ex}`;}
+  else{btn.classList.add('ng');document.querySelectorAll('.cbtn')[correct].classList.add('ok');fb.className='fb ng show';fb.innerHTML=`❌ 不正解。正解は「${'アイウエ'[correct]}」です。<br>${ex}`;}
+  document.getElementById('nb').disabled=false;
+  document.getElementById('sb').disabled=true;
+  document.getElementById('qsc').textContent=`正解 ${sc}問`;
+}
+function next(){idx++;renderQ();}
+function renderS(n){
+  document.getElementById('pfill').style.width='100%';
+  const p=Math.round(sc/n*100);
+  const m=p>=90?'🎉 完璧！テスト本番も自信を持って！':p>=70?'👍 よくできました！苦手な箇所だけ復習しよう。':p>=50?'📖 もう1周やってみよう。繰り返せば必ず覚えられる！':'💪 まずはセクションを絞って練習してみよう！';
+  document.getElementById('qc').innerHTML=`<div class="scard"><div class="sbig">${sc}<span style="font-size:26px;color:var(--muted)">/${n}</span></div><div class="slbl">正解数（${p}%）</div><p class="smsg">${m}</p><button class="btn p" onclick="start()" style="margin:0 auto">もう一度やる</button></div>`;
+}
+function renderY(){
+  document.getElementById('yc').innerHTML=YD.map((q,i)=>`<div class="ycard">
+    <div class="yqn">予想問題 ${i+1}</div>
+    <span class="ydiff ${q.d==='easy'?'easy':'med'}">${q.dl}</span>
+    <p class="yq">${q.q}</p>
+    <p class="yhint">💡 ${q.h}</p>
+    <button class="atbtn" onclick="tog(${i},this)">解答例を見る</button>
+    <div class="abox" id="a${i}">${q.a}</div>
+  </div>`).join('');
+}
+function tog(i,btn){
+  const b=document.getElementById('a'+i);
+  btn.textContent=b.classList.toggle('show')?'解答例を隠す':'解答例を見る';
+}
+start();
+</script>
+</body>
+</html>
