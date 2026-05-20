@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PC選定サポート 問診票 | right-write</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --accent: #5C4FCF;
+    --accent-light: #EAE8FA;
+    --accent-dark: #3B31A8;
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --text: #1A1814;
+    --text2: #6B6760;
+    --text3: #9B9790;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.06);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--text);
+    color: #fff;
+    padding: 20px 24px 18px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .header-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.08em;
+  }
+  .header-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .header-badge {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+  }
+
+  /* Progress bar */
+  .progress-wrap {
+    height: 3px;
+    background: rgba(255,255,255,0.15);
+    position: sticky;
+    top: 57px;
+    z-index: 99;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* Main */
+  .main {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 28px 16px 0;
+  }
+
+  /* Section */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 32px 0 12px;
+    padding-left: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border2);
+  }
+
+  /* Q Card */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    transition: border-color 0.2s;
+  }
+  .q-card.has-answer { border-color: rgba(92,79,207,0.2); }
+
+  .q-meta {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .q-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    background: var(--accent-light);
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .q-text {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .q-sub {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* Chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .chip {
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text2);
+    background: var(--surface2);
+    transition: all 0.15s;
+    user-select: none;
+    font-family: 'Noto Sans JP', sans-serif;
+    line-height: 1.3;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .chip.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 500;
+  }
+  .chip.disabled {
+    border-color: rgba(163,45,45,0.3);
+    color: var(--red);
+    background: var(--red-light);
+    cursor: default;
+    opacity: 0.7;
+  }
+  .chip.disabled:hover { border-color: rgba(163,45,45,0.5); }
+
+  /* Inline notes */
+  .note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    line-height: 1.6;
+    display: none;
+    animation: fadeIn 0.2s ease;
+  }
+  .note.show { display: block; }
+  .note.warn { background: var(--amber-light); color: var(--amber); border-left: 3px solid var(--amber); }
+  .note.info { background: var(--green-light); color: var(--green); border-left: 3px solid var(--green); }
+  .note.danger { background: var(--red-light); color: var(--red); border-left: 3px solid var(--red); }
+
+  /* Textarea */
+  textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+
+  /* Result panel */
+  .result-panel {
+    background: var(--surface);
+    border: 1px solid rgba(92,79,207,0.25);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-top: 20px;
+    display: none;
+    animation: slideUp 0.3s ease;
+  }
+  .result-panel.show { display: block; }
+
+  .result-head {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .result-row {
+    font-size: 13px;
+    line-height: 1.9;
+    margin-bottom: 2px;
+    color: var(--text);
+  }
+  .rtag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin: 2px 2px;
+    font-weight: 500;
+  }
+  .rtag.g { background: var(--green-light); color: var(--green); }
+  .rtag.p { background: var(--accent-light); color: var(--accent); }
+  .rtag.r { background: var(--red-light); color: var(--red); }
+  .rtag.a { background: var(--amber-light); color: var(--amber); }
+
+  /* Copy button */
+  .copy-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .copy-btn:hover { background: var(--accent-dark); }
+  .copy-btn:active { transform: scale(0.98); }
+  .copy-btn.copied { background: var(--green); }
+
+  /* Calc button */
+  .calc-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 13px;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'Noto Sans JP', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .calc-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Footer credit */
+  .credit {
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 480px) {
+    .main { padding: 20px 12px 0; }
+    .q-card { padding: 14px 16px; }
+    .chip { font-size: 12px; padding: 5px 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-logo">right-write</span>
+  <span class="header-title">PC選定サポート 問診票</span>
+  <span class="header-badge">v3.0</span>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+
+<div class="main">
+
+  <div class="section-label">基本情報</div>
+
+  <div class="q-card" id="card-1">
+    <div class="q-meta">
+      <span class="q-index">1</span>
+      <div>
+        <div class="q-text">主な用途を教えてください</div>
+        <div class="q-sub">複数選択OK</div>
+      </div>
+    </div>
+    <div class="chips" id="q1">
+      <span class="chip" data-q="1">ネット・メール</span>
+      <span class="chip" data-q="1">動画視聴</span>
+      <span class="chip" data-q="1">動画編集</span>
+      <span class="chip" data-q="1">写真・画像編集</span>
+      <span class="chip" data-q="1">Word・Excel</span>
+      <span class="chip" data-q="1">会計・業務ソフト</span>
+      <span class="chip" data-q="1">オンライン会議</span>
+      <span class="chip" data-q="1">ゲーム</span>
+      <span class="chip" data-q="1">プログラミング</span>
+      <span class="chip" data-q="1">AI活用</span>
+    </div>
+  </div>
+
+  <div class="q-card" id="card-2">
+    <div class="q-meta">
+      <span class="q-index">2</span>
+      <div><div class="q-text">どこで使いますか？</div></div>
+    </div>
+    <div class="chips" id="q2">
+      <span class="chip" data-q="2">主に自宅・固定</span>
+      <span class="chip" data-q="2">カバンに入れて持ち運ぶ</span>
+      <span class="chip" data-q="2">外出先メイン</span>
+      <span class="chip" data-q="2">外部モニターに繋いで使う</span>
+    </div>
+  </div>
+
+  <div class="q-card" id="card-3">
+    <div class="q-meta">
+      <span class="q-index">3</span>
+      <div>
+        <div class="q-text">重さの許容範囲は？</div>
+        <div class="q-sub">持ち運ぶ方は特に重要です！</div>
+      </div>
+    </div>
+    <div class="chips" id="q3">
+      <span class="chip" data-q="3">とにかく軽く！1kg前後</span>
+      <span class="chip" data-q="3">1.5kg以内なら許容</span>
+      <span class="chip" data-q="3">2kg以内ならOK</span>
+      <span class="chip" data-q="3">据え置きなので重さ不問</span>
+    </div>
+  </div>
+
+  <div class="q-card" id="card-4">
+    <div class="q-meta">
+      <span class="q-index">4</span>
+      <div><div class="q-text">画面サイズの希望は？</div></div>
+    </div>
+    <div class="chips" id="q4">
+      <span class="chip" data-q="4">13〜14型（コンパクト）</span>
+      <span class="chip" data-q="4">15型前後（バランス）</span>
+      <span class="chip" data-q="4">16型〜（広く使いたい）</span>
+      <span class="chip" data-q="4">外部モニター使うので何でも</span>
+    </div>
+    <div class="note danger" id="note-size13">⚠ 13〜14型の軽量Windowsでハイスペックを求めると、選択肢がかなり限られ18万円以上になりやすいです。予算と照らし合わせて確認しましょう。</div>
+  </div>
+
+  <div class="section-label">予算・使用期間</div>
+
+  <div class="q-card" id="card-5">
+    <div class="q-meta">
+      <span class="q-index">5</span>
+      <div><div class="q-text">ご予算の目安を教えてください</div></div>
+    </div>
+    <div class="chips" id="q5">
+      <span class="chip" data-q="5">8〜12万円</span>
+      <span class="chip" data-q="5">12〜15万円</span>
+      <span class="chip" data-q="5">15〜18万円</span>
+      <span class="chip" data-q="5">18〜20万円</span>
+      <span class="chip" data-q="5">20万円〜（こだわりたい）</span>
+    </div>
+    <div class="note warn" id="note-budget20">💸 20万円を超えるなら、MacBook Airとも比べてみる価値があります（今回はWindows縛りですが、参考までに）。</div>
+  </div>
+
+  <div class="q-card" id="card-6">
+    <div class="q-meta">
+      <span class="q-index">6</span>
+      <div><div class="q-text">何年くらい使うつもりですか？</div></div>
+    </div>
+    <div class="chips" id="q6">
+      <span class="chip" data-q="6">2〜3年</span>
+      <span class="chip" data-q="6">5年くらい</span>
+      <span class="chip" data-q="6">壊れるまで長く</span>
+    </div>
+  </div>
+
+  <div class="section-label">スペック</div>
+
+  <div class="q-card" id="card-7">
+    <div class="q-meta">
+      <span class="q-index">7</span>
+      <div><div class="q-text">同時に開くアプリ数のイメージは？</div></div>
+    </div>
+    <div class="chips" id="q7">
+      <span class="chip" data-q="7">1〜2個くらい</span>
+      <span class="chip" data-q="7">ブラウザ＋α で3〜5個</span>
+      <span class="chip" data-q="7">たくさん開きっぱなし</span>
+      <span class="chip" data-q="7">ブラウザのタブが常に大量</span>
+    </div>
+  </div>
+
+  <div class="q-card" id="card-8">
+    <div class="q-meta">
+      <span class="q-index">8</span>
+      <div>
+        <div class="q-text">メモリ（RAM）の希望は？</div>
+        <div class="q-sub">PCの「作業机の広さ」です</div>
+      </div>
+    </div>
+    <div class="chips" id="q8">
+      <span class="chip disabled" data-q="8">8GB ← 非推奨</span>
+      <span class="chip" data-q="8">16GB（標準・最低ライン）</span>
+      <span class="chip" data-q="8">32GB（余裕を持たせたい）</span>
+      <span class="chip" data-q="8">わからない → おまかせ</span>
+    </div>
+    <div class="note danger show">⚠ 2026年現在、8GBは動作が重くなりやすく非推奨です。最低でも16GBをおすすめします。</div>
+  </div>
+
+  <div class="q-card" id="card-9">
+    <div class="q-meta">
+      <span class="q-index">9</span>
+      <div><div class="q-text">クラウドストレージは使っていますか？</div></div>
+    </div>
+    <div class="chips" id="q9">
+      <span class="chip" data-q="9">Google Drive / OneDriveをよく使う</span>
+      <span class="chip" data-q="9">少し使うが本体にも保存したい</span>
+      <span class="chip" data-q="9">クラウドは使わない・わからない</span>
+    </div>
+    <div class="note info" id="note-cloud">💡 Google One（100GB）なら月290円から。本体ストレージを節約できておすすめです！</div>
+  </div>
+
+  <div class="q-card" id="card-10">
+    <div class="q-meta">
+      <span class="q-index">10</span>
+      <div>
+        <div class="q-text">ストレージ（SSD容量）の希望は？</div>
+        <div class="q-sub">PCの「引き出しの数」です</div>
+      </div>
+    </div>
+    <div class="chips" id="q10">
+      <span class="chip" data-q="10">256GB（クラウド併用前提）</span>
+      <span class="chip" data-q="10">512GB（基本はこれ）</span>
+      <span class="chip" data-q="10">1TB（写真・動画が多い）</span>
+      <span class="chip" data-q="10">わからない → おまかせ</span>
+    </div>
+    <div class="note danger" id="note-storage256">⚠ クラウド未使用＋256GBは容量不足になりやすいです。512GB以上を強くおすすめします。</div>
+  </div>
+
+  <div class="q-card" id="card-11">
+    <div class="q-meta">
+      <span class="q-index">11</span>
+      <div><div class="q-text">バッテリーの重要度は？</div></div>
+    </div>
+    <div class="chips" id="q11">
+      <span class="chip" data-q="11">電源がある場所がメインなので不問</span>
+      <span class="chip" data-q="11">半日くらい持てば十分</span>
+      <span class="chip" data-q="11">一日外でも使えると嬉しい</span>
+    </div>
+  </div>
+
+  <div class="section-label">現在の環境・その他</div>
+
+  <div class="q-card" id="card-12">
+    <div class="q-meta">
+      <span class="q-index">12</span>
+      <div><div class="q-text">今使っているPCは？</div></div>
+    </div>
+    <div class="chips" id="q12">
+      <span class="chip" data-q="12">Windows（買い替え）</span>
+      <span class="chip" data-q="12">Macから乗り換え</span>
+      <span class="chip" data-q="12">初めてのPC</span>
+      <span class="chip" data-q="12">2台目・サブ機として</span>
+    </div>
+  </div>
+
+  <div class="q-card" id="card-13">
+    <div class="q-meta">
+      <span class="q-index">13</span>
+      <div><div class="q-text">Officeはどうしますか？</div></div>
+    </div>
+    <div class="chips" id="q13">
+      <span class="chip" data-q="13">同梱されていてほしい</span>
+      <span class="chip" data-q="13">Microsoft 365を別契約する</span>
+      <span class="chip" data-q="13">無料ソフトでいい</span>
+      <span class="chip" data-q="13">使わない・わからない</span>
+    </div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-meta">
+      <span class="q-index">14</span>
+      <div>
+        <div class="q-text">気になるメーカー・NG条件</div>
+        <div class="q-sub">任意・自由に書いてください</div>
+      </div>
+    </div>
+    <textarea id="free1" rows="2" placeholder="例：NECがいい、富士通はちょっと…、Lenovoを薦められた など"></textarea>
+  </div>
+
+  <div class="q-card">
+    <div class="q-meta">
+      <span class="q-index">15</span>
+      <div>
+        <div class="q-text">その他・気になること・不安なこと</div>
+        <div class="q-sub">任意・自由に書いてください</div>
+      </div>
+    </div>
+    <textarea id="free2" rows="2" placeholder="例：セットアップもお願いしたい、子どもも使う、特定ソフトが必要 など"></textarea>
+  </div>
+
+  <!-- Result -->
+  <div class="result-panel" id="result-panel">
+    <div class="result-head">✦ 選定の方向性メモ</div>
+    <div id="result-content"></div>
+  </div>
+
+  <button class="calc-btn" onclick="buildResult()">▶ 選定メモを確認する</button>
+  <button class="copy-btn" id="copy-btn" onclick="copyResult()">📋 この内容をコピーしてAIに貼り付ける</button>
+
+  <div class="credit">Powered by right-write × Claude</div>
+
+</div>
+
+<script>
+  const MULTI = ['1'];
+
+  document.querySelectorAll('.chip:not(.disabled)').forEach(c => {
+    c.addEventListener('click', () => {
+      const q = c.dataset.q;
+      if (!MULTI.includes(q)) {
+        document.querySelectorAll(`.chip[data-q="${q}"]:not(.disabled)`).forEach(x => x.classList.remove('selected'));
+      }
+      c.classList.toggle('selected');
+      document.getElementById(`card-${q}`)?.classList.toggle('has-answer',
+        document.querySelectorAll(`.chip[data-q="${q}"].selected`).length > 0);
+      handleNotes(q);
+      updateProgress();
+      buildResult();
+    });
+  });
+
+  function getSelected(q) {
+    return [...document.querySelectorAll(`.chip[data-q="${q}"].selected`)].map(c => c.textContent.trim());
+  }
+
+  function handleNotes(q) {
+    if (q === '4') {
+      const s = getSelected('4');
+      toggle('note-size13', s.some(x => x.includes('13〜14型')));
+    }
+    if (q === '5') {
+      toggle('note-budget20', getSelected('5').includes('20万円〜（こだわりたい）'));
+    }
+    if (q === '9' || q === '10') {
+      const noCloud = getSelected('9').includes('クラウドは使わない・わからない');
+      toggle('note-cloud', noCloud);
+      toggle('note-storage256', noCloud && getSelected('10').includes('256GB（クラウド併用前提）'));
+    }
+  }
+
+  function toggle(id, show) {
+    document.getElementById(id)?.classList.toggle('show', show);
+  }
+
+  function updateProgress() {
+    const total = 13;
+    let answered = 0;
+    for (let i = 1; i <= total; i++) {
+      if (document.querySelectorAll(`.chip[data-q="${i}"].selected`).length > 0) answered++;
+    }
+    document.getElementById('progress').style.width = (answered / total * 100) + '%';
+  }
+
+  function buildResult() {
+    const uso = getSelected('1'), basho = getSelected('2'), omosa = getSelected('3');
+    const size = getSelected('4'), yosan = getSelected('5'), years = getSelected('6');
+    const apps = getSelected('7'), mem = getSelected('8'), cloud = getSelected('9');
+    const storage = getSelected('10'), battery = getSelected('11'), office = getSelected('13');
+
+    const panel = document.getElementById('result-panel');
+    if ([uso, basho, yosan].every(a => a.length === 0)) { panel.classList.remove('show'); return; }
+
+    let html = '';
+    const row = (icon, label, tags) => tags.length
+      ? `<div class="result-row">${icon} <b>${label}</b>：${tags.map(t => `<span class="rtag p">${t}</span>`).join('')}</div>`
+      : '';
+
+    if (uso.length) html += row('📌','用途', uso);
+    if (basho.length) html += row('📍','場所', basho);
+    if (omosa.length) html += row('⚖️','重さ', omosa);
+    if (size.length) html += row('🖥','サイズ', size);
+    if (yosan.length) html += row('💰','予算', yosan);
+    if (mem.length) html += row('🧠','メモリ', mem);
+    if (storage.length) html += row('💾','ストレージ', storage);
+    if (years.length) html += row('📅','使用期間', years);
+
+    // ポイント
+    let hints = [], warns = [];
+    const isLight = omosa.some(o => o.includes('1kg') || o.includes('1.5kg'));
+    const isSmall = size.some(s => s.includes('13〜14型'));
+    const isHeavy = uso.some(u => ['動画編集','AI活用','プログラミング','ゲーム'].includes(u));
+    const isMobile = basho.some(b => b.includes('持ち運び') || b.includes('外出先'));
+
+    if (isLight || isMobile) hints.push('軽量モデル優先');
+    if (omosa.includes('とにかく軽く！1kg前後')) hints.push('LG gram・富士通LIFEBOOKを検討');
+    if (apps.some(a => a.includes('たくさん') || a.includes('大量'))) hints.push('メモリ16GB以上必須');
+    if (isHeavy) hints.push('CPU重視（Core Ultra / Ryzen AI以上）');
+    if (uso.includes('ゲーム')) hints.push('GPU搭載モデル検討');
+    if (battery.includes('一日外でも')) hints.push('バッテリー重視（20時間前後）');
+    if (office.includes('同梱')) hints.push('Office同梱モデル指定');
+
+    if (isSmall && isHeavy && yosan[0] && !yosan[0].includes('18〜20') && !yosan[0].includes('20万')) {
+      warns.push('13型＋ハイスペックは18万円以上が現実的');
+    }
+    if (isSmall && isLight && isHeavy) warns.push('軽量・小型・高性能の三立は選択肢が激減します');
+    if (uso.includes('ゲーム') && isLight) warns.push('軽量ゲーミングは高額になりやすいです');
+
+    if (hints.length) html += `<div class="result-row" style="margin-top:10px;">💡 <b>選定ポイント</b>：${hints.map(h=>`<span class="rtag g">${h}</span>`).join('')}</div>`;
+    if (warns.length) html += `<div class="result-row">🚨 <b>要確認</b>：${warns.map(w=>`<span class="rtag r">${w}</span>`).join('')}</div>`;
+
+    document.getElementById('result-content').innerHTML = html;
+    panel.classList.add('show');
+  }
+
+  function buildText() {
+    const uso=getSelected('1'),basho=getSelected('2'),omosa=getSelected('3'),size=getSelected('4');
+    const yosan=getSelected('5'),years=getSelected('6'),apps=getSelected('7'),mem=getSelected('8');
+    const cloud=getSelected('9'),storage=getSelected('10'),battery=getSelected('11');
+    const prev=getSelected('12'),office=getSelected('13');
+    const free1=document.getElementById('free1').value.trim();
+    const free2=document.getElementById('free2').value.trim();
+
+    let t = `【PC選定サポート 問診票】\n`;
+    t += `\n用途：${uso.join('、')||'未選択'}`;
+    t += `\n使う場所：${basho.join('、')||'未選択'}`;
+    t += `\n重さ：${omosa.join('、')||'未選択'}`;
+    t += `\n画面サイズ：${size.join('、')||'未選択'}`;
+    t += `\n予算：${yosan[0]||'未選択'}`;
+    t += `\n使用期間：${years[0]||'未選択'}`;
+    t += `\n同時起動：${apps.join('、')||'未選択'}`;
+    t += `\nメモリ：${mem[0]||'未選択（最低16GB推奨）'}`;
+    t += `\nクラウド：${cloud.join('、')||'未選択'}`;
+    t += `\nストレージ：${storage.join('、')||'未選択'}`;
+    t += `\nバッテリー：${battery.join('、')||'未選択'}`;
+    t += `\n現在の環境：${prev.join('、')||'未選択'}`;
+    t += `\nOffice：${office.join('、')||'未選択'}`;
+    if (free1) t += `\nメーカー希望・NG：${free1}`;
+    if (free2) t += `\nその他：${free2}`;
+    t += `\n\n上記の条件に合うWindowsノートPCを2〜3機種、機種名・価格帯・おすすめ理由付きで提案してください。`;
+    return t;
+  }
+
+  function copyResult() {
+    const text = buildText();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = '✅ コピーしました！AIに貼り付けてください';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 この内容をコピーしてAIに貼り付ける';
+        btn.classList.remove('copied');
+      }, 3000);
+    });
+  }
+</script>
+</body>
+</html>
