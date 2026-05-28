@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英語復習クイズ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F1117;
+  --surface: #1A1D27;
+  --surface2: #22263A;
+  --border: #2E3350;
+  --logic-accent: #4F8EF7;
+  --logic-light: rgba(79,142,247,0.12);
+  --comm-accent: #F76E4F;
+  --comm-light: rgba(247,110,79,0.12);
+  --green: #3DD68C;
+  --green-light: rgba(61,214,140,0.12);
+  --red: #F75F5F;
+  --red-light: rgba(247,95,95,0.12);
+  --yellow: #F7C948;
+  --text: #E8EAF2;
+  --text-dim: #7B809A;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  padding: 12px;
+}
+.container { max-width: 640px; margin: 0 auto; }
+
+/* タブ */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  padding: 6px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-dim);
+  background: transparent;
+  line-height: 1.4;
+}
+.tab-btn.active-logic {
+  background: var(--logic-accent);
+  color: white;
+}
+.tab-btn.active-comm {
+  background: var(--comm-accent);
+  color: white;
+}
+
+/* ヘッダー */
+.header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title { font-size: 16px; font-weight: 900; flex: 1; }
+.header-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.score-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.score-logic { background: var(--logic-light); color: var(--logic-accent); border: 1px solid var(--logic-accent); }
+.score-comm  { background: var(--comm-light);  color: var(--comm-accent);  border: 1px solid var(--comm-accent); }
+
+/* モード切り替え */
+.mode-toggle {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.mode-btn {
+  flex: 1;
+  padding: 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--text-dim);
+  transition: all 0.2s;
+}
+.mode-btn.active-logic { border-color: var(--logic-accent); color: var(--logic-accent); background: var(--logic-light); }
+.mode-btn.active-comm  { border-color: var(--comm-accent);  color: var(--comm-accent);  background: var(--comm-light); }
+
+/* プログレス */
+.progress-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  margin-bottom: 12px;
+}
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 7px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.progress-bar { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-fill {
+  height: 6px; border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.fill-logic { background: linear-gradient(90deg, var(--logic-accent), #A0C4FF); }
+.fill-comm  { background: linear-gradient(90deg, var(--comm-accent),  #FFB89A); }
+
+/* 問題カード */
+.question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.q-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+.tag-logic { background: var(--logic-light); color: var(--logic-accent); border: 1px solid var(--logic-accent); }
+.tag-comm  { background: var(--comm-light);  color: var(--comm-accent);  border: 1px solid var(--comm-accent); }
+.q-en {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.blank {
+  display: inline-block;
+  border-bottom: 2px solid var(--logic-accent);
+  min-width: 90px;
+  text-align: center;
+  color: var(--logic-accent);
+  font-weight: 700;
+  padding: 0 4px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.blank-comm { border-color: var(--comm-accent); color: var(--comm-accent); }
+.q-ja {
+  font-size: 13px;
+  color: var(--text-dim);
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  line-height: 1.7;
+  border-left: 3px solid var(--border);
+}
+
+/* 語順問題 */
+.sort-area { margin-top: 16px; }
+.sort-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+.word-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+}
+.word-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid;
+  user-select: none;
+}
+.word-chip.pool-chip {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+.word-chip.pool-chip:hover { border-color: var(--logic-accent); color: var(--logic-accent); }
+.word-chip.pool-chip.comm-pool:hover { border-color: var(--comm-accent); color: var(--comm-accent); }
+.word-chip.answer-chip {
+  background: var(--logic-light);
+  border-color: var(--logic-accent);
+  color: var(--logic-accent);
+}
+.word-chip.answer-chip.comm-chip {
+  background: var(--comm-light);
+  border-color: var(--comm-accent);
+  color: var(--comm-accent);
+}
+.answer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 2px dashed var(--border);
+  margin-bottom: 12px;
+}
+.answer-row.has-words { border-style: solid; }
+.check-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.check-logic { background: var(--logic-accent); color: white; }
+.check-comm  { background: var(--comm-accent);  color: white; }
+.check-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.check-btn:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+/* 選択肢 */
+.choices { display: flex; flex-direction: column; gap: 9px; margin-top: 16px; }
+.choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  font-family: inherit;
+  font-size: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  width: 100%;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--logic-accent); background: var(--logic-light); }
+.choice-btn.comm-btn:hover:not(:disabled) { border-color: var(--comm-accent); background: var(--comm-light); }
+.choice-btn:disabled { cursor: default; }
+.choice-label {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--border);
+  font-weight: 700; font-size: 12px;
+  color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: #0F1117; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.choice-btn.show-answer { border-color: var(--green); background: var(--green-light); }
+.choice-btn.show-answer .choice-label { background: var(--green); color: #0F1117; }
+
+/* 解説 */
+.explanation {
+  display: none;
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--surface2);
+  border-left: 3px solid var(--logic-accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.explanation.show { display: block; }
+.explanation.comm-ex { border-color: var(--comm-accent); }
+.ex-correct { font-size: 13px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.ex-text { font-size: 13px; color: var(--text-dim); line-height: 1.7; }
+
+/* sort結果 */
+.sort-result {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sort-result.show { display: block; }
+.sort-correct { background: var(--green-light); border: 1px solid var(--green); color: var(--green); }
+.sort-wrong   { background: var(--red-light);   border: 1px solid var(--red);   color: var(--text); }
+.sort-ans { color: var(--green); font-weight: 700; font-family: 'JetBrains Mono', monospace; display: block; margin-top: 4px; }
+.sort-ex  { color: var(--text-dim); margin-top: 6px; display: block; }
+
+/* ナビ */
+.nav-wrap { display: none; margin-top: 12px; }
+.nav-wrap.show { display: block; }
+.next-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.next-btn:hover { border-color: var(--logic-accent); color: var(--logic-accent); }
+.next-btn.comm-next:hover { border-color: var(--comm-accent); color: var(--comm-accent); }
+
+/* 結果 */
+.result-screen { display: none; }
+.result-screen.show { display: block; }
+.quiz-area.hide { display: none; }
+
+.result-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.result-icon { font-size: 44px; margin-bottom: 8px; }
+.result-score { font-size: 52px; font-weight: 900; font-family: 'JetBrains Mono', monospace; line-height: 1; }
+.score-c-logic { color: var(--logic-accent); }
+.score-c-comm  { color: var(--comm-accent); }
+.result-denom { font-size: 20px; color: var(--text-dim); }
+.result-pct { font-size: 16px; color: var(--text-dim); margin: 6px 0; }
+.result-msg { font-size: 15px; font-weight: 700; margin-top: 10px; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  text-align: center;
+}
+.stat-num { font-size: 24px; font-weight: 900; font-family: 'JetBrains Mono', monospace; }
+.stat-lbl { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+.miss-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.miss-title { font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 10px; }
+.miss-item { padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; line-height: 1.6; }
+.miss-item:last-child { border-bottom: none; }
+.miss-qnum { color: var(--text-dim); }
+.miss-en { color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 2px; }
+.miss-ans { color: var(--green); font-weight: 700; font-size: 12px; margin-top: 2px; }
+.miss-tag { display: inline-block; background: var(--surface2); color: var(--text-dim); font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+.retry-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.retry-logic { background: var(--logic-accent); color: white; }
+.retry-comm  { background: var(--comm-accent);  color: white; }
+.retry-btn:hover { opacity: 0.88; }
+
+/* シャッフルボタン */
+.shuffle-btn {
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+}
+.shuffle-btn.on-logic { border-color: var(--logic-accent); color: var(--logic-accent); background: var(--logic-light); }
+.shuffle-btn.on-comm  { border-color: var(--comm-accent);  color: var(--comm-accent);  background: var(--comm-light); }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- タブ -->
+  <div class="tabs">
+    <button class="tab-btn active-logic" id="tabLogic" onclick="switchTab('logic')">📝 論理表現 II<br><span style="font-size:10px;font-weight:400">不定詞・動名詞</span></button>
+    <button class="tab-btn" id="tabComm" onclick="switchTab('comm')">📖 英語コミュニケーション II<br><span style="font-size:10px;font-weight:400">語彙・読解</span></button>
+  </div>
+
+  <!-- 論理表現IIエリア -->
+  <div id="logicArea">
+    <div class="header">
+      <div style="flex:1">
+        <div class="header-title" style="color:var(--logic-accent)">論理表現 II</div>
+        <div class="header-sub">不定詞・動名詞 復習クイズ</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="score-badge score-logic" id="lScoreBadge">0点</div>
+        <button class="shuffle-btn" id="lShuffleBtn" onclick="toggleShuffle('logic')">🔀 シャッフル</button>
+      </div>
+    </div>
+    <!-- モード切り替え -->
+    <div class="mode-toggle">
+      <button class="mode-btn active-logic" id="lModeChoice" onclick="setMode('logic','choice')">◉ 選択問題</button>
+      <button class="mode-btn" id="lModeSort" onclick="setMode('logic','sort')">⇄ 語順並べ替え</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-info"><span id="lProgressText">1 / 1</span><span id="lProgressPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill fill-logic" id="lProgressFill" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-area" id="lQuizArea">
+      <div class="question-card" id="lQCard"></div>
+      <div class="nav-wrap" id="lNavWrap">
+        <button class="next-btn" id="lNextBtn" onclick="nextQ('logic')">次の問題 →</button>
+      </div>
+    </div>
+    <div class="result-screen" id="lResultScreen"></div>
+  </div>
+
+  <!-- 英語コミュニケーションIIエリア -->
+  <div id="commArea" style="display:none">
+    <div class="header">
+      <div style="flex:1">
+        <div class="header-title" style="color:var(--comm-accent)">英語コミュニケーション II</div>
+        <div class="header-sub">語彙・読解 復習クイズ</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="score-badge score-comm" id="cScoreBadge">0点</div>
+        <button class="shuffle-btn" id="cShuffleBtn" onclick="toggleShuffle('comm')">🔀 シャッフル</button>
+      </div>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active-comm" id="cModeChoice" onclick="setMode('comm','choice')">◉ 選択問題</button>
+      <button class="mode-btn" id="cModeSort" onclick="setMode('comm','sort')">⇄ 語順並べ替え</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-info"><span id="cProgressText">1 / 1</span><span id="cProgressPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill fill-comm" id="cProgressFill" style="width:0%"></div></div>
+    </div>
+    <div class="quiz-area" id="cQuizArea">
+      <div class="question-card" id="cQCard"></div>
+      <div class="nav-wrap" id="cNavWrap">
+        <button class="next-btn comm-next" id="cNextBtn" onclick="nextQ('comm')">次の問題 →</button>
+      </div>
+    </div>
+    <div class="result-screen" id="cResultScreen"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 論理表現II 選択問題
+// ============================================================
+const logicChoiceQ = [
+  {tag:"名詞的用法",en:"It is important ___ enough sleep.",ja:"十分な睡眠をとることが大切だ。",choices:["to get","getting","get","for get"],ans:0,ex:"It is＋形容詞＋to do の形式主語構文。It = to get enough sleep。"},
+  {tag:"名詞的用法",en:"Her dream is ___ a singer.",ja:"彼女の夢は歌手になることだ。",choices:["to be","being","be","to being"],ans:0,ex:"補語になる不定詞。Her dream = to be a singer の関係。"},
+  {tag:"名詞的用法",en:"I hope ___ to university.",ja:"私は大学に行くことを希望しています。",choices:["to go","going","go","for going"],ans:0,ex:"hope は不定詞だけを目的語にとる動詞。hope to do。"},
+  {tag:"名詞的用法",en:"She decided ___ her job.",ja:"彼女は仕事を辞めることを決めた。",choices:["to quit","quitting","quit","for quit"],ans:0,ex:"decide to do「〜することを決める」。不定詞のみOK。"},
+  {tag:"形容詞的用法",en:"I have a lot of things ___ today.",ja:"私には今日するべきことがたくさんある。",choices:["to do","doing","do","for do"],ans:0,ex:"things を修飾する形容詞的用法。things to do「するべきこと」。"},
+  {tag:"形容詞的用法",en:"I need a chair ___.",ja:"私は座るための椅子が必要だ。",choices:["to sit on","to sit","sitting","sat on"],ans:0,ex:"a chair to sit on。sit on a chair の on が残る。前置詞を忘れずに！"},
+  {tag:"副詞的用法",en:"I got up early ___ the 6:30 train.",ja:"私は6時30分の列車に乗るために早く起きた。",choices:["to catch","catching","catch","for catch"],ans:0,ex:"目的を表す不定詞「〜するために」。"},
+  {tag:"副詞的用法",en:"I'm glad ___ you.",ja:"私はあなたに会えてうれしいです。",choices:["to see","seeing","see","for see"],ans:0,ex:"感情の原因を表す不定詞。glad to see「会えてうれしい」。"},
+  {tag:"意味上の主語",en:"It is important ___ to get enough sleep.",ja:"私たちが十分な睡眠をとることが大切だ。",choices:["for us","of us","for we","of we"],ans:0,ex:"important は人の性質を表さない形容詞 → for。for us to do の形。"},
+  {tag:"意味上の主語",en:"It was kind ___ to help me.",ja:"私を助けてくれるなんてあなたは親切だった。",choices:["of you","for you","of your","for your"],ans:0,ex:"kind は人の性質を表す形容詞 → of。It was kind of you to do。"},
+  {tag:"意味上の主語",en:"It was careless ___ to leave the light on.",ja:"電気をつけっぱなしにするとはあなたは不注意だった。",choices:["of you","for you","of your","for your"],ans:0,ex:"careless は人の性質を表す → of。It was careless of you to do。"},
+  {tag:"SVO+to不定詞",en:"Our teacher told us ___ each other.",ja:"先生は私たちにお互いを助け合うように言った。",choices:["to help","help","helping","helped"],ans:0,ex:"tell＋O＋to do「Oに〜するように言う」。"},
+  {tag:"SVO+to不定詞",en:"My mother asked me ___ to the supermarket.",ja:"母は私にスーパーへ行くよう頼んだ。",choices:["to go","going","go","for go"],ans:0,ex:"ask＋O＋to do「Oに〜するよう頼む」。"},
+  {tag:"SVO+to不定詞",en:"My parents allowed me ___ abroad.",ja:"両親は私が留学するのを許してくれた。",choices:["to study","studying","study","for study"],ans:0,ex:"allow＋O＋to do「Oが〜するのを許す」。"},
+  {tag:"原形不定詞",en:"My mother made me ___ my room.",ja:"母は私に部屋の掃除をさせた。",choices:["clean","to clean","cleaning","cleaned"],ans:0,ex:"make＋O＋原形（to なし）。「強制的に〜させる」。"},
+  {tag:"原形不定詞",en:"My father let me ___ to the movies.",ja:"父は私を映画に行かせてくれた。",choices:["go","to go","going","went"],ans:0,ex:"let＋O＋原形（to なし）。「許可して〜させる」。"},
+  {tag:"原形不定詞",en:"I saw the man ___ out of the car.",ja:"私はその男が車から降りるのを見た。",choices:["get","to get","getting","got"],ans:0,ex:"知覚動詞 see＋O＋原形。to は不要。"},
+  {tag:"原形不定詞",en:"She heard someone ___ her name.",ja:"彼女は誰かが自分の名前を呼ぶのを聞いた。",choices:["call","to call","calling","called"],ans:0,ex:"知覚動詞 hear＋O＋原形。to は不要。"},
+  {tag:"疑問詞+to不定詞",en:"I don't know ___ to do.",ja:"私は何をするべきかわからない。",choices:["what","how","where","when"],ans:0,ex:"what to do「何をするべきか」。疑問詞＋to不定詞は名詞句を作る。"},
+  {tag:"疑問詞+to不定詞",en:"He knew ___ to use the software.",ja:"彼はそのソフトウェアの使い方を知っていた。",choices:["how","what","where","when"],ans:0,ex:"how to do「どのように〜するか／〜する方法」。"},
+  {tag:"不定詞の否定形",en:"She told me ___ late.",ja:"彼女は私に遅刻しないように言った。",choices:["not to be","to not be","not be","don't be"],ans:0,ex:"不定詞の否定形は not を to の直前に。not to be（○）to not be（✕）。"},
+  {tag:"too...to / enough to",en:"I'm too tired ___ walk.",ja:"私はあまりにも疲れていて歩けない。",choices:["to","for","that","of"],ans:0,ex:"too＋形容詞＋to do「〜するには…すぎる」。"},
+  {tag:"too...to / enough to",en:"He is smart enough ___ the puzzle.",ja:"彼はそのパズルを解くほど頭が良い。",choices:["to solve","solving","solve","for solve"],ans:0,ex:"形容詞＋enough to do「〜するほど十分…」。enough は形容詞の後！"},
+  {tag:"動名詞・目的語",en:"I like ___ to music.",ja:"私は音楽を聴くことが好きです。",choices:["listening","to listening","listen","listened"],ans:0,ex:"前置詞の後は動名詞のみ。like doing も可。"},
+  {tag:"動名詞・前置詞",en:"Thank you for ___ today.",ja:"今日は来てくれてありがとう。",choices:["coming","to come","come","came"],ans:0,ex:"前置詞（for）の後は動名詞。thank you for doing。"},
+  {tag:"動名詞・look forward to",en:"I am looking forward ___ from you.",ja:"あなたからの便りを楽しみに待っています。",choices:["to hearing","to hear","hearing","hear"],ans:0,ex:"look forward to doing。to は前置詞なので後ろは動名詞！"},
+  {tag:"動名詞・be used to",en:"I'm used to ___ up early.",ja:"私は早起きに慣れている。",choices:["getting","get","to get","got"],ans:0,ex:"be used to doing。to は前置詞なので動名詞が続く！"},
+  {tag:"動名詞・動詞の使い分け",en:"She enjoys ___ detective stories.",ja:"彼女は探偵小説を読むことを楽しんでいる。",choices:["reading","to read","read","reads"],ans:0,ex:"enjoy は動名詞だけを目的語にとる。enjoy doing。"},
+  {tag:"動名詞・動詞の使い分け",en:"Would you mind ___ five minutes?",ja:"5分待っていただけますか。",choices:["waiting","to wait","wait","waited"],ans:0,ex:"mind は動名詞だけを目的語にとる。Would you mind doing?"},
+  {tag:"動名詞・動詞の使い分け",en:"He finished ___ his homework.",ja:"彼は宿題をし終えた。",choices:["doing","to do","do","done"],ans:0,ex:"finish は動名詞だけを目的語にとる。finish doing。"},
+];
+
+// ============================================================
+// 論理表現II 語順並べ替え問題
+// ============================================================
+const logicSortQ = [
+  {tag:"語順",en:"私のひいおじいさんは90歳まで生きた。",words:["My","great-grandfather","lived","to","be","90","."],ans:"My great-grandfather lived to be 90 .",ex:"live to be 〜「〜歳まで生きる」。live + to不定詞（結果）。"},
+  {tag:"語順",en:"誰かが私の名前を呼ぶのが聞こえた。",words:["I","heard","someone","call","my","name","."],ans:"I heard someone call my name .",ex:"知覚動詞 hear＋O＋原形。「誰かが名前を呼ぶのを聞いた」。"},
+  {tag:"語順",en:"母親たちは子どもたちを公園で遊ばせた。",words:["Mothers","let","their","children","play","in","the","park","."],ans:"Mothers let their children play in the park .",ex:"let＋O＋原形。「〜させる（許可）」。to は不要。"},
+  {tag:"語順",en:"あなたに会議に出席していただきたい。",words:["I","would","like","you","to","attend","the","meeting","."],ans:"I would like you to attend the meeting .",ex:"would like＋O＋to do。want の丁寧表現。"},
+  {tag:"語順",en:"私は彼女のチームがその試合に勝つと確信している。",words:["I'm","sure","of","her","team","winning","the","game","."],ans:"I'm sure of her team winning the game .",ex:"sure of doing。her team が動名詞の意味上の主語。"},
+  {tag:"語順",en:"電気をつけっぱなしにするとはあなたは不注意だった。",words:["It","was","careless","of","you","to","leave","the","light","on","all","night","."],ans:"It was careless of you to leave the light on all night .",ex:"It was＋人の性質の形容詞＋of＋人＋to do。careless→of を使う。"},
+  {tag:"語順",en:"さよならも言わずに、その男性は立ち去った。",words:["The","man","went","away","without","saying","goodbye","."],ans:"The man went away without saying goodbye .",ex:"without doing「〜せずに」。前置詞の後は動名詞。"},
+  {tag:"語順",en:"私は早起きに慣れている。",words:["I'm","used","to","getting","up","early","."],ans:"I'm used to getting up early .",ex:"be used to doing「〜することに慣れている」。to は前置詞→動名詞！"},
+  {tag:"語順",en:"その植物は毎日水をやる必要がない。",words:["The","plant","doesn't","need","to","be","watered","every","day","."],ans:"The plant doesn't need to be watered every day .",ex:"need to be watered「水をやられる必要がある」。不定詞の受動態。"},
+  {tag:"語順",en:"そのフルーツはあまりにも固すぎてそのナイフでは切れなかった。",words:["The","fruit","was","too","hard","to","be","cut","with","the","knife","."],ans:"The fruit was too hard to be cut with the knife .",ex:"too＋形容詞＋to do。be cut「切られる」の不定詞受動態。"},
+];
+
+// ============================================================
+// 英語コミュニケーションII 選択問題
+// ============================================================
+const commChoiceQ = [
+  {tag:"語彙",en:"Different combinations of musical notes ___ different impressions on listeners.",ja:"音符の様々な組み合わせは聴衆に異なる印象を残す。",choices:["leave","make","give","put"],ans:0,ex:"leave an impression on〜「〜に印象を残す」。leave が正解。"},
+  {tag:"語彙",en:"Society can't remain ___ to homeless people.",ja:"社会はホームレスの人々に無関心でいられない。",choices:["indifferent","curious","firm","prior"],ans:0,ex:"indifferent「無関心な」。remain indifferent to〜「〜に無関心でいる」。"},
+  {tag:"語彙",en:"I'm ___ to agree with your opinion here.",ja:"私はここであなたの意見を賛成したいと思っています。",choices:["inclined","optimistic","indifferent","potential"],ans:0,ex:"be inclined to do「〜したい気持ちがある・〜する傾向がある」。"},
+  {tag:"語彙",en:"The ( ) of Norway is the krone.",ja:"ノルウェーの通貨はクローネです。",choices:["currency","circumstance","counter","eyesight"],ans:0,ex:"currency「通貨」。circumstance「状況」、counter「カウンター」と区別する。"},
+  {tag:"語彙",en:"She is ( ) to live to a hundred.",ja:"彼女は100歳まで生きそうだ。",choices:["likely","influential","pretty","mutual"],ans:0,ex:"be likely to do「〜しそうだ」。likely は可能性を表す重要形容詞。"},
+  {tag:"語彙",en:"I'm ( ) to a college in the United States.",ja:"私はアメリカの大学に出願しています。",choices:["applying","emitting","surprising","fascinating"],ans:0,ex:"apply to〜「〜に出願する・応募する」。apply の -ing 形。"},
+  {tag:"読解",en:"Why are street pianos called 'street pianos'?",ja:"なぜストリートピアノと呼ばれるのですか？",choices:["Because they are placed in public spaces","Because they are very old","Because they play music automatically","Because they are made of metal"],ans:0,ex:"本文より：placed in public spaces = 公共の場所に置かれているから。"},
+  {tag:"読解",en:"Who started the street piano project?",ja:"ストリートピアノのプロジェクトを始めたのは誰ですか？",choices:["Luke Jerram","Jane Johnson","Amy","Peter"],ans:0,ex:"本文より：British artist Luke Jerram が2008年にプロジェクトを開始した。"},
+  {tag:"読解",en:"When did the street piano project start?",ja:"プロジェクトはいつ始まりましたか？",choices:["2008","2010","2006","2012"],ans:0,ex:"本文より：It started in 2008. ルーク・ジェラムが地元のランドリーを訪れた時にアイデアを得た。"},
+  {tag:"読解",en:"Fast fashion products often end up in ___ within a year.",ja:"ファストファッション製品はしばしば1年以内にゴミになる。",choices:["landfills","shops","museums","wardrobes"],ans:0,ex:"本文より：half of all fast fashion products are thrown away within a year → sent to landfills。"},
+  {tag:"語彙",en:"Many people think it is ( ) to keep animals in cages.",ja:"多くの人は動物をおりに閉じ込めるのは残酷だと考えている。",choices:["cruel","ignorant","rough","major"],ans:0,ex:"cruel「残酷な」。keep animals in cages「動物をおりに入れておく」文脈から判断。"},
+  {tag:"語彙",en:"Natto is very healthy, even though it smells ( ).",ja:"納豆はひどいにおいがするが、とても健康に良い。",choices:["awful","different","dirty","regional"],ans:0,ex:"awful「ひどい」。smell awful「ひどいにおいがする」。"},
+  {tag:"読解",en:"Street pianos can ___ people from different backgrounds.",ja:"ストリートピアノは異なる背景を持つ人々をつなぐことができる。",choices:["connect","separate","confuse","ignore"],ans:0,ex:"本文テーマより：ストリートピアノは人々を結びつけるためのプロジェクト。"},
+  {tag:"文法",en:"The audience ( ) excited during the musician's concert.",ja:"そのミュージシャンのコンサートの間、聴衆は興奮しているように見えた。",choices:["looked","became","kept","made"],ans:0,ex:"look excited「興奮しているように見える」。知覚動詞 look＋形容詞。"},
+  {tag:"文法",en:"The teacher ( ) the door open during class.",ja:"先生は授業中ドアを開けたままにしました。",choices:["kept","looked","became","made"],ans:0,ex:"keep＋O＋形容詞「Oを〜の状態に保つ」。kept the door open。"},
+];
+
+// ============================================================
+// 英語コミュニケーションII 語順並べ替え問題
+// ============================================================
+const commSortQ = [
+  {tag:"語順",en:"ファストファッションは世界中でとても人気になってきています。",words:["Fast","fashion","has","become","very","popular","all","over","the","world","."],ans:"Fast fashion has become very popular all over the world .",ex:"has become「〜になってきた」。現在完了形。"},
+  {tag:"語順",en:"彼女は10分前に電話をしてきたから、もうすぐ到着するはずだ。",words:["She","should","arrive","soon","because","she","called","me","ten","minutes","ago","."],ans:"She should arrive soon because she called me ten minutes ago .",ex:"should「〜するはず」。because節で理由を表す。"},
+  {tag:"語順",en:"私は先生に怒られて先生によって窓を割ったことを叱られた。",words:["I","was","scolded","by","my","teacher","because","I","broke","the","window","."],ans:"I was scolded by my teacher because I broke the window .",ex:"be scolded by〜「〜に叱られる」。受動態。"},
+  {tag:"語順",en:"彼女は会議に遅れるかもしれません。",words:["She","may","be","late","for","the","conference","."],ans:"She may be late for the conference .",ex:"may「〜かもしれない」。be late for〜「〜に遅れる」。"},
+  {tag:"語順",en:"あなたのプロジェクトには大金が必要です。",words:["You","need","a","huge","amount","of","money","for","your","project","."],ans:"You need a huge amount of money for your project .",ex:"a huge amount of〜「大量の〜」。"},
+  {tag:"語順",en:"一生懸命勉強すれば、これらの質問が簡単だとわかるでしょう。",words:["If","you","study","hard",",","you'll","find","these","questions","easy","."],ans:"If you study hard , you'll find these questions easy .",ex:"find＋O＋形容詞「Oが〜だとわかる」。条件節はif。"},
+  {tag:"語順",en:"彼女はキャプテンに選ばれて満足だった。",words:["She","was","satisfied","with","being","chosen","as","captain","."],ans:"She was satisfied with being chosen as captain .",ex:"be satisfied with doing「〜することに満足している」。前置詞の後は動名詞。"},
+  {tag:"語順",en:"彼女はヨーロッパに行くことを楽しみにしている。",words:["She","is","looking","forward","to","going","to","Europe","."],ans:"She is looking forward to going to Europe .",ex:"look forward to doing「〜を楽しみにする」。to は前置詞→動名詞。"},
+];
+
+// ============================================================
+// State
+// ============================================================
+const state = {
+  logic: { cur:0, score:0, answered:false, wrongList:[], shuffle:false, mode:'choice', active:[] },
+  comm:  { cur:0, score:0, answered:false, wrongList:[], shuffle:false, mode:'choice', active:[] },
+};
+let currentTab = 'logic';
+// 語順問題用
+const sortState = { logic:{placed:[], pool:[]}, comm:{placed:[], pool:[]} };
+
+function shuffleArr(arr) {
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('logicArea').style.display = tab==='logic'?'block':'none';
+  document.getElementById('commArea').style.display  = tab==='comm' ?'block':'none';
+  document.getElementById('tabLogic').className = 'tab-btn' + (tab==='logic'?' active-logic':'');
+  document.getElementById('tabComm').className  = 'tab-btn' + (tab==='comm' ?' active-comm':'');
+}
+
+function toggleShuffle(tab) {
+  const s = state[tab];
+  s.shuffle = !s.shuffle;
+  const btn = document.getElementById(tab==='logic'?'lShuffleBtn':'cShuffleBtn');
+  btn.className = 'shuffle-btn' + (s.shuffle ? (' on-'+tab) : '');
+  btn.textContent = s.shuffle ? '🔀 シャッフル中' : '🔀 シャッフル';
+  initQuiz(tab);
+}
+
+function setMode(tab, mode) {
+  state[tab].mode = mode;
+  const prefix = tab==='logic'?'l':'c';
+  document.getElementById(prefix+'ModeChoice').className = 'mode-btn' + (mode==='choice'?' active-'+tab:'');
+  document.getElementById(prefix+'ModeSort').className   = 'mode-btn' + (mode==='sort'  ?' active-'+tab:'');
+  initQuiz(tab);
+}
+
+function initQuiz(tab) {
+  const s = state[tab];
+  s.cur=0; s.score=0; s.answered=false; s.wrongList=[];
+  const pool = s.mode==='choice'
+    ? (tab==='logic'?logicChoiceQ:commChoiceQ)
+    : (tab==='logic'?logicSortQ:commSortQ);
+  s.active = s.shuffle ? shuffleArr(pool) : [...pool];
+  const prefix = tab==='logic'?'l':'c';
+  document.getElementById(prefix+'QuizArea').classList.remove('hide');
+  document.getElementById(prefix+'ResultScreen').classList.remove('show');
+  renderQ(tab);
+}
+
+function renderQ(tab) {
+  const s = state[tab];
+  const q = s.active[s.cur];
+  const prefix = tab==='logic'?'l':'c';
+  const total = s.active.length;
+  const pct = Math.round((s.cur/total)*100);
+  document.getElementById(prefix+'ProgressText').textContent = (s.cur+1)+' / '+total;
+  document.getElementById(prefix+'ProgressPct').textContent = pct+'%';
+  document.getElementById(prefix+'ProgressFill').style.width = pct+'%';
+  document.getElementById(tab==='logic'?'lScoreBadge':'cScoreBadge').textContent = s.score+'点';
+  s.answered = false;
+
+  const nextBtn = document.getElementById(prefix+'NextBtn');
+  if(nextBtn) nextBtn.textContent = s.cur+1<total?'次の問題 →':'結果を見る';
+
+  document.getElementById(prefix+'NavWrap').classList.remove('show');
+
+  if(s.mode==='choice') renderChoice(tab, q);
+  else renderSort(tab, q);
+}
+
+function renderChoice(tab, q) {
+  const prefix = tab==='logic'?'l':'c';
+  const isComm = tab==='comm';
+  const blankClass = isComm?'blank blank-comm':'blank';
+  const tagClass = isComm?'q-tag tag-comm':'q-tag tag-logic';
+  const labels = ['A','B','C','D'];
+
+  // 選択肢シャッフル（正解位置をランダムに）
+  const idxs = shuffleArr([0,1,2,3]);
+  const shuffledChoices = idxs.map(i=>q.choices[i]);
+  const newAns = idxs.indexOf(q.ans);
+
+  const choicesHTML = shuffledChoices.map((c,i)=>`
+    <button class="choice-btn${isComm?' comm-btn':''}" id="${prefix}choice${i}" onclick="answer('${tab}',${i},${newAns})">
+      <span class="choice-label">${labels[i]}</span>
+      <span>${c}</span>
+    </button>
+  `).join('');
+
+  document.getElementById(prefix+'QCard').innerHTML = `
+    <span class="${tagClass}">${q.tag}</span>
+    <div class="q-en">${q.en.replace('___','<span class="'+blankClass+'">　　　　</span>').replace('( )','<span class="'+blankClass+'">　　　　</span>')}</div>
+    <div class="q-ja">${q.ja}</div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="explanation${isComm?' comm-ex':''}" id="${prefix}explanation">
+      <div class="ex-correct">✓ 正解：${shuffledChoices[newAns]}</div>
+      <div class="ex-text">${q.ex}</div>
+    </div>
+  `;
+}
+
+function answer(tab, i, correctIdx) {
+  const s = state[tab];
+  if(s.answered) return;
+  s.answered = true;
+  const prefix = tab==='logic'?'l':'c';
+  const btns = document.querySelectorAll(`#${prefix}QCard .choice-btn`);
+  btns.forEach(b=>b.disabled=true);
+  if(i===correctIdx) {
+    btns[i].classList.add('correct');
+    s.score++;
+  } else {
+    btns[i].classList.add('wrong');
+    btns[correctIdx].classList.add('show-answer');
+    s.wrongList.push(s.cur);
+  }
+  document.getElementById(prefix+'explanation').classList.add('show');
+  document.getElementById(tab==='logic'?'lScoreBadge':'cScoreBadge').textContent = s.score+'点';
+  document.getElementById(prefix+'NavWrap').classList.add('show');
+}
+
+function renderSort(tab, q) {
+  const prefix = tab==='logic'?'l':'c';
+  const isComm = tab==='comm';
+  const tagClass = isComm?'q-tag tag-comm':'q-tag tag-logic';
+
+  sortState[tab].placed = [];
+  sortState[tab].pool = shuffleArr([...q.words]);
+
+  const ss = sortState[tab];
+
+  document.getElementById(prefix+'QCard').innerHTML = `
+    <span class="${tagClass}">${q.tag}</span>
+    <div class="q-ja" style="font-size:15px;color:var(--text);margin-bottom:12px">${q.en}</div>
+    <div class="sort-area">
+      <div class="sort-label">↓ タップして選ぶ</div>
+      <div class="word-pool" id="${prefix}Pool">${ss.pool.map((w,i)=>`<span class="word-chip pool-chip${isComm?' comm-pool':''}" onclick="pickWord('${tab}',${i})">${w}</span>`).join('')}</div>
+      <div class="sort-label">↓ 並べた順番（タップで戻す）</div>
+      <div class="answer-row" id="${prefix}AnswerRow"></div>
+      <button class="check-btn check-${tab}" onclick="checkSort('${tab}')" id="${prefix}CheckBtn">答え合わせ</button>
+    </div>
+    <div class="sort-result" id="${prefix}SortResult"></div>
+  `;
+}
+
+function pickWord(tab, poolIdx) {
+  const s = sortState[tab];
+  const prefix = tab==='logic'?'l':'c';
+  const isComm = tab==='comm';
+
+  const word = s.pool[poolIdx];
+  if(word===null) return;
+  s.pool[poolIdx] = null;
+  s.placed.push({word, poolIdx});
+
+  // re-render pool
+  const poolEl = document.getElementById(prefix+'Pool');
+  poolEl.innerHTML = s.pool.map((w,i)=>w===null?'':`<span class="word-chip pool-chip${isComm?' comm-pool':''}" onclick="pickWord('${tab}',${i})">${w}</span>`).join('');
+
+  // render answer row
+  const ansEl = document.getElementById(prefix+'AnswerRow');
+  ansEl.classList.add('has-words');
+  ansEl.innerHTML = s.placed.map((p,i)=>`<span class="word-chip answer-chip${isComm?' comm-chip':''}" onclick="removeWord('${tab}',${i})">${p.word}</span>`).join('');
+}
+
+function removeWord(tab, placedIdx) {
+  const s = sortState[tab];
+  const prefix = tab==='logic'?'l':'c';
+  const isComm = tab==='comm';
+
+  const item = s.placed[placedIdx];
+  s.pool[item.poolIdx] = item.word;
+  s.placed.splice(placedIdx, 1);
+
+  // re-render pool
+  const poolEl = document.getElementById(prefix+'Pool');
+  poolEl.innerHTML = s.pool.map((w,i)=>w===null?'':`<span class="word-chip pool-chip${isComm?' comm-pool':''}" onclick="pickWord('${tab}',${i})">${w}</span>`).join('');
+
+  // re-render answer row
+  const ansEl = document.getElementById(prefix+'AnswerRow');
+  if(s.placed.length===0) ansEl.classList.remove('has-words');
+  ansEl.innerHTML = s.placed.map((p,i)=>`<span class="word-chip answer-chip${isComm?' comm-chip':''}" onclick="removeWord('${tab}',${i})">${p.word}</span>`).join('');
+}
+
+function checkSort(tab) {
+  const s = state[tab];
+  const ss = sortState[tab];
+  const prefix = tab==='logic'?'l':'c';
+  const q = s.active[s.cur];
+
+  const userAns = ss.placed.map(p=>p.word).join(' ');
+  const correct = userAns === q.ans;
+
+  if(correct) s.score++;
+  else s.wrongList.push(s.cur);
+  s.answered = true;
+
+  document.getElementById(prefix+'CheckBtn').disabled = true;
+
+  const resultEl = document.getElementById(prefix+'SortResult');
+  resultEl.classList.add('show');
+  if(correct) {
+    resultEl.className = 'sort-result show sort-correct';
+    resultEl.innerHTML = `✓ 正解！<span class="sort-ex">${q.ex}</span>`;
+  } else {
+    resultEl.className = 'sort-result show sort-wrong';
+    resultEl.innerHTML = `✗ 不正解<span class="sort-ans">正解：${q.ans}</span><span class="sort-ex">${q.ex}</span>`;
+  }
+
+  document.getElementById(tab==='logic'?'lScoreBadge':'cScoreBadge').textContent = s.score+'点';
+  document.getElementById(prefix+'NavWrap').classList.add('show');
+}
+
+function nextQ(tab) {
+  const s = state[tab];
+  s.cur++;
+  if(s.cur>=s.active.length) showResult(tab);
+  else renderQ(tab);
+}
+
+function showResult(tab) {
+  const s = state[tab];
+  const prefix = tab==='logic'?'l':'c';
+  const isComm = tab==='comm';
+  document.getElementById(prefix+'QuizArea').classList.add('hide');
+  const rs = document.getElementById(prefix+'ResultScreen');
+  rs.classList.add('show');
+
+  const pct = Math.round((s.score/s.active.length)*100);
+  let icon,msg;
+  if(pct>=90){icon='🏆';msg='すごい！ほぼ完璧！';}
+  else if(pct>=70){icon='⭐';msg='よくできました！';}
+  else if(pct>=50){icon='💪';msg='もう少しで合格ライン！';}
+  else{icon='📖';msg='復習してまた挑戦しよう！';}
+
+  const modeLabel = s.mode==='choice'?'選択問題':'語順並べ替え';
+  const missHTML = s.wrongList.length>0 ? `
+    <div class="miss-section">
+      <div class="miss-title">✗ 間違えた問題（${s.wrongList.length}問）</div>
+      ${s.wrongList.map(idx=>{
+        const wq=s.active[idx];
+        return `<div class="miss-item">
+          <span class="miss-qnum">問${idx+1}</span><span class="miss-tag">${wq.tag}</span>
+          <div class="miss-en">${s.mode==='choice'?wq.en.replace('___','＿＿＿'):wq.en}</div>
+          <div class="miss-ans">正解：${s.mode==='choice'?wq.choices[wq.ans]:wq.ans}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  ` : `<div style="background:var(--green-light);border:1px solid var(--green);border-radius:12px;padding:16px;text-align:center;color:var(--green);font-weight:700;margin-bottom:12px">全問正解！パーフェクト！🎉</div>`;
+
+  rs.innerHTML = `
+    <div class="result-hero">
+      <div class="result-icon">${icon}</div>
+      <div class="result-score ${isComm?'score-c-comm':'score-c-logic'}">${s.score}<span class="result-denom"> / ${s.active.length}</span></div>
+      <div class="result-pct">${pct}%　（${modeLabel}）</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" style="color:var(--green)">${s.score}</div><div class="stat-lbl">正解</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--red)">${s.active.length-s.score}</div><div class="stat-lbl">不正解</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:${isComm?'var(--comm-accent)':'var(--logic-accent)'}">${pct}%</div><div class="stat-lbl">正解率</div></div>
+    </div>
+    ${missHTML}
+    <button class="retry-btn retry-${tab}" onclick="initQuiz('${tab}')">もう一度挑戦する 🔄</button>
+  `;
+}
+
+// 起動
+initQuiz('logic');
+initQuiz('comm');
+</script>
+</body>
+</html>
