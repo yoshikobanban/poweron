@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英語定期テスト対策アプリ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+  :root {
+    --green-dark: #1a6b4a;
+    --green-mid: #2d9e6b;
+    --green-light: #e8f7f0;
+    --green-pale: #f3faf6;
+    --leaf: #5cb85c;
+    --earth: #8b6914;
+    --sky: #4a90c4;
+    --sky-light: #e8f3fb;
+    --text: #1a2e22;
+    --text-sub: #5a7a66;
+    --white: #ffffff;
+    --border: #c8e6d4;
+    --correct: #2d9e6b;
+    --wrong: #e05252;
+    --wrong-light: #fdeaea;
+    --neutral: #f0f0f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', 'Hiragino Sans', sans-serif;
+    background: var(--green-pale);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ヘッダー */
+  header {
+    background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+    color: white;
+    padding: 20px 24px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '🌿';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 56px;
+    opacity: 0.25;
+  }
+  header h1 { font-size: 1.1rem; font-weight: 800; letter-spacing: 0.05em; }
+  header p { font-size: 0.8rem; opacity: 0.85; margin-top: 4px; }
+
+  /* タブ */
+  nav {
+    display: flex;
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav button {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-sub);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  nav button.active {
+    color: var(--green-dark);
+    border-bottom-color: var(--green-mid);
+  }
+
+  /* メインコンテンツ */
+  main { padding: 20px 16px 40px; max-width: 680px; margin: 0 auto; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* セクションタイトル */
+  .section-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+  }
+
+  /* 英文テキスト */
+  .passage-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 4px solid var(--green-mid);
+    margin-bottom: 16px;
+    line-height: 2;
+    font-size: 0.95rem;
+  }
+  .passage-card .sentence { display: block; margin-bottom: 4px; }
+  .passage-card .translation {
+    display: none;
+    color: var(--text-sub);
+    font-size: 0.82rem;
+    margin-top: 2px;
+    padding-left: 12px;
+    border-left: 2px solid var(--border);
+  }
+  .passage-card.show-trans .translation { display: block; }
+
+  .read-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--green-mid);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 12px;
+    transition: background 0.2s;
+  }
+  .read-btn:hover { background: var(--green-dark); }
+  .read-btn.reading { background: var(--earth); }
+
+  .toggle-trans {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    cursor: pointer;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  /* 速度コントロール */
+  .speed-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    font-weight: 600;
+  }
+  .speed-control input[type=range] {
+    flex: 1;
+    accent-color: var(--green-mid);
+  }
+
+  /* 単語カード */
+  .word-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .word-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .word-card:hover { border-color: var(--green-mid); }
+  .word-card .word-en {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--green-dark);
+  }
+  .word-card .word-pos {
+    font-size: 0.7rem;
+    color: var(--text-sub);
+    font-weight: 600;
+    margin: 2px 0;
+  }
+  .word-card .word-ja {
+    font-size: 0.85rem;
+    color: var(--text);
+    display: none;
+  }
+  .word-card.revealed .word-ja { display: block; }
+  .word-card .word-hint {
+    font-size: 0.72rem;
+    color: var(--text-sub);
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  /* 文法 */
+  .grammar-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--sky);
+  }
+  .grammar-card h3 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--sky);
+    margin-bottom: 8px;
+  }
+  .grammar-card .pattern {
+    background: var(--sky-light);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .grammar-card .example {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    line-height: 1.6;
+  }
+  .grammar-card .example em {
+    color: var(--sky);
+    font-style: normal;
+    font-weight: 700;
+  }
+
+  /* 問題共通 */
+  .quiz-progress {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .score-badge {
+    background: var(--green-light);
+    color: var(--green-dark);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+  }
+
+  .question-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1.5px solid var(--border);
+  }
+  .question-card .q-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .question-card .q-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .blank { 
+    display: inline-block;
+    border-bottom: 2px solid var(--green-mid);
+    min-width: 80px;
+    text-align: center;
+    color: var(--green-mid);
+    font-weight: 800;
+  }
+
+  /* 4択 */
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .choice-btn {
+    background: var(--neutral);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 12px 10px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    line-height: 1.3;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--green-mid); background: var(--green-light); }
+  .choice-btn.correct { background: var(--green-light); border-color: var(--correct); color: var(--correct); }
+  .choice-btn.wrong { background: var(--wrong-light); border-color: var(--wrong); color: var(--wrong); }
+
+  /* 並び替え */
+  .word-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 48px; margin-bottom: 12px; }
+  .word-chip {
+    background: var(--green-light);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--green-dark);
+  }
+  .word-chip:hover { border-color: var(--green-mid); transform: translateY(-1px); }
+  .word-chip.selected { background: var(--green-mid); color: white; border-color: var(--green-dark); }
+  .answer-area {
+    background: var(--green-pale);
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .answer-area .word-chip { background: var(--white); }
+
+  /* ボタン */
+  .btn-check {
+    background: var(--green-dark);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 28px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: background 0.2s;
+  }
+  .btn-check:hover { background: var(--green-mid); }
+  .btn-next {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    padding: 12px 24px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--text-sub);
+    transition: all 0.2s;
+  }
+  .btn-next:hover { border-color: var(--green-mid); color: var(--green-dark); }
+
+  .feedback {
+    display: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 10px;
+  }
+  .feedback.correct { display: block; background: var(--green-light); color: var(--correct); }
+  .feedback.wrong { display: block; background: var(--wrong-light); color: var(--wrong); }
+
+  /* 結果 */
+  .result-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+    border: 2px solid var(--border);
+  }
+  .result-card .big-score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--green-dark);
+    line-height: 1;
+  }
+  .result-card p { color: var(--text-sub); margin-top: 8px; font-size: 0.9rem; }
+  .btn-retry {
+    display: inline-block;
+    margin-top: 20px;
+    background: var(--green-mid);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 32px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌍 英語定期テスト対策</h1>
+  <p>Environment & SDGs — 中学生向け</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('reading')">📖 音読</button>
+  <button onclick="showSection('words')">📝 重要単語</button>
+  <button onclick="showSection('grammar')">✏️ 文法</button>
+  <button onclick="showSection('blank')">🔲 穴埋め</button>
+  <button onclick="showSection('arrange')">🔀 並び替え</button>
+</nav>
+
+<main>
+
+<!-- ===== 音読 ===== -->
+<section id="reading" class="section active">
+  <div class="section-title">📖 本文を読もう</div>
+
+  <button class="read-btn" id="readBtn" onclick="toggleRead()">
+    <span id="readIcon">▶</span> 音読スタート
+  </button>
+
+  <div class="speed-control">
+    <span>速度：</span>
+    <input type="range" id="speedRange" min="0.5" max="1.5" step="0.1" value="0.9" oninput="updateSpeed()">
+    <span id="speedLabel">0.9×</span>
+  </div>
+
+  <button class="toggle-trans" onclick="toggleTrans()">日本語訳を表示 / 非表示</button>
+
+  <div class="passage-card" id="passageCard">
+    <span class="sentence" id="s0">Our planet is facing a serious problem.</span>
+    <span class="translation">私たちの地球は深刻な問題に直面しています。</span>
+
+    <span class="sentence" id="s1">The temperature of the earth is rising every year.</span>
+    <span class="translation">地球の気温は毎年上昇しています。</span>
+
+    <span class="sentence" id="s2">This is called global warming, and it affects all living things.</span>
+    <span class="translation">これは地球温暖化と呼ばれ、すべての生き物に影響を与えます。</span>
+
+    <span class="sentence" id="s3">One of the main causes is too much carbon dioxide in the air.</span>
+    <span class="translation">主な原因の一つは、空気中の二酸化炭素が多すぎることです。</span>
+
+    <span class="sentence" id="s4">We produce carbon dioxide when we use cars, factories, and electricity.</span>
+    <span class="translation">車や工場、電気を使うときに二酸化炭素が発生します。</span>
+
+    <span class="sentence" id="s5">However, there are things we can do to help.</span>
+    <span class="translation">しかし、私たちができることがあります。</span>
+
+    <span class="sentence" id="s6">For example, using renewable energy like solar or wind power is important.</span>
+    <span class="translation">たとえば、太陽光や風力などの再生可能エネルギーを使うことが大切です。</span>
+
+    <span class="sentence" id="s7">We should also reduce, reuse, and recycle things in our daily lives.</span>
+    <span class="translation">また、日常生活でリデュース・リユース・リサイクルを心がけるべきです。</span>
+
+    <span class="sentence" id="s8">The SDGs remind us that everyone has a role to play.</span>
+    <span class="translation">SDGsは、誰もが役割を担うべきだと教えてくれます。</span>
+
+    <span class="sentence" id="s9">Small actions in our daily lives can make a big difference for the future.</span>
+    <span class="translation">日常の小さな行動が、未来に大きな変化をもたらすことができます。</span>
+  </div>
+</section>
+
+<!-- ===== 重要単語 ===== -->
+<section id="words" class="section">
+  <div class="section-title">📝 重要単語（タップで意味を確認）</div>
+  <div class="word-grid" id="wordGrid"></div>
+</section>
+
+<!-- ===== 文法 ===== -->
+<section id="grammar" class="section">
+  <div class="section-title">✏️ 本文の重要文法</div>
+
+  <div class="grammar-card">
+    <h3>① 受動態（be動詞 + 過去分詞）</h3>
+    <div class="pattern">S + is/are + 過去分詞 「〜される・〜と呼ばれる」</div>
+    <div class="example">
+      This <em>is called</em> global warming.<br>
+      → これは地球温暖化<em>と呼ばれています</em>。<br><br>
+      ポイント：call → called（過去分詞）
+    </div>
+  </div>
+
+  <div class="grammar-card">
+    <h3>② should + 動詞の原形</h3>
+    <div class="pattern">S + should + 動詞原形 「〜すべきだ」</div>
+    <div class="example">
+      We <em>should reduce</em>, reuse, and recycle.<br>
+      → 私たちはリデュース・リユース・リサイクル<em>をすべきです</em>。<br><br>
+      ポイント：義務・推奨を表す助動詞
+    </div>
+  </div>
+
+  <div class="grammar-card">
+    <h3>③ 不定詞の形容詞的用法</h3>
+    <div class="pattern">名詞 + to + 動詞原形 「〜するための…」</div>
+    <div class="example">
+      there are things <em>we can do to help</em>.<br>
+      → <em>助けるためにできる</em>ことがあります。<br><br>
+      ポイント：things を to help が後ろから修飾
+    </div>
+  </div>
+
+  <div class="grammar-card">
+    <h3>④ 比較級（-er / more）</h3>
+    <div class="pattern">比較級 + than 「〜よりも…」</div>
+    <div class="example">
+      Small actions can make a <em>bigger</em> difference.<br>
+      → 小さな行動が<em>より大きな</em>変化をもたらせる。<br><br>
+      ポイント：big → bigger（短い形容詞は -er）
+    </div>
+  </div>
+</section>
+
+<!-- ===== 穴埋め ===== -->
+<section id="blank" class="section">
+  <div class="section-title">🔲 穴埋め問題</div>
+  <div class="quiz-progress">
+    <span id="blankProgress">問題 1 / 5</span>
+    <span class="score-badge" id="blankScore">0 / 0</span>
+  </div>
+  <div id="blankContainer"></div>
+</section>
+
+<!-- ===== 並び替え ===== -->
+<section id="arrange" class="section">
+  <div class="section-title">🔀 並び替え問題</div>
+  <div class="quiz-progress">
+    <span id="arrangeProgress">問題 1 / 4</span>
+    <span class="score-badge" id="arrangeScore">0 / 0</span>
+  </div>
+  <div id="arrangeContainer"></div>
+</section>
+
+</main>
+
+<script>
+// ===== データ =====
+
+const words = [
+  { en: 'planet', pos: '名詞', ja: '惑星、地球', hint: 'our planet = 私たちの地球' },
+  { en: 'serious', pos: '形容詞', ja: '深刻な、重大な', hint: 'a serious problem' },
+  { en: 'temperature', pos: '名詞', ja: '気温、温度', hint: 'the temperature of the earth' },
+  { en: 'global warming', pos: '名詞句', ja: '地球温暖化', hint: '環境問題の重要キーワード' },
+  { en: 'affect', pos: '動詞', ja: '影響を与える', hint: 'affects all living things' },
+  { en: 'carbon dioxide', pos: '名詞', ja: '二酸化炭素（CO₂）', hint: '化学式はCO₂' },
+  { en: 'cause', pos: '名詞', ja: '原因', hint: 'one of the main causes' },
+  { en: 'renewable', pos: '形容詞', ja: '再生可能な', hint: 'renewable energy' },
+  { en: 'reduce', pos: '動詞', ja: '減らす', hint: '3Rの1つ：Reduce' },
+  { en: 'recycle', pos: '動詞', ja: 'リサイクルする', hint: '3Rの1つ：Recycle' },
+  { en: 'remind', pos: '動詞', ja: '思い出させる', hint: 'remind us that...' },
+  { en: 'difference', pos: '名詞', ja: '違い、変化', hint: 'make a big difference' },
+];
+
+const blankQuestions = [
+  {
+    question: 'Our planet is ( ) a serious problem.',
+    choices: ['facing', 'faced', 'face', 'faces'],
+    answer: 0,
+    explanation: 'is facing（現在進行形）＝直面している'
+  },
+  {
+    question: 'This is ( ) global warming.',
+    choices: ['calling', 'called', 'call', 'to call'],
+    answer: 1,
+    explanation: 'is called（受動態）＝〜と呼ばれている'
+  },
+  {
+    question: 'Using ( ) energy like solar power is important.',
+    choices: ['recycled', 'serious', 'renewable', 'global'],
+    answer: 2,
+    explanation: 'renewable energy = 再生可能エネルギー'
+  },
+  {
+    question: 'We ( ) reduce, reuse, and recycle things.',
+    choices: ['must not', 'should', 'cannot', 'were'],
+    answer: 1,
+    explanation: 'should = 〜すべきだ（義務・推奨）'
+  },
+  {
+    question: 'Small actions can make a big ( ) for the future.',
+    choices: ['cause', 'problem', 'difference', 'temperature'],
+    answer: 2,
+    explanation: 'make a difference = 変化をもたらす'
+  },
+];
+
+const arrangeQuestions = [
+  {
+    ja: '地球の気温は毎年上昇しています。',
+    words: ['The', 'temperature', 'of', 'the', 'earth', 'is', 'rising', 'every', 'year', '.'],
+    answer: 'The temperature of the earth is rising every year .'
+  },
+  {
+    ja: '私たちは日常生活でリサイクルをすべきです。',
+    words: ['We', 'should', 'recycle', 'things', 'in', 'our', 'daily', 'lives', '.'],
+    answer: 'We should recycle things in our daily lives .'
+  },
+  {
+    ja: '太陽光エネルギーを使うことが大切です。',
+    words: ['Using', 'solar', 'energy', 'is', 'important', '.'],
+    answer: 'Using solar energy is important .'
+  },
+  {
+    ja: '誰もが役割を担うべきです。',
+    words: ['Everyone', 'has', 'a', 'role', 'to', 'play', '.'],
+    answer: 'Everyone has a role to play .'
+  },
+];
+
+// ===== タブ切り替え =====
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===== 音読 =====
+let utterance = null;
+let reading = false;
+let speechRate = 0.9;
+const sentences = [
+  'Our planet is facing a serious problem.',
+  'The temperature of the earth is rising every year.',
+  'This is called global warming, and it affects all living things.',
+  'One of the main causes is too much carbon dioxide in the air.',
+  'We produce carbon dioxide when we use cars, factories, and electricity.',
+  'However, there are things we can do to help.',
+  'For example, using renewable energy like solar or wind power is important.',
+  'We should also reduce, reuse, and recycle things in our daily lives.',
+  'The SDGs remind us that everyone has a role to play.',
+  'Small actions in our daily lives can make a big difference for the future.'
+];
+let currentSentence = 0;
+
+function highlightSentence(idx) {
+  document.querySelectorAll('.sentence').forEach((el, i) => {
+    el.style.background = i === idx ? '#fff9c4' : '';
+    el.style.borderRadius = '4px';
+  });
+}
+
+function readNext() {
+  if (currentSentence >= sentences.length) {
+    currentSentence = 0;
+    reading = false;
+    document.getElementById('readBtn').innerHTML = '▶ 音読スタート';
+    document.getElementById('readBtn').classList.remove('reading');
+    document.querySelectorAll('.sentence').forEach(el => el.style.background = '');
+    return;
+  }
+  highlightSentence(currentSentence);
+  utterance = new SpeechSynthesisUtterance(sentences[currentSentence]);
+  utterance.lang = 'en-US';
+  utterance.rate = speechRate;
+  utterance.onend = () => {
+    currentSentence++;
+    if (reading) readNext();
+  };
+  speechSynthesis.speak(utterance);
+}
+
+function toggleRead() {
+  if (!reading) {
+    reading = true;
+    currentSentence = 0;
+    document.getElementById('readBtn').innerHTML = '⏹ 停止';
+    document.getElementById('readBtn').classList.add('reading');
+    readNext();
+  } else {
+    reading = false;
+    speechSynthesis.cancel();
+    document.getElementById('readBtn').innerHTML = '▶ 音読スタート';
+    document.getElementById('readBtn').classList.remove('reading');
+    document.querySelectorAll('.sentence').forEach(el => el.style.background = '');
+  }
+}
+
+function updateSpeed() {
+  speechRate = parseFloat(document.getElementById('speedRange').value);
+  document.getElementById('speedLabel').textContent = speechRate.toFixed(1) + '×';
+}
+
+function toggleTrans() {
+  document.getElementById('passageCard').classList.toggle('show-trans');
+}
+
+// ===== 単語 =====
+function buildWords() {
+  const grid = document.getElementById('wordGrid');
+  grid.innerHTML = '';
+  words.forEach((w, i) => {
+    const card = document.createElement('div');
+    card.className = 'word-card';
+    card.innerHTML = `<div class="word-en">${w.en}</div><div class="word-pos">${w.pos}</div><div class="word-ja">${w.ja}</div><div class="word-hint">${w.hint}</div>`;
+    card.onclick = () => card.classList.toggle('revealed');
+    grid.appendChild(card);
+  });
+}
+
+// ===== 穴埋め =====
+let blankIdx = 0;
+let blankCorrect = 0;
+let blankAnswered = 0;
+
+function buildBlank(idx) {
+  if (idx >= blankQuestions.length) {
+    showBlankResult();
+    return;
+  }
+  const q = blankQuestions[idx];
+  const displayQ = q.question.replace('( )', '<span class="blank">　　　</span>');
+  const container = document.getElementById('blankContainer');
+  container.innerHTML = `
+    <div class="question-card">
+      <div class="q-label">問題 ${idx + 1}</div>
+      <div class="q-text">${displayQ}</div>
+      <div class="choices" id="blankChoices"></div>
+      <div class="feedback" id="blankFeedback"></div>
+    </div>
+    <button class="btn-next" id="blankNext" style="display:none" onclick="nextBlank()">次の問題 →</button>
+  `;
+  document.getElementById('blankProgress').textContent = `問題 ${idx + 1} / ${blankQuestions.length}`;
+  const choicesEl = document.getElementById('blankChoices');
+  q.choices.forEach((c, ci) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c;
+    btn.onclick = () => checkBlank(ci, q.answer, q.explanation);
+    choicesEl.appendChild(btn);
+  });
+}
+
+function checkBlank(selected, correct, explanation) {
+  blankAnswered++;
+  const btns = document.querySelectorAll('#blankChoices .choice-btn');
+  btns.forEach(b => b.disabled = true);
+  const fb = document.getElementById('blankFeedback');
+  if (selected === correct) {
+    btns[selected].classList.add('correct');
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ 正解！　' + explanation;
+    blankCorrect++;
+  } else {
+    btns[selected].classList.add('wrong');
+    btns[correct].classList.add('correct');
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ 不正解。正解は「' + blankQuestions[blankIdx].choices[correct] + '」　' + explanation;
+  }
+  document.getElementById('blankScore').textContent = blankCorrect + ' / ' + blankAnswered;
+  document.getElementById('blankNext').style.display = 'inline-block';
+}
+
+function nextBlank() {
+  blankIdx++;
+  buildBlank(blankIdx);
+}
+
+function showBlankResult() {
+  document.getElementById('blankContainer').innerHTML = `
+    <div class="result-card">
+      <div class="big-score">${blankCorrect}<span style="font-size:1.5rem;color:var(--text-sub)"> / ${blankQuestions.length}</span></div>
+      <p>${blankCorrect === blankQuestions.length ? '🎉 パーフェクト！素晴らしい！' : blankCorrect >= 3 ? '👍 よくできました！もう一度チャレンジしよう' : '📖 本文を見直してもう一度！'}</p>
+      <button class="btn-retry" onclick="resetBlank()">もう一度挑戦</button>
+    </div>
+  `;
+}
+
+function resetBlank() {
+  blankIdx = 0; blankCorrect = 0; blankAnswered = 0;
+  document.getElementById('blankScore').textContent = '0 / 0';
+  buildBlank(0);
+}
+
+// ===== 並び替え =====
+let arrangeIdx = 0;
+let arrangeCorrect = 0;
+let arrangeAnswered = 0;
+let selectedWords = [];
+let remainingWords = [];
+
+function buildArrange(idx) {
+  if (idx >= arrangeQuestions.length) {
+    showArrangeResult();
+    return;
+  }
+  const q = arrangeQuestions[idx];
+  selectedWords = [];
+  remainingWords = [...q.words];
+  const shuffled = [...q.words].sort(() => Math.random() - 0.5);
+
+  document.getElementById('arrangeContainer').innerHTML = `
+    <div class="question-card">
+      <div class="q-label">問題 ${idx + 1}</div>
+      <div class="q-text">🇯🇵 ${q.ja}</div>
+      <div style="font-size:0.78rem;color:var(--text-sub);margin-bottom:8px;font-weight:600;">単語をタップして並び替えてください</div>
+      <div class="answer-area" id="answerArea"></div>
+      <div class="word-chips" id="wordChips"></div>
+      <div class="feedback" id="arrangeFeedback"></div>
+    </div>
+    <button class="btn-check" onclick="checkArrange()">確認する</button>
+    <button class="btn-next" id="arrangeNext" style="display:none" onclick="nextArrange()">次の問題 →</button>
+  `;
+  document.getElementById('arrangeProgress').textContent = `問題 ${idx + 1} / ${arrangeQuestions.length}`;
+
+  const chipsEl = document.getElementById('wordChips');
+  shuffled.forEach(w => {
+    const chip = document.createElement('button');
+    chip.className = 'word-chip';
+    chip.textContent = w;
+    chip.dataset.word = w;
+    chip.onclick = () => moveToAnswer(chip, w);
+    chipsEl.appendChild(chip);
+  });
+}
+
+function moveToAnswer(chip, word) {
+  if (chip.classList.contains('selected')) return;
+  chip.classList.add('selected');
+  selectedWords.push(word);
+  const area = document.getElementById('answerArea');
+  const answerChip = document.createElement('button');
+  answerChip.className = 'word-chip';
+  answerChip.textContent = word;
+  answerChip.onclick = () => returnToPool(answerChip, word, chip);
+  area.appendChild(answerChip);
+}
+
+function returnToPool(answerChip, word, originalChip) {
+  selectedWords = selectedWords.filter((w, i) => {
+    if (w === word && !answerChip._removed) { answerChip._removed = true; return false; }
+    return true;
+  });
+  answerChip.remove();
+  originalChip.classList.remove('selected');
+}
+
+function checkArrange() {
+  const q = arrangeQuestions[arrangeIdx];
+  const userAnswer = selectedWords.join(' ');
+  arrangeAnswered++;
+  const fb = document.getElementById('arrangeFeedback');
+  document.querySelector('.btn-check').disabled = true;
+  if (userAnswer === q.answer) {
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ 正解！';
+    arrangeCorrect++;
+  } else {
+    fb.className = 'feedback wrong';
+    fb.textContent = '❌ 不正解。正しい順序: ' + q.answer.replace(' .', '.');
+  }
+  document.getElementById('arrangeScore').textContent = arrangeCorrect + ' / ' + arrangeAnswered;
+  document.getElementById('arrangeNext').style.display = 'inline-block';
+}
+
+function nextArrange() {
+  arrangeIdx++;
+  buildArrange(arrangeIdx);
+}
+
+function showArrangeResult() {
+  document.getElementById('arrangeContainer').innerHTML = `
+    <div class="result-card">
+      <div class="big-score">${arrangeCorrect}<span style="font-size:1.5rem;color:var(--text-sub)"> / ${arrangeQuestions.length}</span></div>
+      <p>${arrangeCorrect === arrangeQuestions.length ? '🎉 全問正解！完璧です！' : '📖 間違えた問題を本文で確認してみよう！'}</p>
+      <button class="btn-retry" onclick="resetArrange()">もう一度挑戦</button>
+    </div>
+  `;
+}
+
+function resetArrange() {
+  arrangeIdx = 0; arrangeCorrect = 0; arrangeAnswered = 0;
+  document.getElementById('arrangeScore').textContent = '0 / 0';
+  buildArrange(0);
+}
+
+// ===== 初期化 =====
+buildWords();
+buildBlank(0);
+buildArrange(0);
+</script>
+</body>
+</html>
