@@ -660,6 +660,28 @@ function highlightSentence(idx) {
   });
 }
 
+// 良い音声を選ぶ（Chromeなどでロボット声になるのを防ぐ）
+let bestVoice = null;
+function pickBestVoice() {
+  const voices = speechSynthesis.getVoices();
+  if (!voices.length) return null;
+  const priorities = [
+    v => /Google US English/i.test(v.name),
+    v => /Natural/i.test(v.name) && /en/i.test(v.lang),
+    v => v.lang === 'en-US',
+    v => /^en/i.test(v.lang)
+  ];
+  for (const test of priorities) {
+    const found = voices.find(test);
+    if (found) return found;
+  }
+  return voices[0];
+}
+bestVoice = pickBestVoice();
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => { bestVoice = pickBestVoice(); };
+}
+
 function readNext() {
   if (currentSentence >= sentences.length) {
     currentSentence = 0;
@@ -672,6 +694,7 @@ function readNext() {
   highlightSentence(currentSentence);
   utterance = new SpeechSynthesisUtterance(sentences[currentSentence]);
   utterance.lang = 'en-US';
+  if (bestVoice) utterance.voice = bestVoice;
   utterance.rate = speechRate;
   utterance.onend = () => {
     currentSentence++;
