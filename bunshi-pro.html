@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動名詞②・分詞 練習クイズ PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #2563EB;
+  --blue-light: #EFF6FF;
+  --green: #16A34A;
+  --green-light: #F0FDF4;
+  --red: #DC2626;
+  --red-light: #FEF2F2;
+  --orange: #EA580C;
+  --orange-light: #FFF7ED;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-400: #9CA3AF;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'BIZ UDPGothic', 'Noto Sans JP', sans-serif;
+  background: #F0F4FF;
+  min-height: 100vh;
+  padding: 16px;
+  color: var(--gray-900);
+}
+.container { max-width: 640px; margin: 0 auto; }
+
+/* ヘッダー */
+.header {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title { font-size: 17px; font-weight: 700; color: var(--blue); }
+.header-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+.score-badge {
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.shuffle-btn {
+  border: 2px solid var(--blue);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  background: white; color: var(--blue);
+}
+.shuffle-btn.on { background: var(--blue); color: white; }
+
+/* モード選択画面 */
+.mode-screen { display: none; }
+.mode-screen.show { display: block; }
+.mode-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+.mode-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.mode-card:active { transform: translateY(0) scale(0.99); }
+.mode-icon { font-size: 32px; margin-bottom: 8px; }
+.mode-title { font-size: 17px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
+.mode-count {
+  display: inline-block;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+.mode-count.empty { background: var(--gray-100); color: var(--gray-400); }
+
+/* プログレス */
+.progress-wrap {
+  background: white;
+  border-radius: var(--radius);
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+.progress-bar { background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, var(--blue), #60A5FA); height: 8px; border-radius: 4px; transition: width 0.4s ease; }
+.progress-fill.orange { background: linear-gradient(90deg, var(--orange), #FB923C); }
+
+/* 問題カード（4択） */
+.question-card { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.q-tag { display: inline-block; background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.q-tag.orange-tag { background: var(--orange-light); color: var(--orange); }
+.q-en { font-size: 17px; line-height: 1.7; color: var(--gray-900); margin-bottom: 8px; }
+.blank { display: inline-block; border-bottom: 3px solid var(--blue); min-width: 100px; text-align: center; color: var(--blue); font-weight: 700; padding: 0 4px; }
+.q-ja { font-size: 13px; color: var(--gray-400); padding: 8px 12px; background: var(--gray-50); border-radius: var(--radius-sm); line-height: 1.6; }
+
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.choice-btn {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+  border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white;
+  font-family: inherit; font-size: 15px; color: var(--gray-800); cursor: pointer;
+  text-align: left; transition: all 0.15s; line-height: 1.5; width: 100%;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); transform: translateX(2px); }
+.choice-btn:disabled { cursor: default; }
+.choice-label {
+  display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+  border-radius: 50%; background: var(--gray-100); font-weight: 700; font-size: 13px;
+  color: var(--gray-600); flex-shrink: 0; transition: all 0.15s;
+}
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.choice-btn.show-answer { border-color: var(--green); background: var(--green-light); }
+.choice-btn.show-answer .choice-label { background: var(--green); color: white; }
+
+/* 並べ替え用 */
+.rearrange-target {
+  display: flex; flex-wrap: wrap; gap: 8px; min-height: 56px;
+  padding: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200);
+  border-radius: var(--radius-sm); margin-top: 14px; align-items: flex-start;
+}
+.rearrange-target.filled { border-style: solid; background: var(--blue-light); border-color: var(--blue); }
+.rearrange-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.word-chip {
+  padding: 9px 14px; background: white; border: 2px solid var(--gray-200);
+  border-radius: 20px; font-size: 15px; font-family: inherit; cursor: pointer;
+  transition: all 0.15s; color: var(--gray-800);
+}
+.word-chip:hover { border-color: var(--blue); background: var(--blue-light); }
+.word-chip.placed { opacity: 0.35; cursor: default; pointer-events: none; }
+.word-chip.in-target { background: var(--blue); color: white; border-color: var(--blue); cursor: pointer; }
+.rearrange-actions { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn {
+  flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm);
+  background: white; font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--gray-600); cursor: pointer;
+}
+.action-btn:hover { border-color: var(--gray-400); }
+.check-btn {
+  width: 100%; margin-top: 12px; padding: 13px; background: var(--orange); color: white;
+  border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 15px;
+  font-weight: 700; cursor: pointer;
+}
+.check-btn:hover { background: #C2410C; }
+.check-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+
+/* 解説 */
+.explanation { display: none; margin-top: 14px; padding: 14px; background: #F8F9FF; border-left: 4px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.explanation.orange-border { border-left-color: var(--orange); background: #FFF9F5; }
+.explanation.show { display: block; }
+.ex-correct { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.ex-correct.wrong-flag { color: var(--red); }
+.ex-text { font-size: 13px; color: var(--gray-600); line-height: 1.7; }
+.ex-yourans { font-size: 13px; color: var(--red); margin-bottom: 4px; }
+
+/* ナビ */
+.nav-wrap { display: none; margin-top: 14px; }
+.nav-wrap.show { display: block; }
+.next-btn { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.next-btn:hover { background: #1D4ED8; }
+.next-btn.orange { background: var(--orange); }
+.next-btn.orange:hover { background: #C2410C; }
+
+.quiz-area { display: block; }
+.quiz-area.hide { display: none; }
+.result-screen { display: none; }
+.result-screen.show { display: block; }
+
+/* 結果画面 */
+.result-hero { background: white; border-radius: var(--radius); padding: 28px 20px; text-align: center; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.result-icon { font-size: 48px; margin-bottom: 8px; }
+.result-score { font-size: 56px; font-weight: 700; color: var(--blue); line-height: 1; }
+.result-denom { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result-pct { font-size: 18px; color: var(--gray-600); margin: 6px 0; }
+.result-msg { font-size: 16px; font-weight: 700; color: var(--gray-800); margin-top: 10px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card { background: white; border-radius: var(--radius-sm); padding: 14px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.stat-num { font-size: 26px; font-weight: 700; }
+.stat-lbl { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.correct-c { color: var(--green); }
+.wrong-c { color: var(--red); }
+.blue-c { color: var(--blue); }
+.miss-section { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.miss-title { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.miss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; line-height: 1.6; }
+.miss-item:last-child { border-bottom: none; }
+.miss-qnum { color: var(--gray-400); font-size: 12px; }
+.miss-en { color: var(--gray-800); }
+.miss-ans { color: var(--green); font-weight: 700; font-size: 12px; margin-top: 2px; }
+.miss-tag { display: inline-block; background: var(--gray-100); color: var(--gray-600); font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+.btn-row { display: flex; flex-direction: column; gap: 10px; }
+.retry-btn { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+.retry-btn:hover { background: #1D4ED8; }
+.retry-btn.outline { background: white; color: var(--gray-600); border: 2px solid var(--gray-200); }
+.retry-btn.outline:hover { border-color: var(--gray-400); }
+.retry-btn.wrong-only { background: var(--red); }
+.retry-btn.wrong-only:hover { background: #B91C1C; }
+.retry-btn.wrong-only:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+
+.back-link { text-align: center; margin-top: 14px; }
+.back-link a { color: var(--gray-400); font-size: 13px; text-decoration: none; cursor: pointer; }
+.back-link a:hover { color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div style="flex:1">
+      <div class="header-title">動名詞②・分詞 練習クイズ PRO</div>
+      <div class="header-sub" id="headerSub">Vision Quest 1 p.65〜73</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+      <div class="score-badge" id="scoreBadge" style="display:none">0点</div>
+    </div>
+  </div>
+
+  <!-- モード選択画面 -->
+  <div class="mode-screen show" id="modeScreen">
+    <div class="mode-card" onclick="startMode('mc')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-title">4択クイズ</div>
+      <div class="mode-desc">動名詞②・分詞の基本問題。間違えたら解説が出ます。</div>
+      <span class="mode-count" id="mcCount">全35問</span>
+      <div style="margin-top:10px">
+        <label style="font-size:13px;color:var(--gray-600)">
+          <input type="checkbox" id="shuffleCheck" onchange="shuffleMode=this.checked" style="margin-right:6px">
+          出題順をシャッフルする
+        </label>
+      </div>
+    </div>
+
+    <div class="mode-card" onclick="startMode('rearrange')">
+      <div class="mode-icon">🔀</div>
+      <div class="mode-title">並べ替えクイズ</div>
+      <div class="mode-desc">語群をタップして正しい英文を組み立てます。分詞構文の語順問題が中心。</div>
+      <span class="mode-count" id="reCount">全12問</span>
+    </div>
+
+    <div class="mode-card" onclick="startMode('wrongonly')" id="wrongOnlyCard">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-title">苦手問題だけ復習</div>
+      <div class="mode-desc">前回間違えた問題だけを再出題します。全問正解したらクリアです。</div>
+      <span class="mode-count empty" id="wrongCount">保存された苦手問題：0問</span>
+    </div>
+  </div>
+
+  <!-- プログレス -->
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <div class="progress-info">
+      <span id="progressText">1 / 35</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="quiz-area" id="quizArea" style="display:none">
+    <div class="question-card" id="qCard"></div>
+    <div class="nav-wrap" id="navWrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">次の問題 →</button>
+    </div>
+    <div class="back-link"><a onclick="backToMenu()">← モード選択に戻る</a></div>
+  </div>
+
+  <div class="result-screen" id="resultScreen"></div>
+</div>
+
+<script>
+/* ============ 4択問題バンク（35問） ============ */
+const mcQuestions = [
+  {tag:"動名詞が表す時",en:"She is proud of ___ a nurse.",ja:"彼女は看護師であることを誇りに思っている。",choices:["being","to be","have been","be"],ans:0,ex:"動名詞 being は述語動詞と「同じ時」を表す。= She is proud that she is a nurse。"},
+  {tag:"動名詞が表す時",en:"She is proud of ___ a nurse.（過去のこと）",ja:"彼女は看護師だったことを誇りに思っている。",choices:["having been","being","to have been","have being"],ans:0,ex:"having been は述語動詞より「前の時」を表す。= She is proud that she was a nurse。"},
+  {tag:"動名詞/不定詞を目的語とする動詞",en:"We enjoyed ___ cards.",ja:"私たちはトランプをして楽しんだ。",choices:["playing","to play","play","played"],ans:0,ex:"enjoy は動名詞のみを目的語にする動詞。enjoy doing「〜することを楽しむ」。"},
+  {tag:"動名詞/不定詞を目的語とする動詞",en:"I hope ___ you again.",ja:"あなたにまた会いたいです。",choices:["to see","seeing","see","saw"],ans:0,ex:"hope は不定詞のみを目的語にする動詞。hope to do「〜することを望む」。"},
+  {tag:"目的語が動名詞と不定詞で意味が異なる動詞",en:"I remember ___ him at the party.",ja:"私はパーティーで彼に会ったのを覚えている。",choices:["seeing","to see","see","saw"],ans:0,ex:"remember doing「（過去に）〜したことを覚えている」。remember to do「これから〜することを覚えている」とは意味が違う。"},
+  {tag:"目的語が動名詞と不定詞で意味が異なる動詞",en:"Remember ___ off the lights.",ja:"忘れずに照明を消してね。",choices:["to turn","turning","turn","turned"],ans:0,ex:"remember to do「これから〜することを覚えている（忘れずに〜する）」。未来の行動を指す。"},
+  {tag:"動名詞を使った構文",en:"It's no use ___ with him anymore.",ja:"これ以上、彼と議論しても無駄だ。",choices:["arguing","to argue","argue","argued"],ans:0,ex:"It is no use doing「〜しても無駄である」の構文。use の後は動名詞。"},
+  {tag:"動名詞を使った構文",en:"There is no ___ what will happen.",ja:"何が起こるかわからない。",choices:["telling","to tell","tell","told"],ans:0,ex:"There is no doing「〜することはできない」の構文。no の後は動名詞。"},
+  {tag:"分詞・名詞を修飾（前置修飾）",en:"Firefighters entered the ___ house.",ja:"消防士たちは燃えている家に入った。",choices:["burning","burned","burn","to burn"],ans:0,ex:"分詞1語で名詞を修飾する場合は名詞の前に置く。burning house「燃えている家」（現在分詞＝〜している）。"},
+  {tag:"分詞・名詞を修飾（後置修飾）",en:"Do you know the girl ___ to Sally?",ja:"サリーと話している少女を知っていますか。",choices:["talking","talked","talk","to talk"],ans:0,ex:"分詞が2語以上のまとまりで名詞を修飾する場合は名詞の後ろに置く。the girl talking to Sally。"},
+  {tag:"分詞・名詞を修飾（過去分詞）",en:"Be careful of the ___ glass.",ja:"割れたガラスに注意しなさい。",choices:["broken","breaking","break","to break"],ans:0,ex:"過去分詞は「〜された」という受け身の意味。broken glass「割れたガラス」。"},
+  {tag:"補語になる分詞",en:"The mall will remain ___ until Thursday.",ja:"そのショッピングモールは木曜日まで閉まったままだろう。",choices:["closed","closing","close","to close"],ans:0,ex:"SVCの構文で過去分詞が補語（C）になる。The mall is closed.「閉まっている」という関係。"},
+  {tag:"補語になる分詞",en:"She kept me ___ for an hour.",ja:"彼女は私を1時間待たせた。",choices:["waiting","waited","to wait","wait"],ans:0,ex:"SVOCの構文で現在分詞が補語（C）になる。I was waiting.「私は待っていた」という関係。"},
+  {tag:"知覚動詞+O+現在分詞",en:"I saw Steve ___ for a bus.",ja:"私はスティーブがバスを待っているのを見かけた。",choices:["waiting","waited","to wait","wait"],ans:0,ex:"知覚動詞 see ＋ O ＋ 現在分詞「Oが〜しているのを見かける」。進行中の動作を表す。"},
+  {tag:"知覚動詞+O+過去分詞",en:"I saw the book ___ in the paper.",ja:"私はその本が新聞で広告されているのを見かけた。",choices:["advertised","advertising","advertise","to advertise"],ans:0,ex:"知覚動詞 see ＋ O ＋ 過去分詞「Oが〜されるのを見かける」。受け身の意味。"},
+  {tag:"have/get+O+過去分詞",en:"She had her hair ___.",ja:"彼女は髪を切ってもらった。",choices:["cut","cutting","to cut","cuts"],ans:0,ex:"have ＋ O ＋ 過去分詞「Oを〜してもらう」。had her hair cut「髪を切ってもらった」。"},
+  {tag:"have/get+O+過去分詞",en:"She had her bag ___.",ja:"彼女はバッグを盗まれた。",choices:["stolen","stealing","steal","to steal"],ans:0,ex:"have ＋ O ＋ 過去分詞「Oを〜される（被害）」。had her bag stolen「バッグを盗まれた」。"},
+  {tag:"分詞構文・付帯状況",en:"We sat up all night, ___ on the phone.",ja:"電話で話しながら、私たちは夜を明かした。",choices:["talking","talked","talk","to talk"],ans:0,ex:"分詞構文：付帯状況「〜しながら」を表す。We sat up all night while we were talking。"},
+  {tag:"分詞構文・時",en:"___ soccer, he hurt his leg.",ja:"サッカーをしている時に、彼は脚をけがした。",choices:["Playing","Played","To play","Plays"],ans:0,ex:"分詞構文：時を表す「〜している時に」。= While he was playing soccer, he hurt his leg。"},
+  {tag:"分詞構文・連続動作",en:"The train leaves Nagoya at eight, ___ in Tokyo at ten.",ja:"その列車は8時に名古屋を出発し、10時に東京に着く。",choices:["arriving","arrived","arrive","to arrive"],ans:0,ex:"分詞構文：連続した動作・出来事「…して〜する」。= and arrives in Tokyo at ten。"},
+  {tag:"分詞構文・否定形",en:"I just stood there, ___ what to do.",ja:"何をしてよいかわからないまま、私はただそこに立っていた。",choices:["not knowing","knowing not","not to know","don't know"],ans:0,ex:"分詞構文の否定形は〈not ＋ doing〉の形。not は分詞の直前に置く。"},
+  {tag:"完了形の分詞構文",en:"___ my homework, I went to bed.",ja:"宿題を終えてから、私は寝た。",choices:["Having finished","Finishing","Having finish","To have finished"],ans:0,ex:"完了形の分詞構文〈having ＋ 過去分詞〉は主節よりも「前のこと」を表す。= After I had finished my homework。"},
+  {tag:"慣用的な独立分詞構文",en:"___ from this picture, he is very tall.",ja:"この写真から判断すると、彼はとても背が高い。",choices:["Judging","Judged","Judge","To judge"],ans:0,ex:"慣用的な独立分詞構文：judging from 〜「〜から判断すると」。主節と主語が異なっても主語を示さない。"},
+  {tag:"付帯状況のwith",en:"He waited for her to come back with the engine ___.",ja:"エンジンをかけたまま、彼は彼女が戻ってくるのを待った。",choices:["running","ran","run","to run"],ans:0,ex:"〈with ＋ 名詞 ＋ 現在分詞〉「Aが〜している状態で」付帯状況を表す。エンジンが「動いている」ので現在分詞。"},
+  {tag:"付帯状況のwith",en:"The woman was sitting with her legs ___.",ja:"その女性は脚を組んで座っていた。",choices:["crossed","crossing","cross","to cross"],ans:0,ex:"〈with ＋ 名詞 ＋ 過去分詞〉「Aが〜された状態で」付帯状況を表す。脚は「組まれる」ので過去分詞。"},
+  {tag:"動名詞・前置詞+動名詞",en:"Kate was afraid of ___ talked to by others.",ja:"ケイトは他人に話しかけられることを恐れていた。",choices:["being","to be","have been","be"],ans:0,ex:"前置詞 of の後は動名詞。受け身の動名詞〈being ＋ 過去分詞〉「〜されること」。"},
+  {tag:"動名詞・否定形",en:"It's no use ___ to her now.",ja:"今彼女に話しても無駄だ。彼女はすっかり怒っている。",choices:["not talking","talking not","not to talk","don't talk"],ans:0,ex:"動名詞の否定形は〈not ＋ doing〉。It's no use not talking のように not は動名詞の直前。"},
+  {tag:"動名詞・受動態",en:"My little sister is tired of ___ like a child.",ja:"私の妹は子ども扱いされることにうんざりしている。",choices:["being treated","treating","to be treated","treated"],ans:0,ex:"動名詞の受動態〈being ＋ 過去分詞〉「〜されること」。tired of doing「〜することにうんざり」。"},
+  {tag:"分詞・名詞を修飾",en:"They have a son ___ Chris.",ja:"彼らにはクリスと名付けられた息子がいる。",choices:["named","naming","name","to name"],ans:0,ex:"過去分詞の後置修飾。a son named Chris「クリスと名付けられた息子」（受け身の意味）。"},
+  {tag:"知覚動詞+O+原形不定詞",en:"I saw the man ___ out of the car.",ja:"私はその男が車から降りるのを見た。",choices:["get","getting","to get","got"],ans:0,ex:"知覚動詞 see ＋ O ＋ 原形不定詞「Oが〜するのを見る」。一連の動作の完了を表す時はこちらを使う。"},
+  {tag:"使役動詞+O+過去分詞",en:"Can you make yourself ___ in English?",ja:"英語で自分の言いたいことを伝えられますか。",choices:["understood","understanding","to understand","understand"],ans:0,ex:"make ＋ O ＋ 過去分詞「Oを〜される状態にする」。make yourself understood「自分の意思を伝える」。"},
+  {tag:"分詞構文・理由",en:"___ in plain English, this book is easy to read.",ja:"わかりやすい英語で書かれているので、この本は読みやすい。",choices:["Written","Writing","To write","Write"],ans:0,ex:"分詞構文：理由を表す「〜なので」= Because it is written in plain English。受け身なので過去分詞。"},
+  {tag:"分詞構文・慣用表現",en:"___, he is a kind person.",ja:"一般的に言って、彼は親切な人だ。",choices:["Generally speaking","Generally spoken","Generally to speak","Generally spoke"],ans:0,ex:"慣用的な独立分詞構文：generally speaking「一般的に言って」。frankly speaking なども同様。"},
+  {tag:"動名詞・前置詞for",en:"I apologized to him for ___ such a thing.",ja:"私はそんなことを言ってしまったことを彼に謝った。",choices:["having said","saying","to have said","to say"],ans:0,ex:"having done は述語動詞より「前の時」を表す動名詞の完了形。apologize for having said「言ってしまったことを謝る」。"},
+  {tag:"分詞・補語（SVOC）",en:"Keep the door ___.",ja:"ドアに鍵を掛けたままにしておいてください。",choices:["locked","locking","to lock","lock"],ans:0,ex:"keep ＋ O ＋ 過去分詞「Oを〜された状態に保つ」。The door is locked.「ドアは鍵がかかっている」の関係。"},
+];
+
+/* ============ 並べ替え問題バンク（12問） ============ */
+const rearrangeQuestions = [
+  {tag:"分詞構文・完了形", ja:"宿題を終えてから、私は寝た。", words:["Having","finished","my","homework,","I","went","to","bed."], answer:"Having finished my homework, I went to bed.", ex:"完了形の分詞構文〈Having＋過去分詞〉が文頭。主節より前のことを表す。"},
+  {tag:"分詞構文・時", ja:"サッカーをしている時に、彼は脚をけがした。", words:["Playing","soccer,","he","hurt","his","leg."], answer:"Playing soccer, he hurt his leg.", ex:"分詞構文の基本形。Playing soccer が「〜している時に」を表す。"},
+  {tag:"分詞構文・連続動作", ja:"その列車は8時に名古屋を出発し、10時に東京に着く。", words:["The","train","leaves","Nagoya","at","eight,","arriving","in","Tokyo","at","ten."], answer:"The train leaves Nagoya at eight, arriving in Tokyo at ten.", ex:"文末の分詞構文。連続した動作「…して〜する」を表す。"},
+  {tag:"分詞構文・否定形", ja:"何をしてよいかわからないまま、私はただそこに立っていた。", words:["I","just","stood","there,","not","knowing","what","to","do."], answer:"I just stood there, not knowing what to do.", ex:"分詞構文の否定形は〈not＋doing〉。not は分詞の直前に置く。"},
+  {tag:"慣用的独立分詞構文", ja:"この写真から判断すると、彼はとても背が高い。", words:["Judging","from","this","picture,","he","is","very","tall."], answer:"Judging from this picture, he is very tall.", ex:"judging from 〜「〜から判断すると」。慣用的な独立分詞構文。"},
+  {tag:"分詞構文・理由", ja:"わかりやすい英語で書かれているので、この本は読みやすい。", words:["Written","in","plain","English,","this","book","is","easy","to","read."], answer:"Written in plain English, this book is easy to read.", ex:"過去分詞で始まる分詞構文。理由「〜なので」を表す。受け身の意味。"},
+  {tag:"付帯状況のwith", ja:"その女性は脚を組んで座っていた。", words:["The","woman","was","sitting","with","her","legs","crossed."], answer:"The woman was sitting with her legs crossed.", ex:"〈with＋名詞＋過去分詞〉。legsは「組まれる」ので過去分詞crossed。"},
+  {tag:"付帯状況のwith", ja:"エンジンをかけたまま、彼は彼女が戻ってくるのを待った。", words:["He","waited","for","her","to","come","back","with","the","engine","running."], answer:"He waited for her to come back with the engine running.", ex:"〈with＋名詞＋現在分詞〉。engineは「動いている」ので現在分詞running。"},
+  {tag:"知覚動詞+O+分詞", ja:"私はスティーブがバスを待っているのを見かけた。", words:["I","saw","Steve","waiting","for","a","bus."], answer:"I saw Steve waiting for a bus.", ex:"知覚動詞see＋O＋現在分詞「Oが〜しているのを見かける」。"},
+  {tag:"have+O+過去分詞", ja:"彼女はバッグを盗まれた。", words:["She","had","her","bag","stolen."], answer:"She had her bag stolen.", ex:"have＋O＋過去分詞「Oを〜される（被害）」。had her bag stolen。"},
+  {tag:"分詞・後置修飾", ja:"サリーと話している少女を知っていますか。", words:["Do","you","know","the","girl","talking","to","Sally?"], answer:"Do you know the girl talking to Sally?", ex:"2語以上の分詞のまとまりは名詞の後ろに置く（後置修飾）。"},
+  {tag:"動名詞・前置詞for", ja:"私はそんなことを言ってしまったことを彼に謝った。", words:["I","apologized","to","him","for","having","said","such","a","thing."], answer:"I apologized to him for having said such a thing.", ex:"動名詞の完了形〈having＋過去分詞〉。謝った時点より前に言ったこと。"},
+];
+
+/* ============ 状態管理 ============ */
+let mode = null;            // 'mc' | 'rearrange' | 'wrongonly'
+let cur = 0, score = 0, answered = false;
+let wrongList = [];         // このセッションで間違えた問題（{mode, q}の配列）
+let activeQuestions = [];
+let shuffleMode = false;
+
+const STORAGE_KEY = 'gerund_participle_wrongbank_v1';
+
+function loadWrongBank() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+function saveWrongBank(bank) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); } catch(e) {}
+}
+function addToWrongBank(item) {
+  const bank = loadWrongBank();
+  // 重複防止（同じmode+enで判定）
+  const key = item.mode + '::' + (item.q.en || item.q.ja);
+  if (!bank.some(b => (b.mode + '::' + (b.q.en || b.q.ja)) === key)) {
+    bank.push(item);
+    saveWrongBank(bank);
+  }
+}
+function removeFromWrongBank(item) {
+  let bank = loadWrongBank();
+  const key = item.mode + '::' + (item.q.en || item.q.ja);
+  bank = bank.filter(b => (b.mode + '::' + (b.q.en || b.q.ja)) !== key);
+  saveWrongBank(bank);
+}
+function updateModeScreenCounts() {
+  document.getElementById('mcCount').textContent = '全' + mcQuestions.length + '問';
+  document.getElementById('reCount').textContent = '全' + rearrangeQuestions.length + '問';
+  const bank = loadWrongBank();
+  const wcEl = document.getElementById('wrongCount');
+  const wcCard = document.getElementById('wrongOnlyCard');
+  if (bank.length > 0) {
+    wcEl.textContent = '保存された苦手問題：' + bank.length + '問';
+    wcEl.classList.remove('empty');
+    wcCard.style.opacity = '1';
+  } else {
+    wcEl.textContent = '保存された苦手問題：0問（まずクイズに挑戦しよう）';
+    wcEl.classList.add('empty');
+    wcCard.style.opacity = '0.6';
+  }
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function backToMenu() {
+  mode = null;
+  document.getElementById('modeScreen').classList.add('show');
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('scoreBadge').style.display = 'none';
+  updateModeScreenCounts();
+}
+
+function startMode(m) {
+  mode = m;
+  cur = 0; score = 0; answered = false; wrongList = [];
+
+  if (m === 'mc') {
+    activeQuestions = shuffleMode ? shuffleArray(mcQuestions) : [...mcQuestions];
+  } else if (m === 'rearrange') {
+    activeQuestions = shuffleArray(rearrangeQuestions);
+  } else if (m === 'wrongonly') {
+    const bank = loadWrongBank();
+    if (bank.length === 0) { return; }
+    activeQuestions = shuffleArray(bank.map(b => b.q)).map((q, i) => {
+      // 元のmodeを保持
+      const origItem = bank.find(b => (b.q.en || b.q.ja) === (q.en || q.ja));
+      q.__origMode = origItem ? origItem.mode : 'mc';
+      return q;
+    });
+  }
+
+  document.getElementById('modeScreen').classList.remove('show');
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('scoreBadge').style.display = 'block';
+  document.getElementById('headerSub').textContent =
+    m === 'mc' ? '4択クイズ' : m === 'rearrange' ? '並べ替えクイズ' : '苦手問題だけ復習';
+
+  renderQ();
+}
+
+function currentQType(q) {
+  if (mode === 'wrongonly') return q.__origMode || (q.words ? 'rearrange' : 'mc');
+  return mode;
+}
+
+function renderQ() {
+  const q = activeQuestions[cur];
+  const qType = currentQType(q);
+  const pct = Math.round((cur / activeQuestions.length) * 100);
+  document.getElementById('progressText').textContent = (cur + 1) + ' / ' + activeQuestions.length;
+  document.getElementById('progressPct').textContent = pct + '%';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = pct + '%';
+  fill.className = 'progress-fill' + (qType === 'rearrange' ? ' orange' : '');
+  document.getElementById('scoreBadge').textContent = score + '点';
+  answered = false;
+
+  if (qType === 'rearrange') {
+    renderRearrangeQ(q);
+  } else {
+    renderMCQ(q);
+  }
+
+  document.getElementById('navWrap').classList.remove('show');
+}
+
+function renderMCQ(q) {
+  const order = [0, 1, 2, 3];
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  q.displayOrder = order;
+  const correctDisplayIndex = order.indexOf(q.ans);
+  const labels = ['A', 'B', 'C', 'D'];
+  const choicesHTML = order.map((origIdx, dispIdx) => `
+    <button class="choice-btn" id="choice${dispIdx}" onclick="answerMC(${dispIdx})">
+      <span class="choice-label">${labels[dispIdx]}</span>
+      <span>${q.choices[origIdx]}</span>
+    </button>
+  `).join('');
+
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag" id="qtag" style="visibility:hidden">${q.tag}</span>
+    <div class="q-en">${q.en.replace('___', '<span class="blank">　　　　</span>')}</div>
+    <div class="q-ja">${q.ja}</div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="explanation" id="explanation">
+      <div class="ex-correct">✓ 正解：${labels[correctDisplayIndex]}．${q.choices[q.ans]}</div>
+      <div class="ex-text">${q.ex}</div>
+    </div>
+  `;
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.className = 'next-btn';
+  nextBtn.textContent = cur + 1 < activeQuestions.length ? '次の問題 →' : '結果を見る';
+}
+
+function answerMC(dispIdx) {
+  if (answered) return;
+  answered = true;
+  const q = activeQuestions[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  const correctDisplayIndex = q.displayOrder.indexOf(q.ans);
+
+  const wasCorrect = (dispIdx === correctDisplayIndex);
+  if (wasCorrect) {
+    btns[dispIdx].classList.add('correct');
+    score++;
+    if (mode === 'wrongonly') removeFromWrongBank({mode:'mc', q});
+  } else {
+    btns[dispIdx].classList.add('wrong');
+    btns[correctDisplayIndex].classList.add('show-answer');
+    wrongList.push(q);
+    addToWrongBank({mode:'mc', q});
+  }
+
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('qtag').style.visibility = 'visible';
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+}
+
+/* ---------- 並べ替えロジック ---------- */
+let rearrangeState = { pool: [], placed: [] };
+
+function renderRearrangeQ(q) {
+  const pool = shuffleArray(q.words.map((w, i) => ({ word: w, id: i })));
+  rearrangeState = { pool, placed: [] };
+
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag orange-tag">${q.tag}</span>
+    <div class="q-ja" style="margin-bottom:14px">${q.ja}</div>
+    <div class="rearrange-target" id="rTarget"></div>
+    <div class="rearrange-pool" id="rPool"></div>
+    <div class="rearrange-actions">
+      <button class="action-btn" onclick="undoWord()">↩️ 1つ戻す</button>
+      <button class="action-btn" onclick="resetWords()">🔄 リセット</button>
+    </div>
+    <button class="check-btn" id="checkBtn" onclick="checkRearrange()" disabled>答え合わせ</button>
+    <div class="explanation orange-border" id="explanation">
+      <div class="ex-correct" id="exCorrectLine">✓ 正解</div>
+      <div class="ex-text" id="exTextLine"></div>
+    </div>
+  `;
+  renderRearrangeUI();
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.className = 'next-btn orange';
+  nextBtn.textContent = cur + 1 < activeQuestions.length ? '次の問題 →' : '結果を見る';
+}
+
+function renderRearrangeUI() {
+  const target = document.getElementById('rTarget');
+  const pool = document.getElementById('rPool');
+  target.innerHTML = rearrangeState.placed.map(item =>
+    `<button class="word-chip in-target" onclick="removeWord(${item.id})">${item.word}</button>`
+  ).join('') || '<span style="color:var(--gray-400);font-size:13px">ここに単語をタップして並べます</span>';
+  target.className = 'rearrange-target' + (rearrangeState.placed.length > 0 ? ' filled' : '');
+
+  pool.innerHTML = rearrangeState.pool.map(item =>
+    `<button class="word-chip" onclick="placeWord(${item.id})">${item.word}</button>`
+  ).join('');
+
+  const allPlaced = rearrangeState.pool.length === 0 && rearrangeState.placed.length > 0;
+  document.getElementById('checkBtn').disabled = !allPlaced;
+}
+
+function placeWord(id) {
+  if (answered) return;
+  const idx = rearrangeState.pool.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const [item] = rearrangeState.pool.splice(idx, 1);
+  rearrangeState.placed.push(item);
+  renderRearrangeUI();
+}
+function removeWord(id) {
+  if (answered) return;
+  const idx = rearrangeState.placed.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const [item] = rearrangeState.placed.splice(idx, 1);
+  rearrangeState.pool.push(item);
+  renderRearrangeUI();
+}
+function undoWord() {
+  if (answered) return;
+  if (rearrangeState.placed.length === 0) return;
+  const item = rearrangeState.placed.pop();
+  rearrangeState.pool.push(item);
+  renderRearrangeUI();
+}
+function resetWords() {
+  if (answered) return;
+  const q = activeQuestions[cur];
+  rearrangeState.pool = [...rearrangeState.pool, ...rearrangeState.placed];
+  rearrangeState.placed = [];
+  renderRearrangeUI();
+}
+
+function checkRearrange() {
+  if (answered) return;
+  answered = true;
+  const q = activeQuestions[cur];
+  const userAnswer = rearrangeState.placed.map(i => i.word).join(' ');
+  const wasCorrect = userAnswer === q.answer;
+
+  document.getElementById('checkBtn').style.display = 'none';
+  document.querySelectorAll('.word-chip').forEach(b => b.disabled = true);
+  document.querySelectorAll('.rearrange-actions .action-btn').forEach(b => b.style.display = 'none');
+
+  const exCorrectLine = document.getElementById('exCorrectLine');
+  const exTextLine = document.getElementById('exTextLine');
+
+  if (wasCorrect) {
+    exCorrectLine.textContent = '✓ 正解！';
+    exCorrectLine.classList.remove('wrong-flag');
+    exTextLine.innerHTML = `<strong>${q.answer}</strong><br><br>${q.ex}`;
+    score++;
+    if (mode === 'wrongonly') removeFromWrongBank({mode:'rearrange', q});
+  } else {
+    exCorrectLine.textContent = '✗ 不正解';
+    exCorrectLine.classList.add('wrong-flag');
+    exTextLine.innerHTML = `あなたの答え：${userAnswer || '（未回答）'}<br>正解：<strong>${q.answer}</strong><br><br>${q.ex}`;
+    wrongList.push(q);
+    addToWrongBank({mode:'rearrange', q});
+  }
+
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+}
+
+function nextQ() {
+  cur++;
+  if (cur >= activeQuestions.length) {
+    showResult();
+  } else {
+    renderQ();
+  }
+}
+
+function showResult() {
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('progressWrap').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  const pct = Math.round((score / activeQuestions.length) * 100);
+  let icon, msg;
+  if (pct === 100) { icon = '🏆'; msg = '全問正解！パーフェクト！'; }
+  else if (pct >= 90) { icon = '🌟'; msg = 'すごい！ほぼ完璧！'; }
+  else if (pct >= 70) { icon = '⭐'; msg = 'よくできました！'; }
+  else if (pct >= 50) { icon = '💪'; msg = 'もう少しで合格ライン！'; }
+  else { icon = '📖'; msg = '復習してまた挑戦しよう！'; }
+
+  const missHTML = wrongList.length > 0 ? `
+    <div class="miss-section">
+      <div class="miss-title">✗ 間違えた問題（${wrongList.length}問）— 苦手バンクに保存しました</div>
+      ${wrongList.map((wq) => {
+        const isRe = !!wq.words;
+        const enLine = isRe ? wq.answer : wq.en.replace('___', '＿＿＿');
+        const ansLine = isRe ? '' : `<div class="miss-ans">正解：${wq.choices[wq.ans]}</div>`;
+        return `<div class="miss-item">
+          <span class="miss-tag">${wq.tag}</span>
+          <div class="miss-en">${enLine}</div>
+          ${ansLine}
+        </div>`;
+      }).join('')}
+    </div>
+  ` : '';
+
+  const bank = loadWrongBank();
+
+  rs.innerHTML = `
+    <div class="result-hero">
+      <div class="result-icon">${icon}</div>
+      <div class="result-score">${score}<span class="result-denom"> / ${activeQuestions.length}</span></div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num correct-c">${score}</div><div class="stat-lbl">正解</div></div>
+      <div class="stat-card"><div class="stat-num wrong-c">${activeQuestions.length - score}</div><div class="stat-lbl">不正解</div></div>
+      <div class="stat-card"><div class="stat-num blue-c">${pct}%</div><div class="stat-lbl">正解率</div></div>
+    </div>
+    ${missHTML}
+    <div class="btn-row">
+      <button class="retry-btn" onclick="startMode('${mode === 'wrongonly' ? 'wrongonly' : mode}')">もう一度同じモードに挑戦 🔄</button>
+      <button class="retry-btn wrong-only" onclick="startMode('wrongonly')" ${bank.length === 0 ? 'disabled' : ''}>
+        苦手問題だけ復習する（${bank.length}問） 🎯
+      </button>
+      <button class="retry-btn outline" onclick="backToMenu()">モード選択に戻る</button>
+    </div>
+  `;
+}
+
+/* 初期化 */
+updateModeScreenCounts();
+</script>
+</body>
+</html>
