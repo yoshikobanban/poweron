@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>関係詞 練習クイズ PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #7C3AED;
+  --blue-light: #F5F3FF;
+  --blue-mid: #DDD6FE;
+  --green: #16A34A;
+  --green-light: #F0FDF4;
+  --red: #DC2626;
+  --red-light: #FEF2F2;
+  --orange: #EA580C;
+  --orange-light: #FFF7ED;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-400: #9CA3AF;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'BIZ UDPGothic', 'Noto Sans JP', sans-serif;
+  background: #F3F0FF;
+  min-height: 100vh;
+  padding: 16px;
+  color: var(--gray-900);
+}
+.container { max-width: 640px; margin: 0 auto; }
+
+.header {
+  background: white;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.header-title { font-size: 17px; font-weight: 700; color: var(--blue); }
+.header-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+.score-badge {
+  background: var(--blue);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.mode-screen { display: none; }
+.mode-screen.show { display: block; }
+.mode-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+}
+.mode-card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.mode-icon { font-size: 32px; margin-bottom: 8px; }
+.mode-title { font-size: 17px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: var(--gray-600); line-height: 1.5; }
+.mode-count { display: inline-block; background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+.mode-count.empty { background: var(--gray-100); color: var(--gray-400); }
+
+.progress-wrap {
+  background: white; border-radius: var(--radius); padding: 12px 18px;
+  margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+.progress-bar { background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, var(--blue), #A78BFA); height: 8px; border-radius: 4px; transition: width 0.4s ease; }
+.progress-fill.orange { background: linear-gradient(90deg, var(--orange), #FB923C); }
+
+.question-card { background: white; border-radius: var(--radius); padding: 20px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.q-tag { display: inline-block; background: var(--blue-light); color: var(--blue); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.q-tag.orange-tag { background: var(--orange-light); color: var(--orange); }
+.q-en { font-size: 17px; line-height: 1.7; color: var(--gray-900); margin-bottom: 8px; }
+.blank { display: inline-block; border-bottom: 3px solid var(--blue); min-width: 100px; text-align: center; color: var(--blue); font-weight: 700; padding: 0 4px; }
+.q-ja { font-size: 13px; color: var(--gray-400); padding: 8px 12px; background: var(--gray-50); border-radius: var(--radius-sm); line-height: 1.6; }
+
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.choice-btn {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px;
+  border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white;
+  font-family: inherit; font-size: 15px; color: var(--gray-800); cursor: pointer;
+  text-align: left; transition: all 0.15s; line-height: 1.5; width: 100%;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-light); transform: translateX(2px); }
+.choice-btn:disabled { cursor: default; }
+.choice-label {
+  display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
+  border-radius: 50%; background: var(--gray-100); font-weight: 700; font-size: 13px;
+  color: var(--gray-600); flex-shrink: 0; transition: all 0.15s;
+}
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.choice-btn.show-answer { border-color: var(--green); background: var(--green-light); }
+.choice-btn.show-answer .choice-label { background: var(--green); color: white; }
+
+.rearrange-target {
+  display: flex; flex-wrap: wrap; gap: 8px; min-height: 56px;
+  padding: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200);
+  border-radius: var(--radius-sm); margin-top: 14px; align-items: flex-start;
+}
+.rearrange-target.filled { border-style: solid; background: var(--blue-light); border-color: var(--blue); }
+.rearrange-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.word-chip {
+  padding: 9px 14px; background: white; border: 2px solid var(--gray-200);
+  border-radius: 20px; font-size: 15px; font-family: inherit; cursor: pointer;
+  transition: all 0.15s; color: var(--gray-800);
+}
+.word-chip:hover { border-color: var(--blue); background: var(--blue-light); }
+.word-chip.in-target { background: var(--blue); color: white; border-color: var(--blue); cursor: pointer; }
+.rearrange-actions { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn {
+  flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm);
+  background: white; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer;
+}
+.action-btn:hover { border-color: var(--gray-400); }
+.check-btn {
+  width: 100%; margin-top: 12px; padding: 13px; background: var(--orange); color: white;
+  border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+}
+.check-btn:hover { background: #C2410C; }
+.check-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+
+.explanation { display: none; margin-top: 14px; padding: 14px; background: #F8F5FF; border-left: 4px solid var(--blue); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.explanation.orange-border { border-left-color: var(--orange); background: #FFF9F5; }
+.explanation.show { display: block; }
+.ex-correct { font-size: 14px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.ex-correct.wrong-flag { color: var(--red); }
+.ex-text { font-size: 13px; color: var(--gray-600); line-height: 1.7; }
+
+.nav-wrap { display: none; margin-top: 14px; }
+.nav-wrap.show { display: block; }
+.next-btn { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.next-btn:hover { opacity: 0.9; }
+.next-btn.orange { background: var(--orange); }
+
+.quiz-area { display: block; }
+.result-screen { display: none; }
+.result-screen.show { display: block; }
+
+.result-hero { background: white; border-radius: var(--radius); padding: 28px 20px; text-align: center; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.result-icon { font-size: 48px; margin-bottom: 8px; }
+.result-score { font-size: 56px; font-weight: 700; color: var(--blue); line-height: 1; }
+.result-denom { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result-pct { font-size: 18px; color: var(--gray-600); margin: 6px 0; }
+.result-msg { font-size: 16px; font-weight: 700; color: var(--gray-800); margin-top: 10px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat-card { background: white; border-radius: var(--radius-sm); padding: 14px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.stat-num { font-size: 26px; font-weight: 700; }
+.stat-lbl { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.correct-c { color: var(--green); }
+.wrong-c { color: var(--red); }
+.blue-c { color: var(--blue); }
+.miss-section { background: white; border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.miss-title { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+.miss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; line-height: 1.6; }
+.miss-item:last-child { border-bottom: none; }
+.miss-en { color: var(--gray-800); }
+.miss-ans { color: var(--green); font-weight: 700; font-size: 12px; margin-top: 2px; }
+.miss-tag { display: inline-block; background: var(--gray-100); color: var(--gray-600); font-size: 11px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
+
+.btn-row { display: flex; flex-direction: column; gap: 10px; }
+.retry-btn { width: 100%; padding: 16px; background: var(--blue); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer; }
+.retry-btn:hover { opacity: 0.9; }
+.retry-btn.outline { background: white; color: var(--gray-600); border: 2px solid var(--gray-200); }
+.retry-btn.wrong-only { background: var(--red); }
+.retry-btn.wrong-only:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+
+.back-link { text-align: center; margin-top: 14px; }
+.back-link a { color: var(--gray-400); font-size: 13px; text-decoration: none; cursor: pointer; }
+.back-link a:hover { color: var(--blue); }
+
+.shuffle-check { font-size: 13px; color: var(--gray-600); margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div style="flex:1">
+      <div class="header-title">関係詞 練習クイズ PRO</div>
+      <div class="header-sub" id="headerSub">Vision Quest 1 Lesson 10-1</div>
+    </div>
+    <div class="score-badge" id="scoreBadge" style="display:none">0点</div>
+  </div>
+
+  <!-- モード選択 -->
+  <div class="mode-screen show" id="modeScreen">
+    <div class="mode-card" onclick="startMode('mc')">
+      <div class="mode-icon">📝</div>
+      <div class="mode-title">4択クイズ</div>
+      <div class="mode-desc">who / which / whom / whose / that の使い分けを4択で練習。</div>
+      <span class="mode-count" id="mcCount">全40問</span>
+      <div class="shuffle-check">
+        <label>
+          <input type="checkbox" id="shuffleCheck" onchange="shuffleMode=this.checked" style="margin-right:6px">
+          出題順をシャッフルする
+        </label>
+      </div>
+    </div>
+    <div class="mode-card" onclick="startMode('rearrange')">
+      <div class="mode-icon">🔀</div>
+      <div class="mode-title">並べ替えクイズ</div>
+      <div class="mode-desc">語群をタップして関係詞を含む英文を組み立てます。</div>
+      <span class="mode-count" id="reCount">全12問</span>
+    </div>
+    <div class="mode-card" onclick="startMode('wrongonly')" id="wrongOnlyCard">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-title">苦手問題だけ復習</div>
+      <div class="mode-desc">前回間違えた問題だけを再出題。全問正解でクリア！</div>
+      <span class="mode-count empty" id="wrongCount">保存された苦手問題：0問</span>
+    </div>
+  </div>
+
+  <!-- プログレス -->
+  <div class="progress-wrap" id="progressWrap" style="display:none">
+    <div class="progress-info">
+      <span id="progressText">1 / 40</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="quiz-area" id="quizArea" style="display:none">
+    <div class="question-card" id="qCard"></div>
+    <div class="nav-wrap" id="navWrap">
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">次の問題 →</button>
+    </div>
+    <div class="back-link"><a onclick="backToMenu()">← モード選択に戻る</a></div>
+  </div>
+
+  <div class="result-screen" id="resultScreen"></div>
+</div>
+
+<script>
+/* ===== 4択問題バンク（20問） ===== */
+const mcQuestions = [
+  {tag:"主格 who",en:"I met a woman ___ spoke French well.",ja:"私はフランス語を上手に話す女性に会った。",choices:["who","which","whom","whose"],ans:0,ex:"先行詞が「人」で関係詞節の中で主語の役割 → who。先行詞が「人以外」なら which。"},
+  {tag:"主格 who",en:"Do you know anyone ___ works in a restaurant?",ja:"レストランで働いている人を誰か知っていますか。",choices:["who","which","whom","whose"],ans:0,ex:"先行詞 anyone は「人」で主格 → who。"},
+  {tag:"主格 who",en:"Jack has a friend ___ knows a lot about computers.",ja:"ジャックはコンピューターにとても詳しい友人がいる。",choices:["who","which","whom","whose"],ans:0,ex:"先行詞 a friend は「人」で主格 → who。"},
+  {tag:"主格 which",en:"She was reading a novel ___ was popular with teenagers.",ja:"彼女は10代に人気のある小説を読んでいた。",choices:["which","who","whom","whose"],ans:0,ex:"先行詞 a novel は「もの」で主格 → which。先行詞が「人」なら who。"},
+  {tag:"主格 which",en:"I bought a book ___ caught my eye.",ja:"私は目に留まった本を買った。",choices:["which","who","whom","whose"],ans:0,ex:"先行詞 a book は「もの」で主格 → which。"},
+  {tag:"目的格 whom / who",en:"The people ___ I met in Korea were nice.",ja:"私が韓国で会った人々は親切だった。",choices:["whom","which","whose","that"],ans:0,ex:"先行詞が「人」で関係詞節の中で目的語の役割 → whom（口語では who も可）。目的格は省略できる。"},
+  {tag:"目的格 whom / who",en:"I have finished the book ___ I borrowed yesterday.",ja:"私は昨日借りた本を読み終えた。",choices:["which","who","whose","whom"],ans:0,ex:"先行詞 the book は「もの」で目的格 → which（that も可）。目的格なので省略も可。"},
+  {tag:"目的格 whom / who",en:"Sally wants some friends with ___ she can talk.",ja:"サリーは話せる友人が欲しい。",choices:["whom","who","which","whose"],ans:0,ex:"前置詞 with の目的語が「人」→ whom。前置詞が前に出るときは who は使えない。"},
+  {tag:"目的格 whom / who",en:"He spoke to a man ___ he had never met before.",ja:"彼は以前会ったことのない男性に話しかけた。",choices:["whom","which","whose","that"],ans:0,ex:"先行詞が「人」で目的格 → whom（口語では who も可）。"},
+  {tag:"所有格 whose",en:"I met a woman ___ sister is a cartoonist.",ja:"私は姉[妹]が漫画家である女性に会った。",choices:["whose","who","which","whom"],ans:0,ex:"「先行詞の〜」という所有の意味 → whose。先行詞が「人」でも「人以外」でも whose を使う。"},
+  {tag:"所有格 whose",en:"The house ___ roof is red is my uncle's.",ja:"屋根が赤い家はおじのものだ。",choices:["whose","which","who","whom"],ans:0,ex:"先行詞が「もの（家）」でも whose を使える。whose roof「その家の屋根」。"},
+  {tag:"所有格 whose",en:"He has a friend ___ father is a doctor.",ja:"彼は父親が医者である友人がいる。",choices:["whose","who","which","whom"],ans:0,ex:"「友人の父親」という所有関係 → whose。whose father「その友人の父」。"},
+  {tag:"関係代名詞 that",en:"He is the first person ___ arrived here.",ja:"彼がここに最初に到着した人だ。",choices:["that","who","which","whom"],ans:0,ex:"先行詞に the first がついているとき → that を使う傾向がある。"},
+  {tag:"関係代名詞 that",en:"All ___ glitters is not gold.",ja:"光るものがすべて金とは限らない。",choices:["that","which","who","whom"],ans:0,ex:"先行詞が all のとき → that を使う。which は不可。"},
+  {tag:"関係代名詞 that",en:"The only thing ___ worries me is my father's health.",ja:"私が心配していることは父の健康だけだ。",choices:["that","who","which","whose"],ans:0,ex:"先行詞に the only がついているとき → that を使う傾向がある。"},
+  {tag:"who / which 使い分け",en:"The movie ___ I saw yesterday was exciting.",ja:"私が昨日見た映画はわくわくするものだった。",choices:["which","who","whose","whom"],ans:0,ex:"先行詞 the movie は「もの」で目的格 → which（that も可）。"},
+  {tag:"who / which 使い分け",en:"John got an email from a friend ___ he had met during his stay in Japan.",ja:"ジョンは日本滞在中に会った友人からメールをもらった。",choices:["whom","whose","which","that"],ans:0,ex:"先行詞 a friend は「人」で目的格 → whom（who / that も可）。"},
+  {tag:"who / which 使い分け",en:"He didn't catch ___ his teacher said.",ja:"彼は先生の言ったことが聞き取れなかった。",choices:["what","which","who","that"],ans:0,ex:"what = the thing which。先行詞を含む関係代名詞。「〜すること[もの]」。"},
+  {tag:"関係代名詞の省略",en:"Ken has two cousins, ___ live in Hawaii.",ja:"ケンにはハワイに住んでいるいとこが2人いる。",choices:["who","which","whom","whose"],ans:0,ex:"非限定用法（コンマあり）の関係代名詞。先行詞「人」→ who。that は非限定用法では使えない。"},
+  {tag:"関係代名詞の省略",en:"Is there anything ___ I can do for you?",ja:"何かお役に立てることはありますか。",choices:["that","which","who","whom"],ans:0,ex:"先行詞 anything のとき → that を使う傾向がある（which も可）。"},
+];
+
+/* ===== 並べ替え問題バンク（8問） ===== */
+const rearrangeQuestions = [
+  {tag:"主格 who", ja:"私はフランス語を上手に話す女性に会った。", words:["I","met","a","woman","who","spoke","French","well."], answer:"I met a woman who spoke French well.", ex:"先行詞 a woman（人）＋主格の who。節の中で spoke の主語になっている。"},
+  {tag:"主格 which", ja:"彼女は10代に人気のある小説を読んでいた。", words:["She","was","reading","a","novel","which","was","popular","with","teenagers."], answer:"She was reading a novel which was popular with teenagers.", ex:"先行詞 a novel（もの）＋主格の which。節の中で was popular の主語になっている。"},
+  {tag:"目的格 whom", ja:"私が韓国で会った人々は親切だった。", words:["The","people","whom","I","met","in","Korea","were","nice."], answer:"The people whom I met in Korea were nice.", ex:"先行詞 the people（人）＋目的格の whom。I met の目的語。省略も可。"},
+  {tag:"所有格 whose", ja:"私は姉が漫画家である女性に会った。", words:["I","met","a","woman","whose","sister","is","a","cartoonist."], answer:"I met a woman whose sister is a cartoonist.", ex:"先行詞 a woman の所有格 whose。「その女性の姉」という関係。"},
+  {tag:"関係代名詞 that", ja:"彼はここに最初に到着した人だ。", words:["He","is","the","first","person","that","arrived","here."], answer:"He is the first person that arrived here.", ex:"先行詞に the first がつくとき → that を使う傾向がある。"},
+  {tag:"所有格 whose", ja:"屋根が赤い家はおじのものだ。", words:["The","house","whose","roof","is","red","is","my","uncle's."], answer:"The house whose roof is red is my uncle's.", ex:"先行詞 the house（もの）の所有格 whose。人以外にも whose が使える。"},
+  {tag:"目的格 which", ja:"これが彼の書いた本です。", words:["This","is","the","book","which","he","wrote."], answer:"This is the book which he wrote.", ex:"先行詞 the book（もの）＋目的格の which。he wrote の目的語。省略も可。"},
+  {tag:"関係代名詞 that", ja:"光るものがすべて金とは限らない。", words:["All","that","glitters","is","not","gold."], answer:"All that glitters is not gold.", ex:"先行詞が all のとき → that を使う。which は不可。"},
+];
+
+/* ===== 状態管理 ===== */
+let mode = null;
+let cur = 0, score = 0, answered = false;
+let wrongList = [];
+let activeQuestions = [];
+let shuffleMode = false;
+const STORAGE_KEY = 'kankei_wrongbank_v1';
+
+function loadWrongBank() {
+  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : []; } catch(e) { return []; }
+}
+function saveWrongBank(bank) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bank)); } catch(e) {}
+}
+function addToWrongBank(item) {
+  const bank = loadWrongBank();
+  const key = item.mode + '::' + (item.q.en || item.q.ja);
+  if (!bank.some(b => (b.mode+'::' + (b.q.en||b.q.ja)) === key)) { bank.push(item); saveWrongBank(bank); }
+}
+function removeFromWrongBank(item) {
+  let bank = loadWrongBank();
+  const key = item.mode + '::' + (item.q.en || item.q.ja);
+  bank = bank.filter(b => (b.mode+'::' + (b.q.en||b.q.ja)) !== key);
+  saveWrongBank(bank);
+}
+
+function updateModeScreenCounts() {
+  document.getElementById('mcCount').textContent = '全' + mcQuestions.length + '問';
+  document.getElementById('reCount').textContent = '全' + rearrangeQuestions.length + '問';
+  const bank = loadWrongBank();
+  const el = document.getElementById('wrongCount');
+  if (bank.length > 0) {
+    el.textContent = '保存された苦手問題：' + bank.length + '問';
+    el.classList.remove('empty');
+  } else {
+    el.textContent = '保存された苦手問題：0問（まずクイズに挑戦しよう）';
+    el.classList.add('empty');
+  }
+}
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function backToMenu() {
+  mode = null;
+  document.getElementById('modeScreen').classList.add('show');
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('scoreBadge').style.display = 'none';
+  updateModeScreenCounts();
+}
+
+function startMode(m) {
+  mode = m;
+  cur = 0; score = 0; answered = false; wrongList = [];
+  if (m === 'mc') activeQuestions = shuffleMode ? shuffleArray(mcQuestions) : [...mcQuestions];
+  else if (m === 'rearrange') activeQuestions = shuffleArray(rearrangeQuestions);
+  else if (m === 'wrongonly') {
+    const bank = loadWrongBank();
+    if (bank.length === 0) return;
+    activeQuestions = shuffleArray(bank.map(b => { b.q.__origMode = b.mode; return b.q; }));
+  }
+  document.getElementById('modeScreen').classList.remove('show');
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('scoreBadge').style.display = 'block';
+  document.getElementById('headerSub').textContent = m === 'mc' ? '4択クイズ' : m === 'rearrange' ? '並べ替えクイズ' : '苦手問題だけ復習';
+  renderQ();
+}
+
+function currentQType(q) {
+  if (mode === 'wrongonly') return q.__origMode || (q.words ? 'rearrange' : 'mc');
+  return mode;
+}
+
+function renderQ() {
+  const q = activeQuestions[cur];
+  const qType = currentQType(q);
+  const pct = Math.round((cur / activeQuestions.length) * 100);
+  document.getElementById('progressText').textContent = (cur+1) + ' / ' + activeQuestions.length;
+  document.getElementById('progressPct').textContent = pct + '%';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = pct + '%';
+  fill.className = 'progress-fill' + (qType === 'rearrange' ? ' orange' : '');
+  document.getElementById('scoreBadge').textContent = score + '点';
+  answered = false;
+  if (qType === 'rearrange') renderRearrangeQ(q);
+  else renderMCQ(q);
+  document.getElementById('navWrap').classList.remove('show');
+}
+
+function renderMCQ(q) {
+  const order = [0,1,2,3];
+  for (let i=order.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [order[i],order[j]]=[order[j],order[i]]; }
+  q.displayOrder = order;
+  const correctDI = order.indexOf(q.ans);
+  const labels = ['A','B','C','D'];
+  const choicesHTML = order.map((origIdx, di) => `
+    <button class="choice-btn" id="choice${di}" onclick="answerMC(${di})">
+      <span class="choice-label">${labels[di]}</span>
+      <span>${q.choices[origIdx]}</span>
+    </button>`).join('');
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag" id="qtag" style="visibility:hidden">${q.tag}</span>
+    <div class="q-en">${q.en.replace('___','<span class="blank">　　　　</span>')}</div>
+    <div class="q-ja">${q.ja}</div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="explanation" id="explanation">
+      <div class="ex-correct">✓ 正解：${labels[correctDI]}．${q.choices[q.ans]}</div>
+      <div class="ex-text">${q.ex}</div>
+    </div>`;
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn';
+  nb.textContent = cur+1 < activeQuestions.length ? '次の問題 →' : '結果を見る';
+}
+
+function answerMC(di) {
+  if (answered) return;
+  answered = true;
+  const q = activeQuestions[cur];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+  const correctDI = q.displayOrder.indexOf(q.ans);
+  if (di === correctDI) {
+    btns[di].classList.add('correct'); score++;
+    if (mode === 'wrongonly') removeFromWrongBank({mode:'mc', q});
+  } else {
+    btns[di].classList.add('wrong'); btns[correctDI].classList.add('show-answer');
+    wrongList.push(q); addToWrongBank({mode:'mc', q});
+  }
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('qtag').style.visibility = 'visible';
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+}
+
+let rState = { pool: [], placed: [] };
+function renderRearrangeQ(q) {
+  rState = { pool: shuffleArray(q.words.map((w,i) => ({word:w,id:i}))), placed: [] };
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag orange-tag">${q.tag}</span>
+    <div class="q-ja" style="margin-bottom:14px">${q.ja}</div>
+    <div class="rearrange-target" id="rTarget"></div>
+    <div class="rearrange-pool" id="rPool"></div>
+    <div class="rearrange-actions">
+      <button class="action-btn" onclick="undoWord()">↩️ 1つ戻す</button>
+      <button class="action-btn" onclick="resetWords()">🔄 リセット</button>
+    </div>
+    <button class="check-btn" id="checkBtn" onclick="checkRearrange()" disabled>答え合わせ</button>
+    <div class="explanation orange-border" id="explanation">
+      <div class="ex-correct" id="exCL">✓ 正解</div>
+      <div class="ex-text" id="exTL"></div>
+    </div>`;
+  renderRUI();
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn orange';
+  nb.textContent = cur+1 < activeQuestions.length ? '次の問題 →' : '結果を見る';
+}
+function renderRUI() {
+  const t = document.getElementById('rTarget');
+  t.innerHTML = rState.placed.map(i => `<button class="word-chip in-target" onclick="removeWord(${i.id})">${i.word}</button>`).join('') || '<span style="color:var(--gray-400);font-size:13px">ここに単語をタップして並べます</span>';
+  t.className = 'rearrange-target' + (rState.placed.length > 0 ? ' filled' : '');
+  document.getElementById('rPool').innerHTML = rState.pool.map(i => `<button class="word-chip" onclick="placeWord(${i.id})">${i.word}</button>`).join('');
+  document.getElementById('checkBtn').disabled = rState.pool.length !== 0;
+}
+function placeWord(id) { if (answered) return; const idx=rState.pool.findIndex(i=>i.id===id); if(idx===-1)return; rState.placed.push(rState.pool.splice(idx,1)[0]); renderRUI(); }
+function removeWord(id) { if (answered) return; const idx=rState.placed.findIndex(i=>i.id===id); if(idx===-1)return; rState.pool.push(rState.placed.splice(idx,1)[0]); renderRUI(); }
+function undoWord() { if (answered||!rState.placed.length) return; rState.pool.push(rState.placed.pop()); renderRUI(); }
+function resetWords() { if (answered) return; rState.pool=[...rState.pool,...rState.placed]; rState.placed=[]; renderRUI(); }
+function checkRearrange() {
+  if (answered) return; answered = true;
+  const q = activeQuestions[cur];
+  const userAns = rState.placed.map(i=>i.word).join(' ');
+  const ok = userAns === q.answer;
+  document.getElementById('checkBtn').style.display='none';
+  document.querySelectorAll('.word-chip').forEach(b=>b.disabled=true);
+  document.querySelectorAll('.rearrange-actions .action-btn').forEach(b=>b.style.display='none');
+  const cl = document.getElementById('exCL'), tl = document.getElementById('exTL');
+  if (ok) {
+    cl.textContent='✓ 正解！'; cl.classList.remove('wrong-flag');
+    tl.innerHTML=`<strong>${q.answer}</strong><br><br>${q.ex}`;
+    score++; if (mode==='wrongonly') removeFromWrongBank({mode:'rearrange',q});
+  } else {
+    cl.textContent='✗ 不正解'; cl.classList.add('wrong-flag');
+    tl.innerHTML=`あなたの答え：${userAns||'（未回答）'}<br>正解：<strong>${q.answer}</strong><br><br>${q.ex}`;
+    wrongList.push(q); addToWrongBank({mode:'rearrange',q});
+  }
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score+'点';
+}
+
+function nextQ() { cur++; if (cur>=activeQuestions.length) showResult(); else renderQ(); }
+
+function showResult() {
+  document.getElementById('quizArea').style.display='none';
+  document.getElementById('progressWrap').style.display='none';
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+  const pct = Math.round((score/activeQuestions.length)*100);
+  let icon, msg;
+  if (pct===100){icon='🏆';msg='全問正解！完璧です！';}
+  else if (pct>=90){icon='🌟';msg='すごい！ほぼ完璧！';}
+  else if (pct>=70){icon='⭐';msg='よくできました！';}
+  else if (pct>=50){icon='💪';msg='もう少し！苦手問題を復習しよう！';}
+  else {icon='📖';msg='復習してまた挑戦しよう！';}
+  const missHTML = wrongList.length > 0 ? `
+    <div class="miss-section">
+      <div class="miss-title">✗ 間違えた問題（${wrongList.length}問）— 苦手バンクに保存しました</div>
+      ${wrongList.map(wq => {
+        const isRe = !!wq.words;
+        return `<div class="miss-item">
+          <span class="miss-tag">${wq.tag}</span>
+          <div class="miss-en">${isRe ? wq.answer : wq.en.replace('___','＿＿＿')}</div>
+          ${isRe ? '' : `<div class="miss-ans">正解：${wq.choices[wq.ans]}</div>`}
+        </div>`;
+      }).join('')}
+    </div>` : '';
+  const bank = loadWrongBank();
+  rs.innerHTML = `
+    <div class="result-hero">
+      <div class="result-icon">${icon}</div>
+      <div class="result-score">${score}<span class="result-denom"> / ${activeQuestions.length}</span></div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num correct-c">${score}</div><div class="stat-lbl">正解</div></div>
+      <div class="stat-card"><div class="stat-num wrong-c">${activeQuestions.length-score}</div><div class="stat-lbl">不正解</div></div>
+      <div class="stat-card"><div class="stat-num blue-c">${pct}%</div><div class="stat-lbl">正解率</div></div>
+    </div>
+    ${missHTML}
+    <div class="btn-row">
+      <button class="retry-btn" onclick="startMode('${mode==='wrongonly'?'wrongonly':mode}')">もう一度同じモードに挑戦 🔄</button>
+      <button class="retry-btn wrong-only" onclick="startMode('wrongonly')" ${bank.length===0?'disabled':''}>苦手問題だけ復習（${bank.length}問） 🎯</button>
+      <button class="retry-btn outline" onclick="backToMenu()">モード選択に戻る</button>
+    </div>`;
+}
+
+updateModeScreenCounts();
+</script>
+</body>
+</html>
