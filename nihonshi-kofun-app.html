@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本史 古墳時代〜ヤマト政権 テスト対策</title>
+<style>
+  :root {
+    --bg: #faf8f4;
+    --bg2: #f0ede6;
+    --surface: #ffffff;
+    --border: #d8d0c4;
+    --brown: #6b4c2a;
+    --brown-light: #c4965a;
+    --brown-pale: #f5efe6;
+    --green: #3a6b3a;
+    --green-bg: #edf4ed;
+    --red: #c0392b;
+    --red-bg: #fdecea;
+    --text: #2c2016;
+    --text2: #6b5c4a;
+    --text3: #9a8878;
+    --accent: #8b5a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header { background: var(--brown); color: #fff; padding: 1rem 1.5rem; }
+  header h1 { font-size: 17px; font-weight: 700; line-height: 1.4; }
+  header .sub { font-size: 12px; opacity: .75; margin-top: 2px; }
+
+  .tabs { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tab { flex: 1; min-width: 80px; padding: 12px 8px; font-size: 13px; font-weight: 600; color: var(--text2); background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all .15s; white-space: nowrap; text-align: center; }
+  .tab.active { color: var(--brown); border-bottom-color: var(--brown); background: var(--surface); }
+  .tab:hover:not(.active) { background: var(--border); }
+
+  .page { display: none; padding: 1.25rem; max-width: 640px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  .section-block { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1rem; overflow: hidden; }
+  .section-header { background: var(--brown); color: #fff; padding: .6rem 1rem; font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .speak-btn { background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4); border-radius: 6px; color: #fff; padding: 4px 10px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .speak-btn:hover { background: rgba(255,255,255,.35); }
+  .speak-btn.speaking { background: rgba(255,200,0,.35); }
+  .section-body { padding: 1rem; }
+  .section-body p { font-size: 14px; line-height: 1.9; color: var(--text); margin-bottom: .75rem; }
+  .section-body p:last-child { margin-bottom: 0; }
+  .kw { display: inline; background: var(--brown-pale); color: var(--brown); font-weight: 700; padding: 1px 4px; border-radius: 3px; }
+  .point-box { background: var(--brown-pale); border-left: 4px solid var(--brown-light); border-radius: 0 6px 6px 0; padding: .6rem .9rem; margin-top: .75rem; font-size: 13px; color: var(--accent); line-height: 1.7; }
+
+  .stats-bar { display: flex; gap: 10px; margin-bottom: 1rem; }
+  .stat-box { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .6rem; text-align: center; }
+  .stat-box .n { font-size: 22px; font-weight: 700; color: var(--brown); }
+  .stat-box .l { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .prog-bar { height: 5px; background: var(--bg2); border-radius: 3px; margin-bottom: 1.25rem; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--brown-light); border-radius: 3px; transition: width .3s; }
+
+  .q-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .q-meta { font-size: 11px; color: var(--text3); margin-bottom: .5rem; }
+  .q-stem { font-size: 15px; line-height: 1.7; color: var(--text); margin-bottom: 1rem; font-weight: 600; }
+  .choices { display: flex; flex-direction: column; gap: 8px; }
+  .choice { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--bg); font-size: 14px; color: var(--text); text-align: left; cursor: pointer; transition: all .12s; line-height: 1.5; }
+  .choice:hover:not(:disabled) { background: var(--brown-pale); border-color: var(--brown-light); }
+  .choice.correct { background: var(--green-bg); border-color: var(--green); color: var(--green); font-weight: 700; }
+  .choice.wrong { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+  .choice.reveal { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .choice:disabled { cursor: default; }
+  .explain { display: none; margin-top: 1rem; padding: .75rem 1rem; background: var(--bg2); border-left: 4px solid var(--brown-light); border-radius: 0 8px 8px 0; font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .explain.show { display: block; }
+  .q-nav { display: flex; align-items: center; justify-content: space-between; margin-top: .75rem; }
+  .q-nav button { padding: 8px 20px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 13px; cursor: pointer; font-weight: 600; }
+  .q-nav button:hover { background: var(--bg2); }
+  .q-nav .pos { font-size: 13px; color: var(--text3); }
+  .result-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center; }
+  .result-pct { font-size: 48px; font-weight: 800; color: var(--brown); }
+  .result-msg { font-size: 15px; color: var(--text2); margin-top: .5rem; }
+  .restart-btn { margin-top: 1.5rem; padding: 10px 32px; background: var(--brown); color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .restart-btn:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#127963; 日本史 テスト対策</h1>
+  <div class="sub">古墳時代&#12316;ヤマト政権 ／ 小国の分立・邪馬台国</div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('audio',this)">&#128266; 音声解説</button>
+  <button class="tab" onclick="showTab('tanka',this)">&#9889; 一問一答</button>
+  <button class="tab" onclick="showTab('yontaku',this)">&#128221; 4択問題</button>
+</div>
+
+<!-- 音声解説 -->
+<div id="audio" class="page active">
+
+  <div class="section-block">
+    <div class="section-header">&#9312; 古墳の種類と変遷
+      <button class="speak-btn" onclick="speak(this,'s1')">&#9654; 読む</button>
+    </div>
+    <div class="section-body" id="s1">
+      <p>古墳には<span class="kw">前方後円墳・円墳・方墳</span>などがあります。もっとも特徴的なのが前方後円墳で、前が四角く後ろが丸い形をしています。</p>
+      <p><span class="kw">前期（3世紀後半〜4世紀）</span>は近畿地方を中心に広がり、代表は<span class="kw">箸墓古墳</span>（奈良県）です。副葬品は鏡・玉・剣などの呪術的なものが中心で、石室は竪穴式です。</p>
+      <p><span class="kw">中期（4世紀末〜5世紀）</span>は九州中部〜関東へと拡大し、巨大古墳が増えます。代表は<span class="kw">大仙陵古墳</span>（大阪府堺市）で、仁徳天皇陵古墳とも呼ばれます。副葬品は武具・馬具などの武人的なものに変わります。</p>
+      <p><span class="kw">後期（6〜7世紀）</span>は全国に分布が広がり、<span class="kw">群集墳</span>（小規模古墳の集合）が増加します。<span class="kw">横穴式石室</span>が普及し、家族単位の追葬が可能になりました。代表は<span class="kw">高松塚古墳・石舞台古墳</span>です。</p>
+      <div class="point-box">&#9888; ひっかけ注意！「巨大前方後円墳＝後期」は誤り。巨大古墳は中期。「前期は九州中心」も誤り。近畿中心です。</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-header">&#9313; ヤマト政権のしくみ
+      <button class="speak-btn" onclick="speak(this,'s2')">&#9654; 読む</button>
+    </div>
+    <div class="section-body" id="s2">
+      <p>ヤマト政権は<span class="kw">大王（おおきみ）</span>を中心とした、各地の豪族による連合政権です。3世紀後半〜4世紀に近畿地方を中心に成立しました。</p>
+      <p>豪族を組織したしくみが<span class="kw">氏姓制度</span>です。<span class="kw">氏（うじ）</span>は血縁を基礎とした集団で、<span class="kw">氏上</span>が氏人を統率します。<span class="kw">姓（かばね）</span>は大王がヤマト政権内での家格・地位を示すために与えた称号です（臣・連・直など）。</p>
+      <p>中央豪族の役割分担は、大伴氏・物部氏が<span class="kw">軍事</span>、蘇我氏が<span class="kw">財政</span>、中臣氏が<span class="kw">祭祀</span>を担いました。</p>
+      <p>土地と人民の区分として、<span class="kw">田荘（たどころ）</span>が豪族の私有地、<span class="kw">部曲（かきべ）</span>が豪族の私有民、<span class="kw">屯倉（みやけ）</span>が朝廷の直轄地、<span class="kw">名代・子代</span>が朝廷の直轄民です。</p>
+      <p>地方豪族には<span class="kw">国造（くにのみやつこ）・県主（あがたぬし）</span>の称号が与えられました。</p>
+      <div class="point-box">&#9888; よく出るひっかけ：蘇我氏は「軍事」ではなく財政。中臣氏は「財政」ではなく祭祀。</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-header">&#9314; 朝鮮半島・東アジアとの関係
+      <button class="speak-btn" onclick="speak(this,'s3')">&#9654; 読む</button>
+    </div>
+    <div class="section-body" id="s3">
+      <p>5世紀の朝鮮半島には<span class="kw">高句麗（北）・百済（西南）・新羅（東南）・加耶/任那（南部）</span>が並立していました。</p>
+      <p>倭（日本）は<span class="kw">百済・加耶</span>と特に関係が深く、<span class="kw">高句麗</span>とは対立しがちでした。高句麗の広開土王の碑文（<span class="kw">好太王碑</span>・391年）には倭と高句麗の対立が記されています。</p>
+      <p><span class="kw">倭の五王</span>は5世紀に中国南朝（宋・斉・梁）へ朝貢しました。五王の名は<span class="kw">讃・珍・済・興・武</span>で、記録は<span class="kw">宋書倭国伝</span>（著者：沈約）にあります。「武」は雄略天皇にあたるという説が有力です。</p>
+      <p>朝鮮半島から移住してきた人々を<span class="kw">渡来人</span>と呼びます。伝えたものは<span class="kw">漢字・儒教・須恵器・鉄製農具・機織り・土木技術・仏教</span>などです。王仁（わに）は論語・千字文を伝えました。</p>
+      <div class="point-box">&#9888; 倭の五王の史料は「宋書倭国伝」（南朝）。北朝ではなく南朝に朝貢したことに注意。</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-header">&#9315; 邪馬台国・小国の分立
+      <button class="speak-btn" onclick="speak(this,'s4')">&#9654; 読む</button>
+    </div>
+    <div class="section-body" id="s4">
+      <p>前1世紀ごろの日本は「漢書地理志」によれば<span class="kw">百余国</span>に分かれていました。57年には後漢の光武帝から倭の奴国王に<span class="kw">漢委奴国王</span>の金印が授けられ、志賀島（福岡）で発見されました。</p>
+      <p>「後漢書東夷伝」（著者：<span class="kw">范曄</span>）には107年に倭王・帥升が後漢に朝貢した記録があります。2世紀後半に倭国大乱が起こり、<span class="kw">邪馬台国</span>の女王<span class="kw">卑弥呼</span>が共立されて乱がおさまりました。</p>
+      <p>邪馬台国の主史料は<span class="kw">魏志倭人伝</span>（著者：陳寿）です。卑弥呼は<span class="kw">鬼道（呪術）</span>で政治を行い、<span class="kw">男弟</span>が補佐しました。239年に<span class="kw">帯方郡</span>を経由して魏へ使者を送り、<span class="kw">親魏倭王</span>の称号と銅鏡百枚などを授かりました。</p>
+      <div class="point-box">&#9888; 倭国大乱後に立ったのは卑弥呼（女王）で男王ではありません。使者の経路は「楽浪郡」ではなく「帯方郡」。</div>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <div class="section-header">&#9316; 仏教・文化の伝来
+      <button class="speak-btn" onclick="speak(this,'s5')">&#9654; 読む</button>
+    </div>
+    <div class="section-body" id="s5">
+      <p>仏教の<span class="kw">公伝</span>は<span class="kw">百済の聖明王</span>から<span class="kw">欽明天皇</span>のときとされます。年代は<span class="kw">538年説</span>（上宮聖徳法王帝説）と<span class="kw">552年説</span>（日本書紀）の2説があります。</p>
+      <p>仏教の受容をめぐって<span class="kw">蘇我氏（推進）</span>と<span class="kw">物部氏（反対）</span>が対立しました。</p>
+      <p>渡来人の<span class="kw">王仁（わに）</span>が「論語」「千字文」を伝え儒教・漢字の普及に貢献しました。<span class="kw">弓月君</span>は機織りを伝えました。</p>
+      <div class="point-box">&#9888; 仏教受容を推進したのは蘇我氏。物部氏は反対側です。混同しやすいので注意。</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 一問一答 -->
+<div id="tanka" class="page">
+  <div class="stats-bar">
+    <div class="stat-box"><div class="n" id="t-done">0</div><div class="l">完了</div></div>
+    <div class="stat-box"><div class="n" id="t-ok">0</div><div class="l">正解</div></div>
+    <div class="stat-box"><div class="n" id="t-pct">&#8212;</div><div class="l">正答率</div></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="t-prog" style="width:0%"></div></div>
+  <div id="tanka-area"></div>
+</div>
+
+<!-- 4択問題 -->
+<div id="yontaku" class="page">
+  <div class="stats-bar">
+    <div class="stat-box"><div class="n" id="y-done">0</div><div class="l">完了</div></div>
+    <div class="stat-box"><div class="n" id="y-ok">0</div><div class="l">正解</div></div>
+    <div class="stat-box"><div class="n" id="y-pct">&#8212;</div><div class="l">正答率</div></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="y-prog" style="width:0%"></div></div>
+  <div id="yontaku-area"></div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function speak(btn, sid) {
+  window.speechSynthesis.cancel();
+  if (btn.classList.contains('speaking')) {
+    btn.classList.remove('speaking'); btn.innerHTML = '&#9654; 読む'; return;
+  }
+  document.querySelectorAll('.speak-btn').forEach(b => { b.classList.remove('speaking'); b.innerHTML = '&#9654; 読む'; });
+  const el = document.getElementById(sid);
+  const text = el.innerText.replace(/⚠[\s\S]*$/, '');
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP'; u.rate = 1.1;
+  u.onend = () => { btn.classList.remove('speaking'); btn.innerHTML = '&#9654; 読む'; };
+  btn.classList.add('speaking'); btn.innerHTML = '&#9646; 停止';
+  window.speechSynthesis.speak(u);
+}
+
+const TANKA = [
+  {q:'前方後円墳が近畿中心に築かれた時期は？',c:'前期（3世紀後半〜4世紀）',w:['中期（4世紀末〜5世紀）','後期（6〜7世紀）','弥生時代後期']},
+  {q:'大仙陵古墳が築かれた時期は？',c:'中期（4世紀末〜5世紀）',w:['前期（3世紀後半〜4世紀）','後期（6〜7世紀）','飛鳥時代']},
+  {q:'群集墳・横穴式石室が増加した時期は？',c:'後期（6〜7世紀）',w:['前期（3世紀後半〜4世紀）','中期（4世紀末〜5世紀）','弥生時代']},
+  {q:'大仙陵古墳のある場所は？',c:'大阪府堺市',w:['奈良県桜井市','奈良県明日香村','大阪府羽曳野市']},
+  {q:'大仙陵古墳の別名は？',c:'仁徳天皇陵古墳',w:['応神天皇陵古墳','崇神天皇陵古墳','雄略天皇陵古墳']},
+  {q:'卑弥呼の墓とする説がある奈良県の前期古墳は？',c:'箸墓古墳',w:['石舞台古墳','高松塚古墳','大仙陵古墳']},
+  {q:'蘇我馬子の墓とされる奈良県の後期古墳は？',c:'石舞台古墳',w:['箸墓古墳','高松塚古墳','大仙陵古墳']},
+  {q:'男女群像の壁画がある奈良県の後期古墳は？',c:'高松塚古墳',w:['石舞台古墳','箸墓古墳','大仙陵古墳']},
+  {q:'ヤマト政権の王の称号は？',c:'大王（おおきみ）',w:['天皇（てんのう）','国王','皇帝']},
+  {q:'氏姓制度の「氏（うじ）」とは？',c:'血縁を基礎とした集団',w:['家格・地位を示す称号','朝廷の直轄地','豪族の私有民']},
+  {q:'氏姓制度の「姓（かばね）」とは？',c:'大王が与えた家格・地位の称号',w:['血縁を基礎とした集団','豪族の私有地','朝廷の直轄民']},
+  {q:'氏の統率者を何という？',c:'氏上（うじのかみ）',w:['氏人（うじびと）','国造（くにのみやつこ）','部曲（かきべ）']},
+  {q:'ヤマト政権で軍事を担った中央豪族は？',c:'大伴氏・物部氏',w:['蘇我氏・中臣氏','蘇我氏・物部氏','大伴氏・蘇我氏']},
+  {q:'ヤマト政権で財政を担った中央豪族は？',c:'蘇我氏',w:['大伴氏','物部氏','中臣氏']},
+  {q:'ヤマト政権で祭祀を担った中央豪族は？',c:'中臣氏',w:['蘇我氏','大伴氏','物部氏']},
+  {q:'豪族の私有地を何という？',c:'田荘（たどころ）',w:['屯倉（みやけ）','部曲（かきべ）','名代（なしろ）']},
+  {q:'朝廷（大王）の直轄地を何という？',c:'屯倉（みやけ）',w:['田荘（たどころ）','部曲（かきべ）','国造']},
+  {q:'豪族の私有民を何という？',c:'部曲（かきべ）',w:['田荘（たどころ）','屯倉（みやけ）','名代（なしろ）']},
+  {q:'ヤマト政権が地方豪族に与えた称号は？',c:'国造（くにのみやつこ）・県主',w:['氏上・氏人','田荘・屯倉','大伴・蘇我']},
+  {q:'倭と特に関係が深かった朝鮮半島の国は？',c:'百済・加耶（任那）',w:['高句麗・新羅','高句麗・百済','新羅・加耶']},
+  {q:'倭と対立しがちだった朝鮮半島の国は？',c:'高句麗',w:['百済','新羅','加耶']},
+  {q:'倭と高句麗の対立が記された碑は？',c:'好太王碑（広開土王碑）',w:['宋書倭国伝','魏志倭人伝','漢書地理志']},
+  {q:'倭の五王の名前を全部答えよ',c:'讃・珍・済・興・武',w:['讃・珍・済・興・雄','讃・珍・建・興・武','讃・珍・済・栄・武']},
+  {q:'倭の五王の記録が残る中国の史書は？',c:'宋書倭国伝',w:['魏志倭人伝','後漢書東夷伝','漢書地理志']},
+  {q:'宋書倭国伝の著者は？',c:'沈約（しんやく）',w:['陳寿（ちんじゅ）','范曄（はんよう）','班固（はんこ）']},
+  {q:'「武」は何天皇にあたるという説が有力？',c:'雄略天皇',w:['仁徳天皇','応神天皇','崇神天皇']},
+  {q:'渡来人が伝えた硬質・灰色の土器は？',c:'須恵器（すえき）',w:['土師器（はじき）','弥生土器','縄文土器']},
+  {q:'渡来人の王仁（わに）が伝えた書物は？',c:'論語・千字文',w:['魏志倭人伝・宋書','万葉集・古事記','法隆寺縁起・日本書紀']},
+  {q:'邪馬台国の主史料となる中国の史書は？',c:'魏志倭人伝',w:['宋書倭国伝','後漢書東夷伝','漢書地理志']},
+  {q:'魏志倭人伝の著者は？',c:'陳寿（ちんじゅ）',w:['范曄（はんよう）','沈約（しんやく）','班固（はんこ）']},
+  {q:'後漢書東夷伝の著者は？',c:'范曄（はんよう）',w:['陳寿（ちんじゅ）','沈約（しんやく）','班固（はんこ）']},
+  {q:'卑弥呼が魏に使者を送った年は？',c:'239年',w:['107年','391年','57年']},
+  {q:'卑弥呼が魏に使者を送る際に経由した郡は？',c:'帯方郡（たいほうぐん）',w:['楽浪郡（らくろうぐん）','玄菟郡','真番郡']},
+  {q:'卑弥呼が魏から授かった称号は？',c:'親魏倭王（しんぎわおう）',w:['東夷大将軍','漢委奴国王','倭国王']},
+  {q:'57年に後漢の光武帝から金印を授かった倭の国は？',c:'奴国（なこく）',w:['邪馬台国','狗奴国（くなこく）','伊都国']},
+  {q:'「漢委奴国王」の金印が発見された場所は？',c:'志賀島（福岡県）',w:['奈良県','吉野ヶ里（佐賀県）','高松塚（奈良県）']},
+  {q:'仏教の公伝は何天皇のときか？',c:'欽明天皇（きんめいてんのう）',w:['推古天皇','崇峻天皇','敏達天皇']},
+  {q:'仏教公伝で日本に伝えた朝鮮半島の国は？',c:'百済（くだら）',w:['新羅（しらぎ）','高句麗（こうくり）','加耶（かや）']},
+  {q:'仏教の受容を推進した豪族は？',c:'蘇我氏',w:['物部氏','大伴氏','中臣氏']},
+  {q:'「漢書地理志」に記された前1世紀の日本の国の数は？',c:'百余国',w:['三十余国','七十余国','三十国']},
+];
+
+const YONTAKU = [
+  {stem:'前期古墳の特徴として正しいものはどれか。',choices:['九州北部を中心に前方後円墳が広がった','近畿地方を中心に前方後円墳が広がった','群集墳が増加し全国に広がった','横穴式石室が普及し家族単位の埋葬が増えた'],ans:1,ex:'前期古墳は近畿地方を中心に分布。九州中心は誤り。群集墳・横穴式石室は後期の特徴。'},
+  {stem:'大仙陵古墳について正しいものはどれか。',choices:['奈良県桜井市に所在する前期古墳','大阪府堺市に所在する中期の前方後円墳','大阪府堺市に所在する後期古墳','奈良県明日香村に所在する横穴式石室が有名な古墳'],ans:1,ex:'大仙陵古墳（仁徳天皇陵古墳）は大阪府堺市にある中期（5世紀）の最大級の前方後円墳。'},
+  {stem:'後期古墳について誤っているものはどれか。',choices:['横穴式石室が普及した','群集墳が増加した','追葬（追加の埋葬）が可能になった','近畿地方のみに分布が集中した'],ans:3,ex:'後期古墳は全国に広がった。「近畿集中」は前期の特徴。横穴式石室・群集墳・追葬可能は後期の正しい特徴。'},
+  {stem:'ヤマト政権の中央豪族の担当として正しいものはどれか。',choices:['大伴氏が財政、蘇我氏が軍事を担った','物部氏が祭祀、中臣氏が財政を担った','蘇我氏が財政、中臣氏が祭祀を担った','大伴氏が祭祀、物部氏が財政を担った'],ans:2,ex:'蘇我氏＝財政、中臣氏＝祭祀が正しい。大伴氏・物部氏が軍事。これは頻出のひっかけ。'},
+  {stem:'氏姓制度の「姓（かばね）」の説明として正しいものはどれか。',choices:['血縁を基礎とした集団のこと','大王が与えた家格・地位を示す称号','豪族の私有地のこと','朝廷の直轄民のこと'],ans:1,ex:'姓は大王が与えた称号（臣・連・直など）。血縁集団は「氏」。豪族の私有地は「田荘」、朝廷の直轄民は「名代・子代」。'},
+  {stem:'朝廷（大王）の直轄地を何というか。正しいものはどれか。',choices:['田荘（たどころ）','部曲（かきべ）','屯倉（みやけ）','名代（なしろ）'],ans:2,ex:'屯倉＝朝廷の直轄地。田荘＝豪族の私有地。部曲＝豪族の私有民。名代・子代＝朝廷の直轄民。'},
+  {stem:'倭の五王が朝貢した先として正しいものはどれか。',choices:['中国・北朝（北魏）','後漢（かんのこうかん）','唐（とう）','中国・南朝（宋・斉・梁）'],ans:3,ex:'倭の五王は5世紀に中国南朝（宋・斉・梁）に朝貢した。北朝ではなく南朝が重要。記録は宋書倭国伝。'},
+  {stem:'宋書倭国伝の著者は誰か。',choices:['陳寿（ちんじゅ）','范曄（はんよう）','班固（はんこ）','沈約（しんやく）'],ans:3,ex:'宋書倭国伝の著者は沈約。陳寿は魏志倭人伝、范曄は後漢書東夷伝、班固は漢書地理志の著者。'},
+  {stem:'渡来人について誤っているものはどれか。',choices:['漢字や儒教を日本に伝えた','須恵器の製法を伝えた','稲作（水田農業）を日本に初めて伝えた','機織りや土木技術を伝えた'],ans:2,ex:'稲作は弥生時代に伝来したもので渡来人とは別の流れ。渡来人（5世紀以降）は漢字・儒教・須恵器・機織りなどを伝えた。'},
+  {stem:'邪馬台国の卑弥呼について誤っているものはどれか。',choices:['鬼道（呪術）を使って政治を行った','男弟が政治の実務を補佐した','239年に帯方郡を経由して魏に使者を送った','倭国大乱の後、男王として立てられた'],ans:3,ex:'倭国大乱後に立てられたのは卑弥呼（女王）で男王ではない。239年に帯方郡経由で魏に使者（楽浪郡ではなく帯方郡）。鬼道・男弟の補佐は正しい。'},
+  {stem:'「漢委奴国王」の金印について正しいものはどれか。',choices:['239年に魏の皇帝から親魏倭王に授けられた','57年に後漢の光武帝から奴国王に授けられた','107年に後漢の皇帝から帥升（すいしょう）に授けられた','391年に高句麗から授けられた'],ans:1,ex:'57年に後漢の光武帝から倭の奴国王に授けられた。江戸時代に志賀島（福岡県）で発見。239年の親魏倭王は卑弥呼。'},
+  {stem:'仏教公伝について正しいものはどれか。',choices:['物部氏が仏教の受容を推進した','百済の聖明王から欽明天皇のときに公伝した','日本書紀では538年説が記されている','新羅から仏教が公式に伝えられた'],ans:1,ex:'百済の聖明王→欽明天皇が正しい。推進は蘇我氏（物部氏は反対）。日本書紀は552年説、538年説は上宮聖徳法王帝説。新羅でなく百済から。'},
+  {stem:'魏志倭人伝の内容として正しいものはどれか。',choices:['卑弥呼は仏教の力で国をまとめた','卑弥呼は鬼道を使い、男弟が政治を補佐した','卑弥呼は240年に楽浪郡を経由して魏に使者を送った','邪馬台国の後継者は台与という男性だった'],ans:1,ex:'卑弥呼は鬼道（呪術）を使い男弟が補佐（正しい）。仏教は6世紀伝来で3世紀の卑弥呼とは無関係。239年・帯方郡が正しい。台与（とよ）は女性。'},
+  {stem:'後漢書東夷伝の著者は誰か。',choices:['陳寿（ちんじゅ）','沈約（しんやく）','范曄（はんよう）','班固（はんこ）'],ans:2,ex:'後漢書東夷伝の著者は范曄（はんよう）。陳寿は魏志倭人伝、沈約は宋書倭国伝、班固は漢書地理志の著者。'},
+  {stem:'漢書地理志に記された前1世紀の日本の状況として正しいものはどれか。',choices:['邪馬台国が日本を統一していた','倭は百余国に分かれていた','ヤマト政権がすでに成立していた','倭の奴国が後漢に朝貢していた'],ans:1,ex:'漢書地理志には「倭人は百余国に分かれ」と記されている（前1世紀ごろ）。邪馬台国は3世紀、ヤマト政権は3世紀後半〜4世紀、奴国の朝貢は57年（後漢書東夷伝）。'},
+  {stem:'好太王碑（広開土王碑）について正しいものはどれか。',choices:['百済の王が倭との友好関係を記した碑','日本の大王が朝鮮半島征服を記した碑','高句麗の広開土王が倭との戦いを記した碑（391年）','卑弥呼の業績を記した中国の碑'],ans:2,ex:'好太王碑は高句麗の好太王（広開土王）の業績を記した碑で、391年の倭と高句麗の対立が記されている。'},
+  {stem:'ヤマト政権の地方豪族に与えられた称号として正しいものはどれか。',choices:['田荘・部曲','屯倉・名代','国造・県主','氏上・氏人'],ans:2,ex:'地方豪族の称号は「国造（くにのみやつこ）・県主（あがたぬし）」。田荘・部曲は土地と人民の分類。屯倉・名代は朝廷の直轄。'},
+  {stem:'卑弥呼が魏から授かったものとして正しいものはどれか。',choices:['漢委奴国王の金印','東夷大将軍の称号のみ','親魏倭王の称号と銅鏡百枚など','宋書倭国伝への記録'],ans:2,ex:'卑弥呼は239年に魏から「親魏倭王」の称号と銅鏡百枚などを授かった。漢委奴国王の金印は57年に奴国王が授かったもの。'},
+  {stem:'渡来人・王仁（わに）が伝えたものとして正しいものはどれか。',choices:['仏教と須恵器','論語と千字文（儒教・漢字）','機織りと土木技術','鉄製農具と仏教'],ans:1,ex:'王仁は「論語」と「千字文」を伝え、儒教や漢字の普及に貢献した。機織りは弓月君、仏教の公伝は百済の聖明王から。'},
+  {stem:'氏姓制度の「氏（うじ）」の統率者を何というか。',choices:['氏人（うじびと）','氏上（うじのかみ）','国造（くにのみやつこ）','県主（あがたぬし）'],ans:1,ex:'氏の統率者は「氏上（うじのかみ）」。氏人は氏の構成員。国造・県主は地方豪族に与えられた称号。'},
+];
+
+// 一問一答
+let tIdx=0,tTotal=0,tOk=0;
+const tShuf=[...TANKA].sort(()=>Math.random()-.5);
+
+function renderT(){
+  const area=document.getElementById('tanka-area');
+  if(tIdx>=tShuf.length){
+    const p=Math.round(tOk/tTotal*100);
+    area.innerHTML=`<div class="result-card"><div style="font-size:14px;color:var(--text3)">全${tTotal}問完了</div><div class="result-pct">${p}%</div><div class="result-msg">${p>=80?'完璧！テスト自信持っていけ！':p>=60?'惜しい！もう一周しよう':'音声解説に戻って確認しよう'}</div><button class="restart-btn" onclick="restartT()">もう一度</button></div>`;
+    return;
+  }
+  const q=tShuf[tIdx];
+  const opts=shuffle([q.c,...q.w]);
+  area.innerHTML=`<div class="q-card">
+    <div class="q-meta">一問一答 ${tIdx+1}/${tShuf.length}</div>
+    <div class="q-stem">${q.q}</div>
+    <div class="choices">${opts.map((o,i)=>`<button class="choice" onclick="selT(this,${JSON.stringify(o)},${JSON.stringify(q.c)})">${['&#9312;','&#9313;','&#9314;','&#9315;'][i]} ${o}</button>`).join('')}</div>
+  </div>
+  <div class="q-nav"><button onclick="prevT()">&#8592; 前</button><span class="pos">${tIdx+1}/${tShuf.length}</span><button onclick="nextT()">次 &#8594;</button></div>`;
+}
+function selT(btn,chosen,correct){
+  const btns=document.querySelectorAll('#tanka-area .choice');
+  if(btns[0].disabled)return;
+  btns.forEach(b=>{b.disabled=true;if(b.textContent.slice(1).trim()===correct)b.classList.add('reveal');});
+  const ok=chosen===correct;
+  btn.classList.remove('reveal');
+  btn.classList.add(ok?'correct':'wrong');
+  tTotal++;if(ok)tOk++;updateTStats();
+}
+function nextT(){tIdx=Math.min(tIdx+1,tShuf.length);renderT();}
+function prevT(){if(tIdx>0){tIdx--;renderT();}}
+function restartT(){tIdx=0;tTotal=0;tOk=0;updateTStats();tShuf.sort(()=>Math.random()-.5);renderT();}
+function updateTStats(){
+  document.getElementById('t-done').textContent=tTotal;
+  document.getElementById('t-ok').textContent=tOk;
+  const p=tTotal>0?Math.round(tOk/tTotal*100):0;
+  document.getElementById('t-pct').textContent=tTotal>0?p+'%':'—';
+  document.getElementById('t-prog').style.width=(tIdx/tShuf.length*100)+'%';
+}
+
+// 4択
+let yIdx=0,yTotal=0,yOk=0;
+const yShuf=[...YONTAKU].sort(()=>Math.random()-.5);
+
+function renderY(){
+  const area=document.getElementById('yontaku-area');
+  if(yIdx>=yShuf.length){
+    const p=Math.round(yOk/yTotal*100);
+    area.innerHTML=`<div class="result-card"><div style="font-size:14px;color:var(--text3)">全${yTotal}問完了</div><div class="result-pct">${p}%</div><div class="result-msg">${p>=80?'完璧！テスト自信持っていけ！':p>=60?'惜しい！もう一周しよう':'音声解説に戻って確認しよう'}</div><button class="restart-btn" onclick="restartY()">もう一度</button></div>`;
+    return;
+  }
+  const q=yShuf[yIdx];
+  area.innerHTML=`<div class="q-card">
+    <div class="q-meta">4択問題 ${yIdx+1}/${yShuf.length}</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="choices">${q.choices.map((c,i)=>`<button class="choice" onclick="selY(this,${i})">${['&#9312;','&#9313;','&#9314;','&#9315;'][i]} ${c}</button>`).join('')}</div>
+    <div class="explain" id="y-ex"></div>
+  </div>
+  <div class="q-nav"><button onclick="prevY()">&#8592; 前</button><span class="pos">${yIdx+1}/${yShuf.length}</span><button onclick="nextY()">次 &#8594;</button></div>`;
+}
+function selY(btn,i){
+  const btns=document.querySelectorAll('#yontaku-area .choice');
+  if(btns[0].disabled)return;
+  btns.forEach(b=>b.disabled=true);
+  const q=yShuf[yIdx];
+  const ok=i===q.ans;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok)btns[q.ans].classList.add('reveal');
+  const ex=document.getElementById('y-ex');
+  ex.textContent=q.ex;ex.classList.add('show');
+  yTotal++;if(ok)yOk++;updateYStats();
+}
+function nextY(){yIdx=Math.min(yIdx+1,yShuf.length);renderY();}
+function prevY(){if(yIdx>0){yIdx--;renderY();}}
+function restartY(){yIdx=0;yTotal=0;yOk=0;updateYStats();yShuf.sort(()=>Math.random()-.5);renderY();}
+function updateYStats(){
+  document.getElementById('y-done').textContent=yTotal;
+  document.getElementById('y-ok').textContent=yOk;
+  const p=yTotal>0?Math.round(yOk/yTotal*100):0;
+  document.getElementById('y-pct').textContent=yTotal>0?p+'%':'—';
+  document.getElementById('y-prog').style.width=(yIdx/yShuf.length*100)+'%';
+}
+
+function shuffle(a){return[...a].sort(()=>Math.random()-.5);}
+
+renderT();renderY();
+</script>
+</body>
+</html>
