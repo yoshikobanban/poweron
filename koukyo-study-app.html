@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公共 テスト対策クイズ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Hiragino Sans', 'Noto Sans JP', Arial, sans-serif;
+    background: #0f1923;
+    color: #e8edf2;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a2a3a 0%, #0f1923 100%);
+    border-bottom: 3px solid #2ecc71;
+    padding: 20px 24px 16px;
+    text-align: center;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+
+  header h1 span {
+    color: #2ecc71;
+  }
+
+  .tabs {
+    display: flex;
+    background: #131f2b;
+    border-bottom: 2px solid #1e3448;
+    overflow-x: auto;
+  }
+
+  .tab {
+    flex: 1;
+    min-width: 100px;
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #6b8099;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: #a8c4d8; }
+
+  .tab.active {
+    color: #2ecc71;
+    border-bottom-color: #2ecc71;
+    background: #0f1923;
+  }
+
+  .tab-emoji { display: block; font-size: 1.2rem; margin-bottom: 4px; }
+
+  .content {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* スコア表示 */
+  .score-bar {
+    background: #1a2a3a;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .score-label { font-size: 0.8rem; color: #6b8099; }
+  .score-num { font-size: 1.8rem; font-weight: 900; color: #2ecc71; }
+  .score-total { font-size: 0.9rem; color: #6b8099; }
+
+  .progress-track {
+    flex: 1;
+    height: 8px;
+    background: #1e3448;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+
+  /* 問題カード */
+  .q-card {
+    background: #1a2a3a;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+    border: 2px solid #1e3448;
+    transition: border-color 0.3s;
+  }
+
+  .q-card.correct { border-color: #2ecc71; }
+  .q-card.wrong { border-color: #e74c3c; }
+
+  .q-num {
+    font-size: 0.72rem;
+    color: #2ecc71;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+  }
+
+  .q-text {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #c8d8e8;
+    margin-bottom: 16px;
+  }
+
+  .q-text strong {
+    color: #fff;
+    font-weight: 700;
+  }
+
+  /* 選択肢 */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    background: #0f1923;
+    border: 2px solid #1e3448;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #a8c4d8;
+    font-size: 0.9rem;
+    font-family: 'Hiragino Sans', 'Noto Sans JP', Arial, sans-serif;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: #2ecc71;
+    color: #fff;
+    background: #1a2a3a;
+  }
+
+  .choice-btn.selected-correct {
+    background: #1a4a2a;
+    border-color: #2ecc71;
+    color: #2ecc71;
+    font-weight: 700;
+  }
+
+  .choice-btn.selected-wrong {
+    background: #4a1a1a;
+    border-color: #e74c3c;
+    color: #e74c3c;
+    font-weight: 700;
+  }
+
+  .choice-btn.show-answer {
+    background: #1a4a2a;
+    border-color: #2ecc71;
+    color: #2ecc71;
+  }
+
+  .choice-btn:disabled { cursor: default; }
+
+  /* フィードバック */
+  .feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    display: none;
+  }
+
+  .feedback.correct {
+    background: #1a4a2a;
+    color: #2ecc71;
+    display: block;
+  }
+
+  .feedback.wrong {
+    background: #4a1a1a;
+    color: #ff8080;
+    display: block;
+  }
+
+  /* 結果画面 */
+  .result-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .result-screen.show { display: block; }
+
+  .result-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .result-score { font-size: 3rem; font-weight: 900; color: #2ecc71; }
+  .result-msg { color: #6b8099; margin: 12px 0 24px; font-size: 1rem; }
+
+  .btn-retry {
+    background: #2ecc71;
+    color: #0f1923;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Hiragino Sans', 'Noto Sans JP', Arial, sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .btn-retry:hover { opacity: 0.85; }
+
+  /* セクションタイトル */
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .section-sub {
+    font-size: 0.8rem;
+    color: #6b8099;
+    margin-bottom: 20px;
+  }
+
+  /* 表形式問題 */
+  .table-hint {
+    background: #131f2b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: #6b8099;
+    border-left: 3px solid #2ecc71;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>公共 <span>テスト対策</span> クイズ</h1>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab(0)">
+    <span class="tab-emoji">⚖️</span>法の意義
+  </div>
+  <div class="tab" onclick="switchTab(1)">
+    <span class="tab-emoji">📜</span>憲法比較
+  </div>
+  <div class="tab" onclick="switchTab(2)">
+    <span class="tab-emoji">🌈</span>平等権
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- タブ1：法の意義と役割 -->
+  <div class="section active" id="section-0">
+    <div class="section-title">⚖️ 法の意義と役割</div>
+    <div class="section-sub">社会規範・法の役割・国内法の分類など</div>
+    <div class="score-bar">
+      <div>
+        <div class="score-label">スコア</div>
+        <span class="score-num" id="score-0">0</span>
+        <span class="score-total" id="total-0"> / 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-0" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="quiz-0"></div>
+    <div class="result-screen" id="result-0">
+      <div class="result-emoji" id="result-emoji-0">🎉</div>
+      <div class="result-score" id="result-score-0"></div>
+      <div class="result-msg" id="result-msg-0"></div>
+      <button class="btn-retry" onclick="retrySection(0)">もう一度挑戦！</button>
+    </div>
+  </div>
+
+  <!-- タブ2：憲法比較 -->
+  <div class="section" id="section-1">
+    <div class="section-title">📜 憲法比較</div>
+    <div class="section-sub">日本国憲法 vs 大日本国憲法・明治憲法の政治機構</div>
+    <div class="table-hint">💡 日本国憲法と大日本国憲法（明治憲法）の違いを覚えよう！</div>
+    <div class="score-bar">
+      <div>
+        <div class="score-label">スコア</div>
+        <span class="score-num" id="score-1">0</span>
+        <span class="score-total" id="total-1"> / 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-1" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="quiz-1"></div>
+    <div class="result-screen" id="result-1">
+      <div class="result-emoji" id="result-emoji-1">🎉</div>
+      <div class="result-score" id="result-score-1"></div>
+      <div class="result-msg" id="result-msg-1"></div>
+      <button class="btn-retry" onclick="retrySection(1)">もう一度挑戦！</button>
+    </div>
+  </div>
+
+  <!-- タブ3：平等権 -->
+  <div class="section" id="section-2">
+    <div class="section-title">🌈 平等権</div>
+    <div class="section-sub">女性差別・部落差別・民族差別・障がい者差別</div>
+    <div class="score-bar">
+      <div>
+        <div class="score-label">スコア</div>
+        <span class="score-num" id="score-2">0</span>
+        <span class="score-total" id="total-2"> / 0</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-2" style="width:0%"></div>
+      </div>
+    </div>
+    <div id="quiz-2"></div>
+    <div class="result-screen" id="result-2">
+      <div class="result-emoji" id="result-emoji-2">🎉</div>
+      <div class="result-score" id="result-score-2"></div>
+      <div class="result-msg" id="result-msg-2"></div>
+      <button class="btn-retry" onclick="retrySection(2)">もう一度挑戦！</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const quizData = [
+  // ===== タブ0：法の意義と役割 =====
+  [
+    {
+      q: "電車内でのマナー違反など、社会全体のルールをまとめて何と呼ぶか？",
+      choices: ["社会規範", "法律", "道徳", "慣習"],
+      answer: 0
+    },
+    {
+      q: "社会規範の例を4つあげると？（法・宗教・道徳・あと1つは？）",
+      choices: ["慣習", "政治", "科学", "芸術"],
+      answer: 0
+    },
+    {
+      q: "社会規範の違反者に対してはなんらかの（　）がある。",
+      choices: ["制裁", "表彰", "賞罰", "警告"],
+      answer: 0
+    },
+    {
+      q: "国家権力による制裁とはどのようなものか？（2つ）① 刑罰、②（　）",
+      choices: ["損害賠償", "社会的制裁", "道徳的非難", "慣習的排除"],
+      answer: 0
+    },
+    {
+      q: "道徳・慣習に違反すると「非常識」で自分勝手と（　）される。",
+      choices: ["非難", "賞賛", "無視", "支持"],
+      answer: 0
+    },
+    {
+      q: "法に違反すると、国家権力による（　）を受ける。",
+      choices: ["制裁", "説得", "教育", "賞賛"],
+      answer: 0
+    },
+    {
+      q: "法の内容に問題があれば（　）による立法などを通じて意図的に変更できる。",
+      choices: ["議会", "天皇", "内閣", "裁判所"],
+      answer: 0
+    },
+    {
+      q: "納得して従えるルールの条件①：全員が守らなければならない（　）",
+      choices: ["ルール", "道徳", "慣習", "宗教"],
+      answer: 0
+    },
+    {
+      q: "納得して従えるルールの条件②：（　）に定めたルール",
+      choices: ["明確", "曖昧", "複雑", "柔軟"],
+      answer: 0
+    },
+    {
+      q: "納得して従えるルールの条件③：制裁が（　）なルール",
+      choices: ["重すぎない", "厳しすぎる", "ない", "不公平な"],
+      answer: 0
+    },
+    {
+      q: "法の役割①：人々の間の（　）を公正に解決するルール",
+      choices: ["紛争", "友好", "協力", "競争"],
+      answer: 0
+    },
+    {
+      q: "法の役割①で保護されるもの：個人の（　）の保障と社会秩序の維持",
+      choices: ["権利", "義務", "財産", "地位"],
+      answer: 0
+    },
+    {
+      q: "法の役割②：国家権力の（　）を防止し、各人の基本的人権を保障する",
+      choices: ["濫用", "強化", "拡大", "縮小"],
+      answer: 0
+    },
+    {
+      q: "法の内容の変更方法①：（　）による立法",
+      choices: ["議会", "天皇", "内閣", "国民"],
+      answer: 0
+    },
+    {
+      q: "法の内容の変更方法②：裁判所の（　）",
+      choices: ["判決", "命令", "指示", "調停"],
+      answer: 0
+    },
+    {
+      q: "国内法の分類：公法…国家や（　）の（関係）や、それらと（個人）との関係などを定めたもの",
+      choices: ["地方公共団体", "企業", "個人", "外国"],
+      answer: 0
+    },
+    {
+      q: "国内法の分類：私法…（　）（個人や法人）相互の関係について定めたもの",
+      choices: ["私人", "国家", "政府", "公共"],
+      answer: 0
+    },
+    {
+      q: "国内法の分類：社会法…個人の（　）や公共的な（　）の達成を目的とするもの",
+      choices: ["平等・利益", "自由・義務", "権利・責任", "安全・秩序"],
+      answer: 0
+    },
+    {
+      q: "法の分類の頭文字：①日本国憲法 ②刑法 ③刑事訴訟法 ④民事訴訟法 ⑤（　）法 ⑥商法",
+      choices: ["民", "行政", "労働", "経済"],
+      answer: 0
+    },
+    {
+      q: "成文法は（　）機関の手続きを経て成立した法で、（　）の形式がとられる。",
+      choices: ["立法・文書", "行政・条例", "司法・判例", "国民・条約"],
+      answer: 0
+    },
+    {
+      q: "不文法は文章化されていないが法としての効力をもつ。例として（　）法・慣習法などがある。",
+      choices: ["判例", "条例", "政令", "命令"],
+      answer: 0
+    },
+    {
+      q: "道路交通法は、自転車は原則として（　）を走るものと定めている。",
+      choices: ["車道", "歩道", "路側帯", "自転車道"],
+      answer: 0
+    },
+  ],
+
+  // ===== タブ1：憲法比較 =====
+  [
+    {
+      q: "明治憲法（大日本国憲法）の政治機構図：Bは天皇の（　）権",
+      choices: ["統治", "立法", "行政", "司法"],
+      answer: 0
+    },
+    {
+      q: "明治憲法の政治機構図：Cは天皇の（　）権",
+      choices: ["統帥", "統治", "立法", "行政"],
+      answer: 0
+    },
+    {
+      q: "明治憲法の政治機構図：D（国民）の地位は？",
+      choices: ["臣民", "国民", "市民", "人民"],
+      answer: 0
+    },
+    {
+      q: "明治憲法の政治機構図：Fは（　）院（帝国議会の上院）",
+      choices: ["貴族", "衆議", "参議", "元老"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法の「主権」は？",
+      choices: ["国民主権", "天皇主権", "議会主権", "内閣主権"],
+      answer: 0
+    },
+    {
+      q: "大日本国憲法（明治憲法）の「主権」は？",
+      choices: ["天皇主権", "国民主権", "議会主権", "貴族主権"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法での天皇の地位は？",
+      choices: ["日本国・国民統合の象徴", "元首・統治権の総覧者", "神聖不可侵の存在", "立法権の総覧者"],
+      answer: 0
+    },
+    {
+      q: "大日本国憲法での天皇は（　）不可侵で、元首として統治権を総覧する。",
+      choices: ["神聖", "絶対", "永久", "至高"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法の戦争と軍隊についての方針は？",
+      choices: ["恒久平和主義", "積極的防衛主義", "軍備拡大主義", "中立主義"],
+      answer: 0
+    },
+    {
+      q: "大日本国憲法での軍隊は天皇直属で、（　）権が独立していた。",
+      choices: ["統帥", "立法", "行政", "司法"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法での国民の権利は？",
+      choices: ["永久不可侵の基本的人権", "臣民としての権利（法律で制限可能）", "天皇から与えられた権利", "議会が定めた権利"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法での議会（国会）の位置づけは？",
+      choices: ["国権の最高機関", "天皇の立法権に協賛する機関", "内閣の諮問機関", "司法の補助機関"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法での内閣の位置づけは？",
+      choices: ["行政の最高機関", "天皇を輔弼する機関", "議会の下部機関", "司法の執行機関"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法での裁判所は（　）権の本旨を保障する。",
+      choices: ["司法", "立法", "行政", "統帥"],
+      answer: 0
+    },
+    {
+      q: "日本国憲法の改正手続き：（　）の発議 → （　）投票",
+      choices: ["国会・国民", "天皇・議会", "内閣・国会", "国民・内閣"],
+      answer: 0
+    },
+    {
+      q: "大日本国憲法（明治憲法）の改正手続き：（　）の発議 → 議会の議決",
+      choices: ["天皇", "国民", "内閣", "貴族院"],
+      answer: 0
+    },
+  ],
+
+  // ===== タブ2：平等権 =====
+  [
+    {
+      q: "1985年に批准（国内で有効にすること）された女性差別に関する条約は？",
+      choices: ["女性差別撤廃条約", "男女共同参画条約", "女性権利条約", "国際人権条約"],
+      answer: 0
+    },
+    {
+      q: "1985年に制定された、職場の男女差別をなくすための法律は？",
+      choices: ["男女雇用機会均等法", "男女共同参画基本法", "女性活躍推進法", "育児休業法"],
+      answer: 0
+    },
+    {
+      q: "男女雇用機会均等法の目的：（　）の男女差別をなくし、職業上の男女平等の実現",
+      choices: ["職場", "家庭", "学校", "地域"],
+      answer: 0
+    },
+    {
+      q: "1999年に制定された、男女の役割分担の差別をなくすための法律は？",
+      choices: ["男女共同参画社会基本法", "男女雇用機会均等法", "女性差別撤廃条約", "育児休業法"],
+      answer: 0
+    },
+    {
+      q: "「男は仕事、女は家事・育児」など性差（　）に基づく差別を男女の役割分担の差別という。",
+      choices: ["ジェンダー", "セクシャル", "フェミニズム", "ダイバーシティ"],
+      answer: 0
+    },
+    {
+      q: "男女差別の判例として有名なのは、男女の（　）差別訴訟。",
+      choices: ["昇格", "採用", "給与", "退職"],
+      answer: 0
+    },
+    {
+      q: "部落差別：（　）部落出身者が、今日でも職業・居住・結婚などさまざまな面で差別を受けること。",
+      choices: ["被差別", "同和", "解放", "特殊"],
+      answer: 0
+    },
+    {
+      q: "民族・外国人差別：（　）民族への差別 → 先住民の権利の保障が不十分",
+      choices: ["少数", "多数", "外来", "移民"],
+      answer: 0
+    },
+    {
+      q: "在日（　）人・（　）人への差別 → 旧植民地支配を受けた国の出身者",
+      choices: ["韓国・朝鮮", "中国・台湾", "アメリカ・イギリス", "ブラジル・ペルー"],
+      answer: 0
+    },
+    {
+      q: "1993年に制定された、障がい者の自立と社会参加を支援する法律は？",
+      choices: ["障害者基本法", "障害者差別解消法", "障害者雇用促進法", "障害者権利条約"],
+      answer: 0
+    },
+    {
+      q: "障害者基本法（1993年）は障がい者の（　）と（　）参加を支援する。",
+      choices: ["自立・社会", "雇用・教育", "医療・福祉", "住居・就労"],
+      answer: 0
+    },
+    {
+      q: "2003年に制定された、役所や事業者が障がい者への（　）配慮をすることを定めた法律は？",
+      choices: ["障害者差別解消法", "障害者基本法", "障害者雇用促進法", "バリアフリー法"],
+      answer: 0
+    },
+    {
+      q: "障害者差別解消法で求められる配慮の種類は？",
+      choices: ["合理的配慮", "特別配慮", "優先配慮", "平等配慮"],
+      answer: 0
+    },
+    {
+      q: "部落差別で差別される具体的な場面（3つ）：職業・居住・（　）",
+      choices: ["結婚", "教育", "医療", "選挙"],
+      answer: 0
+    },
+    {
+      q: "男女の役割分担の差別判例：昇格や（　）の男女差別が問題となった。",
+      choices: ["賃金", "採用", "配属", "退職金"],
+      answer: 0
+    },
+  ]
+];
+
+// 状態管理
+const state = [
+  { answered: [], scores: 0 },
+  { answered: [], scores: 0 },
+  { answered: [], scores: 0 }
+];
+
+// シャッフル
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// クイズ描画
+function renderQuiz(sectionIdx) {
+  const qs = quizData[sectionIdx];
+  const container = document.getElementById(`quiz-${sectionIdx}`);
+  container.innerHTML = '';
+  state[sectionIdx].answered = new Array(qs.length).fill(null);
+  state[sectionIdx].scores = 0;
+
+  document.getElementById(`score-${sectionIdx}`).textContent = '0';
+  document.getElementById(`total-${sectionIdx}`).textContent = ` / ${qs.length}`;
+  document.getElementById(`progress-${sectionIdx}`).style.width = '0%';
+  document.getElementById(`result-${sectionIdx}`).classList.remove('show');
+
+  qs.forEach((q, qi) => {
+    // 選択肢をシャッフル（正解インデックスを追跡）
+    const indexed = q.choices.map((c, i) => ({ text: c, orig: i }));
+    const shuffled = shuffle(indexed);
+    const correctShuffledIdx = shuffled.findIndex(s => s.orig === q.answer);
+
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.id = `card-${sectionIdx}-${qi}`;
+
+    const choicesHTML = shuffled.map((c, ci) =>
+      `<button class="choice-btn" onclick="answer(${sectionIdx},${qi},${ci},${correctShuffledIdx})" id="btn-${sectionIdx}-${qi}-${ci}">${c.text}</button>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="q-num">Q${qi + 1}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="choices">${choicesHTML}</div>
+      <div class="feedback" id="fb-${sectionIdx}-${qi}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function answer(sectionIdx, qi, selectedIdx, correctIdx) {
+  if (state[sectionIdx].answered[qi] !== null) return;
+
+  const isCorrect = selectedIdx === correctIdx;
+  state[sectionIdx].answered[qi] = isCorrect;
+
+  const qs = quizData[sectionIdx];
+  const card = document.getElementById(`card-${sectionIdx}-${qi}`);
+  const fb = document.getElementById(`fb-${sectionIdx}-${qi}`);
+
+  // ボタン全部無効化
+  const btns = card.querySelectorAll('.choice-btn');
+  btns.forEach((b, i) => {
+    b.disabled = true;
+    if (i === correctIdx) b.classList.add('show-answer');
+  });
+
+  if (isCorrect) {
+    btns[selectedIdx].classList.remove('show-answer');
+    btns[selectedIdx].classList.add('selected-correct');
+    card.classList.add('correct');
+    fb.className = 'feedback correct';
+    fb.textContent = '✅ 正解！';
+    state[sectionIdx].scores++;
+  } else {
+    btns[selectedIdx].classList.add('selected-wrong');
+    card.classList.add('wrong');
+    fb.className = 'feedback wrong';
+    fb.textContent = `❌ 不正解… 正解は「${qs[qi].choices[qs[qi].answer]}」`;
+  }
+
+  // スコア更新
+  const answered = state[sectionIdx].answered.filter(a => a !== null).length;
+  const score = state[sectionIdx].scores;
+  const total = qs.length;
+
+  document.getElementById(`score-${sectionIdx}`).textContent = score;
+  document.getElementById(`progress-${sectionIdx}`).style.width = `${(answered / total) * 100}%`;
+
+  // 全問回答チェック
+  if (answered === total) {
+    setTimeout(() => showResult(sectionIdx, score, total), 600);
+  }
+}
+
+function showResult(sectionIdx, score, total) {
+  const pct = score / total;
+  let emoji, msg;
+  if (pct === 1) { emoji = '🏆'; msg = '完璧！全問正解！'; }
+  else if (pct >= 0.8) { emoji = '🎉'; msg = 'すごい！もう少しで完璧！'; }
+  else if (pct >= 0.6) { emoji = '👍'; msg = 'いい感じ！もう1回やってみよう！'; }
+  else { emoji = '💪'; msg = 'もう一度チャレンジ！'; }
+
+  document.getElementById(`result-emoji-${sectionIdx}`).textContent = emoji;
+  document.getElementById(`result-score-${sectionIdx}`).textContent = `${score} / ${total}`;
+  document.getElementById(`result-msg-${sectionIdx}`).textContent = msg;
+  document.getElementById(`result-${sectionIdx}`).classList.add('show');
+}
+
+function retrySection(sectionIdx) {
+  renderQuiz(sectionIdx);
+  window.scrollTo(0, 0);
+}
+
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.section').forEach((s, i) => s.classList.toggle('active', i === idx));
+}
+
+// 初期化
+renderQuiz(0);
+renderQuiz(1);
+renderQuiz(2);
+</script>
+</body>
+</html>
