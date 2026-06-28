@@ -638,19 +638,22 @@ function nextCard() { cardIndex = (cardIndex + 1) % allCards.length; showCard();
 function prevCard() { cardIndex = (cardIndex - 1 + allCards.length) % allCards.length; showCard(); }
 
 let correctAnswers = {};
-const totalQ = 10;
+const totalQ = 25;
 function answer(btn, isCorrect, qNum) {
   if (correctAnswers[qNum] !== undefined) return;
   const choices = btn.parentElement.querySelectorAll('.quiz-choice');
   choices.forEach(c => c.classList.add('disabled'));
   const fb = document.getElementById('fb' + qNum);
+  const hint = fb.getAttribute('data-hint') || '';
   if (isCorrect) {
     btn.classList.add('correct');
-    fb.textContent = '⭕ 正解！'; fb.className = 'quiz-feedback correct';
+    fb.innerHTML = '⭕ 正解！' + (hint ? '<br><span style="font-weight:400;font-size:0.85rem;">📖 ' + hint + '</span>' : '');
+    fb.className = 'quiz-feedback correct';
     correctAnswers[qNum] = true;
   } else {
     btn.classList.add('wrong');
-    fb.textContent = '❌ 不正解。もう一度確認しよう！'; fb.className = 'quiz-feedback wrong';
+    fb.innerHTML = '❌ 不正解。もう一度確認しよう！' + (hint ? '<br><span style="font-weight:400;font-size:0.85rem;">📖 ' + hint + '</span>' : '');
+    fb.className = 'quiz-feedback wrong';
     correctAnswers[qNum] = false;
     choices.forEach(c => { if (c.onclick.toString().includes('true')) c.classList.add('correct'); });
   }
@@ -664,7 +667,7 @@ function answer(btn, isCorrect, qNum) {
 function retryQuiz() {
   correctAnswers = {};
   document.querySelectorAll('.quiz-choice').forEach(c => c.classList.remove('correct', 'wrong', 'disabled'));
-  document.querySelectorAll('.quiz-feedback').forEach(f => { f.className = 'quiz-feedback'; });
+  document.querySelectorAll('.quiz-feedback').forEach(f => { f.className = 'quiz-feedback'; f.innerHTML = ''; });
   document.getElementById('score-box').style.display = 'none';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -695,110 +698,294 @@ function retryQuiz() {
     </div>
   </div>
 
-  <div id="quiz-questions" style="display:none">
-    <div class="quiz-header">✏️ 練習問題</div>
+    <div id="quiz-questions" style="display:none">
+    <div class="quiz-header">✏️ 練習問題（全25問）</div>
     <div class="score-box" id="score-box">
       <div class="score-num" id="score-num"></div>
       <div class="score-label">問正解！</div>
       <button class="btn-retry" onclick="retryQuiz()">もう一度チャレンジ</button>
     </div>
 
+    <!-- ===== Part1 ===== -->
     <div class="quiz-block">
-      <div class="section-label" style="margin-bottom:12px">Part 1　内容確認</div>
+      <div class="section-label" style="margin-bottom:12px">Part 1　内容確認・T/F</div>
       <div class="quiz-q"><span class="quiz-q-num">1</span>Fast fashion products are popular because they are fashionable and cheap.<br><small style="font-weight:400;color:#555">ファストファッションの製品はおしゃれで安いので人気だ。</small></div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, true, 1)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, false, 1)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,true,1)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,false,1)">❌ False</button>
       </div>
-      <div class="quiz-feedback" id="fb1"></div>
+      <div class="quiz-feedback" id="fb1" data-hint="Part1③④⑥：Recently, fast fashion has become very popular... It makes the production of clothes quick and cheap."></div>
     </div>
 
     <div class="quiz-block">
-      <div class="quiz-q"><span class="quiz-q-num">2</span>Fast fashion products have no problems.<br><small style="font-weight:400;color:#555">ファストファッション製品には問題がない。</small></div>
+      <div class="quiz-q"><span class="quiz-q-num">2</span>Fast fashion products have no problems at all.<br><small style="font-weight:400;color:#555">ファストファッション製品には全く問題がない。</small></div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 2)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, true, 2)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,false,2)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,true,2)">❌ False</button>
       </div>
-      <div class="quiz-feedback" id="fb2"></div>
+      <div class="quiz-feedback" id="fb2" data-hint="Part1⑦：some people say fast fashion products can cause problems."></div>
     </div>
 
     <div class="quiz-block">
       <div class="quiz-q"><span class="quiz-q-num">3</span>More than half of fast fashion products are thrown away within a year.<br><small style="font-weight:400;color:#555">ファストファッション製品の半数以上が1年以内に捨てられる。</small></div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, true, 3)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, false, 3)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,true,3)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,false,3)">❌ False</button>
       </div>
-      <div class="quiz-feedback" id="fb3"></div>
+      <div class="quiz-feedback" id="fb3" data-hint="Part1⑨：more than half of all fast fashion products are thrown away within a year."></div>
+    </div>
+
+    <!-- Part1 空所補充 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 1　本文空所補充</div>
+      <div class="quiz-q"><span class="quiz-q-num">4</span>次の空所に入る語の組み合わせとして正しいものを選びましょう。<br><br>Its products are also ( &nbsp;&nbsp;&nbsp;&nbsp; ) on the latest fashion ( &nbsp;&nbsp;&nbsp;&nbsp; ).</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,4)">based / trend</button>
+        <button class="quiz-choice" onclick="answer(this,true,4)">based / trends</button>
+        <button class="quiz-choice" onclick="answer(this,false,4)">base / trends</button>
+      </div>
+      <div class="quiz-feedback" id="fb4" data-hint="Part1⑤：be based on〜「〜に基づく」。trendsは複数形に注意。"></div>
+    </div>
+
+    <!-- Part1 指示語 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 1　指示語</div>
+      <div class="quiz-q"><span class="quiz-q-num">5</span>次の下線部「It」が指す内容として正しいものを選びましょう。<br><br><u>It</u> makes the production of clothes quick and cheap.</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,5)">the production of clothes</button>
+        <button class="quiz-choice" onclick="answer(this,true,5)">fast fashion</button>
+        <button class="quiz-choice" onclick="answer(this,false,5)">a company in the U.K.</button>
+      </div>
+      <div class="quiz-feedback" id="fb5" data-hint="Part1③④：Recently, fast fashion has become very popular... It makes the production...の流れでItはfast fashionを指す。"></div>
+    </div>
+
+    <!-- Part1 抜き出し -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 1　本文から抜き出し</div>
+      <div class="quiz-q"><span class="quiz-q-num">6</span>「埋立地に毎秒1台のゴミ収集車分の服が送られる」という内容を表す英文を選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,6)">Clothes are thrown away within a year every second.</button>
+        <button class="quiz-choice" onclick="answer(this,true,6)">One garbage truck of clothes is burned or sent to landfills every second.</button>
+        <button class="quiz-choice" onclick="answer(this,false,6)">A company in the U.K. sends clothes to landfills.</button>
+      </div>
+      <div class="quiz-feedback" id="fb6" data-hint="Part1⑩：And one garbage truck of clothes is burned or sent to landfills every second!"></div>
+    </div>
+
+    <!-- ===== Part2 ===== -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　内容確認・T/F</div>
+      <div class="quiz-q"><span class="quiz-q-num">7</span>Factory workers in developing countries suffer due to the low prices of clothes.<br><small style="font-weight:400;color:#555">途上国の工場労働者は服の低価格のために苦しんでいる。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,true,7)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,false,7)">❌ False</button>
+      </div>
+      <div class="quiz-feedback" id="fb7" data-hint="Part2②：factory workers in developing countries suffer due to the low prices of clothes."></div>
     </div>
 
     <div class="quiz-block">
-      <div class="section-label" style="margin-bottom:12px">Part 2　内容確認</div>
-      <div class="quiz-q"><span class="quiz-q-num">4</span>Factory workers in developing countries suffer because of expensive fashion products.<br><small style="font-weight:400;color:#555">途上国の工場労働者は高価なファッション製品のせいで苦しんでいる。</small></div>
+      <div class="quiz-q"><span class="quiz-q-num">8</span>This deal makes factory workers work at low pay.<br><small style="font-weight:400;color:#555">この取引が工場労働者を低賃金で働かせる。</small></div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 4)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, true, 4)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,true,8)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,false,8)">❌ False</button>
       </div>
-      <div class="quiz-feedback" id="fb4"></div>
+      <div class="quiz-feedback" id="fb8" data-hint="Part2⑦：This deal makes the factory workers work at low pay.〈make+O+原形不定詞〉の形。"></div>
+    </div>
+
+    <!-- Part2 空所補充 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　本文空所補充</div>
+      <div class="quiz-q"><span class="quiz-q-num">9</span>空所に入る正しい組み合わせを選びましょう。<br><br>In order ( &nbsp;&nbsp; ) produce cotton, farmers use chemical ( &nbsp;&nbsp;&nbsp;&nbsp; ) and ( &nbsp;&nbsp;&nbsp;&nbsp; ).</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,9)">of / fertilizers / pesticides</button>
+        <button class="quiz-choice" onclick="answer(this,true,9)">to / fertilizers / pesticides</button>
+        <button class="quiz-choice" onclick="answer(this,false,9)">to / pesticides / fertilizers</button>
+      </div>
+      <div class="quiz-feedback" id="fb9" data-hint="Part2⑨：in order to do「〜するために」（目的の不定詞）。fertilizers（肥料）/ pesticides（農薬）。"></div>
+    </div>
+
+    <!-- Part2 指示語 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　指示語</div>
+      <div class="quiz-q"><span class="quiz-q-num">10</span>次の「These」が指す内容として正しいものを選びましょう。<br><br><u>These</u> damage the environment and farmers' health.</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,10)">factory workers and farmers</button>
+        <button class="quiz-choice" onclick="answer(this,false,10)">fast fashion products</button>
+        <button class="quiz-choice" onclick="answer(this,true,10)">chemical fertilizers and pesticides</button>
+      </div>
+      <div class="quiz-feedback" id="fb10" data-hint="Part2⑨⑩：farmers use chemical fertilizers and pesticides. These damage...の流れでThese＝肥料と農薬。"></div>
+    </div>
+
+    <!-- Part2 抜き出し -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　本文から抜き出し</div>
+      <div class="quiz-q"><span class="quiz-q-num">11</span>「もし工場が注文を受け入れなければ」という内容の英文を選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,11)">If the factory accepts the order, the company finds a new partner.</button>
+        <button class="quiz-choice" onclick="answer(this,true,11)">If the factory doesn't accept the order, the company places the order with a different factory.</button>
+        <button class="quiz-choice" onclick="answer(this,false,11)">If the company doesn't accept the order, the factory stops working.</button>
+      </div>
+      <div class="quiz-feedback" id="fb11" data-hint="Part2⑥：If the factory doesn't accept the order, the company places the order with a different factory."></div>
+    </div>
+
+    <!-- Part2 文法 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　文法問題</div>
+      <div class="quiz-q"><span class="quiz-q-num">12</span>次の文の（　）に入る正しい形を選びましょう。<br><br>It forces a factory ( &nbsp;&nbsp;&nbsp;&nbsp; ) produce the shirt cheaply.</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,12)">for</button>
+        <button class="quiz-choice" onclick="answer(this,true,12)">to</button>
+        <button class="quiz-choice" onclick="answer(this,false,12)">of</button>
+      </div>
+      <div class="quiz-feedback" id="fb12" data-hint="〈force + O + to do〉「Oに〜することを強制する」。OはfactoryでCはto produceという不定詞。"></div>
+    </div>
+
+    <!-- Part2 日本語→英文完成 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 2　日本語に合う英文完成</div>
+      <div class="quiz-q"><span class="quiz-q-num">13</span>「途上国の工場労働者は服の低価格のために苦しんでいる」<br>正しい英文を選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,13)">Factory workers in developing countries suffer because of the high prices of clothes.</button>
+        <button class="quiz-choice" onclick="answer(this,true,13)">Factory workers in developing countries suffer due to the low prices of clothes.</button>
+        <button class="quiz-choice" onclick="answer(this,false,13)">Factory workers in advanced countries suffer due to the low prices of clothes.</button>
+      </div>
+      <div class="quiz-feedback" id="fb13" data-hint="Part2②：suffer due to〜「〜のために苦しむ」。developing countries（途上国）に注意。"></div>
+    </div>
+
+    <!-- ===== Part3 ===== -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　内容確認・T/F</div>
+      <div class="quiz-q"><span class="quiz-q-num">14</span>Ethical fashion companies alone can solve all the problems of fast fashion.<br><small style="font-weight:400;color:#555">エシカルファッション企業だけでファストファッションの問題をすべて解決できる。</small></div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,14)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,true,14)">❌ False</button>
+      </div>
+      <div class="quiz-feedback" id="fb14" data-hint="Part3⑤：ethical fashion companies alone cannot solve all the problems.「だけでは解決できない」が正しい。"></div>
     </div>
 
     <div class="quiz-block">
-      <div class="quiz-q"><span class="quiz-q-num">5</span>Farmers use chemical fertilizers and pesticides to produce cotton.<br><small style="font-weight:400;color:#555">農家は綿花を生産するために化学肥料や農薬を使う。</small></div>
+      <div class="quiz-q"><span class="quiz-q-num">15</span>Ethical fashion companies make environment-friendly products and pay workers a living wage.<br><small style="font-weight:400;color:#555">エシカルファッション企業は環境に優しい製品を作り、労働者にリビングワークを支払う。</small></div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, true, 5)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, false, 5)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,true,15)">⭕ True</button>
+        <button class="quiz-choice" onclick="answer(this,false,15)">❌ False</button>
       </div>
-      <div class="quiz-feedback" id="fb5"></div>
+      <div class="quiz-feedback" id="fb15" data-hint="Part3④：They make environment-friendly products and pay workers a living wage."></div>
+    </div>
+
+    <!-- Part3 空所補充 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　本文空所補充</div>
+      <div class="quiz-q"><span class="quiz-q-num">16</span>空所に入る正しい組み合わせを選びましょう。<br><br>"Ethical" means ( &nbsp;&nbsp;&nbsp;&nbsp; ) right.<br>エシカルとは（　）的に正しいという意味です。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,16)">ethically</button>
+        <button class="quiz-choice" onclick="answer(this,true,16)">morally</button>
+        <button class="quiz-choice" onclick="answer(this,false,16)">legally</button>
+      </div>
+      <div class="quiz-feedback" id="fb16" data-hint="Part3②：'Ethical' means morally right.「エシカルとは道徳的に正しいという意味」。morally（道徳的に）。"></div>
+    </div>
+
+    <!-- Part3 指示語 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　指示語</div>
+      <div class="quiz-q"><span class="quiz-q-num">17</span>次の「the product」が最終的に「linked to」されているものは何か、正しいものを選びましょう。<br><br>...the product is always linked to ( &nbsp;&nbsp;&nbsp;&nbsp; ).</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,17)">workers</button>
+        <button class="quiz-choice" onclick="answer(this,false,17)">ethical fashion</button>
+        <button class="quiz-choice" onclick="answer(this,true,17)">the environment</button>
+      </div>
+      <div class="quiz-feedback" id="fb17" data-hint="Part3⑧：the product is always linked to the environment.「製品は常に環境とつながっている」。"></div>
+    </div>
+
+    <!-- Part3 抜き出し -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　本文から抜き出し</div>
+      <div class="quiz-q"><span class="quiz-q-num">18</span>「ますます多くの人がエシカルファッションに注目している」を表す英文を選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,18)">Many people are interested in ethical fashion products recently.</button>
+        <button class="quiz-choice" onclick="answer(this,true,18)">Today more and more people pay attention to ethical fashion.</button>
+        <button class="quiz-choice" onclick="answer(this,false,18)">People are starting to buy ethical fashion clothes these days.</button>
+      </div>
+      <div class="quiz-feedback" id="fb18" data-hint="Part3①：Today more and more people pay attention to ethical fashion.「more and more〜」＝「ますます多くの〜」。"></div>
+    </div>
+
+    <!-- Part3 文法 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　文法問題</div>
+      <div class="quiz-q"><span class="quiz-q-num">19</span>次の文の（　）に入る正しい形を選びましょう。<br><br>Ethical fashion companies often see the whole fast fashion industry ( &nbsp;&nbsp;&nbsp;&nbsp; ) problems.</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,19)">cause</button>
+        <button class="quiz-choice" onclick="answer(this,false,19)">caused</button>
+        <button class="quiz-choice" onclick="answer(this,true,19)">causing</button>
+      </div>
+      <div class="quiz-feedback" id="fb19" data-hint="Part3③：〈see + O + C（現在分詞）〉「OがCしているのを見る」（知覚動詞構文）。causingはcauseのing形（現在分詞）。"></div>
+    </div>
+
+    <!-- Part3 日本語→英文完成 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">Part 3　日本語に合う英文完成</div>
+      <div class="quiz-q"><span class="quiz-q-num">20</span>「私たち一人ひとりが協力する必要がある」<br>正しい英文を選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,20)">Each of us needs cooperating.</button>
+        <button class="quiz-choice" onclick="answer(this,true,20)">Each of us needs to cooperate.</button>
+        <button class="quiz-choice" onclick="answer(this,false,20)">Each of us need to cooperate.</button>
+      </div>
+      <div class="quiz-feedback" id="fb20" data-hint="Part3⑥：Each of us needs to cooperate.「need + to do」（不定詞）。Each of usは単数扱いなのでneeds。"></div>
+    </div>
+
+    <!-- 重要表現 総合 -->
+    <div class="quiz-block">
+      <div class="section-label" style="margin-bottom:12px">重要表現　総合</div>
+      <div class="quiz-q"><span class="quiz-q-num">21</span>「〜のために苦しむ」を表す英語表現として正しいものを選びましょう。</div>
+      <div class="quiz-choices">
+        <button class="quiz-choice" onclick="answer(this,false,21)">suffer because</button>
+        <button class="quiz-choice" onclick="answer(this,true,21)">suffer due to</button>
+        <button class="quiz-choice" onclick="answer(this,false,21)">suffer for</button>
+      </div>
+      <div class="quiz-feedback" id="fb21" data-hint="Part2②：suffer due to〜「〜のために苦しむ」。due to＝because ofと同じ意味。"></div>
     </div>
 
     <div class="quiz-block">
-      <div class="section-label" style="margin-bottom:12px">Part 3　内容確認</div>
-      <div class="quiz-q"><span class="quiz-q-num">6</span>Ethical fashion companies alone can solve all the problems of fast fashion.<br><small style="font-weight:400;color:#555">エシカルファッション企業だけでファストファッションの問題をすべて解決できる。</small></div>
+      <div class="quiz-q"><span class="quiz-q-num">22</span>「環境とつながっている」を表す英語表現として正しいものを選びましょう。</div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 6)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, true, 6)">❌ False（違う）</button>
+        <button class="quiz-choice" onclick="answer(this,false,22)">connected with the environment</button>
+        <button class="quiz-choice" onclick="answer(this,true,22)">linked to the environment</button>
+        <button class="quiz-choice" onclick="answer(this,false,22)">related for the environment</button>
       </div>
-      <div class="quiz-feedback" id="fb6"></div>
+      <div class="quiz-feedback" id="fb22" data-hint="Part3⑧：the product is always linked to the environment.「be linked to〜」＝「〜とつながっている」（受け身形）。"></div>
     </div>
 
-    <div class="quiz-block">
-      <div class="quiz-q"><span class="quiz-q-num">7</span>We should keep in mind that products are always linked to the environment.<br><small style="font-weight:400;color:#555">製品は常に環境とつながっていることを心に留めておくべきだ。</small></div>
-      <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, true, 7)">⭕ True（正しい）</button>
-        <button class="quiz-choice" onclick="answer(this, false, 7)">❌ False（違う）</button>
-      </div>
-      <div class="quiz-feedback" id="fb7"></div>
-    </div>
-
+    <!-- 単語 -->
     <div class="quiz-block">
       <div class="section-label" style="margin-bottom:12px">単語の意味</div>
-      <div class="quiz-q"><span class="quiz-q-num">8</span>「landfill」の意味は？</div>
+      <div class="quiz-q"><span class="quiz-q-num">23</span>「ethical」の意味は？</div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 8)">大量生産</button>
-        <button class="quiz-choice" onclick="answer(this, true, 8)">埋立地</button>
-        <button class="quiz-choice" onclick="answer(this, false, 8)">農薬</button>
+        <button class="quiz-choice" onclick="answer(this,false,23)">安価な</button>
+        <button class="quiz-choice" onclick="answer(this,true,23)">倫理的な、道徳的に正しい</button>
+        <button class="quiz-choice" onclick="answer(this,false,23)">環境に優しい</button>
       </div>
-      <div class="quiz-feedback" id="fb8"></div>
+      <div class="quiz-feedback" id="fb23" data-hint="Part3②：'Ethical' means morally right.「倫理的な、道徳的に正しい」。"></div>
     </div>
 
     <div class="quiz-block">
-      <div class="quiz-q"><span class="quiz-q-num">9</span>「ethical」の意味は？</div>
+      <div class="quiz-q"><span class="quiz-q-num">24</span>「landfill」の意味は？</div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 9)">安価な</button>
-        <button class="quiz-choice" onclick="answer(this, false, 9)">流行の</button>
-        <button class="quiz-choice" onclick="answer(this, true, 9)">倫理的な、道徳的に正しい</button>
+        <button class="quiz-choice" onclick="answer(this,false,24)">大量生産</button>
+        <button class="quiz-choice" onclick="answer(this,true,24)">埋立地</button>
+        <button class="quiz-choice" onclick="answer(this,false,24)">農薬</button>
       </div>
-      <div class="quiz-feedback" id="fb9"></div>
+      <div class="quiz-feedback" id="fb24" data-hint="Part1⑩：clothes is burned or sent to landfills every second.「埋立地」。"></div>
     </div>
 
     <div class="quiz-block">
-      <div class="quiz-q"><span class="quiz-q-num">10</span>「cooperate」の意味は？</div>
+      <div class="quiz-q"><span class="quiz-q-num">25</span>「cooperate」の意味は？</div>
       <div class="quiz-choices">
-        <button class="quiz-choice" onclick="answer(this, false, 10)">引き起こす</button>
-        <button class="quiz-choice" onclick="answer(this, true, 10)">協力する</button>
-        <button class="quiz-choice" onclick="answer(this, false, 10)">つながっている</button>
+        <button class="quiz-choice" onclick="answer(this,false,25)">引き起こす</button>
+        <button class="quiz-choice" onclick="answer(this,false,25)">解決する</button>
+        <button class="quiz-choice" onclick="answer(this,true,25)">協力する</button>
       </div>
-      <div class="quiz-feedback" id="fb10"></div>
+      <div class="quiz-feedback" id="fb25" data-hint="Part3⑥：Each of us needs to cooperate.「協力する」。"></div>
     </div>
+
+  </div>
 
   </div>
 </div>
