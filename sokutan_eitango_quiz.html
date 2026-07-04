@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>速読英単語 期末テスト対策クイズ (778〜972)</title>
+<style>
+  :root {
+    --main: #e8827a;
+    --main-dark: #d5665c;
+    --bg: #fdf6f2;
+    --card: #ffffff;
+    --text: #333333;
+    --correct: #4caf50;
+    --wrong: #e53935;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, Arial, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    padding: 0;
+    color: var(--text);
+  }
+  .container {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.3em;
+    text-align: center;
+    color: var(--main-dark);
+    margin: 16px 0 8px;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.85em;
+    color: #888;
+    margin-bottom: 16px;
+  }
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 4px;
+    border: 2px solid var(--main);
+    background: white;
+    color: var(--main-dark);
+    border-radius: 10px;
+    font-size: 0.85em;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+  }
+  .tab-btn.active {
+    background: var(--main);
+    color: white;
+  }
+  .card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+  .progress {
+    font-size: 0.85em;
+    color: #999;
+    margin-bottom: 10px;
+    text-align: right;
+  }
+  .question-word {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    color: var(--main-dark);
+    margin: 10px 0 24px;
+    word-break: break-word;
+  }
+  .choice {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    font-size: 1em;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .choice:active { transform: scale(0.98); }
+  .choice.correct {
+    border-color: var(--correct);
+    background: #e8f5e9;
+    color: var(--correct);
+    font-weight: bold;
+  }
+  .choice.wrong {
+    border-color: var(--wrong);
+    background: #ffebee;
+    color: var(--wrong);
+    font-weight: bold;
+  }
+  .choice.disabled { pointer-events: none; }
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  .nav-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: var(--main);
+    color: white;
+    font-size: 0.95em;
+    cursor: pointer;
+  }
+  .nav-btn:disabled {
+    background: #ccc;
+    cursor: default;
+  }
+  .score-panel {
+    text-align: center;
+    padding: 30px 10px;
+  }
+  .score-panel .big {
+    font-size: 2.4em;
+    color: var(--main-dark);
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  .retry-btn {
+    margin-top: 20px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    background: var(--main);
+    color: white;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  .wrong-list {
+    text-align: left;
+    margin-top: 20px;
+    padding: 14px;
+    background: #fafafa;
+    border-radius: 10px;
+    font-size: 0.9em;
+  }
+  .wrong-list div { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>速読英単語 期末テスト対策</h1>
+  <div class="subtitle">778〜972番 / 4択クイズ</div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+// ------------------------------
+// 単語データ (778-972)
+// ------------------------------
+const DATA = {
+  "音楽と人の感情 (778-828)": [
+    ["unbelievable","信じられるような→信じられない"],
+    ["incredible","すばらしい"],
+    ["idea","考え"],
+    ["smart","頭のよい"],
+    ["wise","賢い"],
+    ["intelligent","知能の高い"],
+    ["bright","明るい"],
+    ["popular","人気のある"],
+    ["grade","程度"],
+    ["degree","(温度などの)度"],
+    ["university","(総合)大学"],
+    ["thought","考え"],
+    ["notion","考え"],
+    ["concept","概念"],
+    ["policy","政策"],
+    ["principle","主義"],
+    ["abstract","抽象的な"],
+    ["concrete","具体的な"],
+    ["education","教育"],
+    ["lecture","講義"],
+    ["professor","教授"],
+    ["classical","古典の"],
+    ["especially","特に"],
+    ["test","検査"],
+    ["silence","沈黙"],
+    ["advice","忠告"],
+    ["score","(試合・試験の)得点"],
+    ["average","平均"],
+    ["whole","全体(全部)の"],
+    ["summary","要約"],
+    ["detail","細部"],
+    ["now","今"],
+    ["immediately","即座に"],
+    ["major","主要な"],
+    ["minor","それほど重要でない、小さな"],
+    ["key","かぎ"],
+    ["simply","ただ単に"],
+    ["since","...して以来"],
+    ["performance","演行"],
+    ["able","可能な"],
+    ["ability","能力"],
+    ["unable","できない"],
+    ["available","手に入る"],
+    ["afford","~を持てる(経済的余裕がある)"],
+    ["capacity","能力"],
+    ["talent","才能(ある人々)"],
+    ["potential","潜在的な"],
+    ["instinct","本能"],
+    ["skill","技術"],
+    ["technique","技術"],
+    ["technology","科学技術"]
+  ],
+  "あるジャーナリストの苦難 (829-898)": [
+    ["editor","編集者"],
+    ["magazine","雑誌"],
+    ["extreme","極端"],
+    ["provide","を供給する"],
+    ["supply","を供給する"],
+    ["reader","読者、読む人"],
+    ["statistics","統計(学)"],
+    ["journalist","ジャーナリスト"],
+    ["instruct","に教える"],
+    ["command","命令"],
+    ["order","に命令する"],
+    ["well-known","よく知られている、有名な"],
+    ["article","記事"],
+    ["president","大統領"],
+    ["palace","宮殿"],
+    ["republic","共和国"],
+    ["arrive","着く"],
+    ["reach","に着く"],
+    ["approach","に近づく"],
+    ["access","接近、出入り"],
+    ["sentence","文"],
+    ["refuse","を拒絶する"],
+    ["decline","減少する"],
+    ["deny","を否定する"],
+    ["reject","を拒絶する"],
+    ["publish","を出版する"],
+    ["surround","を囲む"],
+    ["height","高さ"],
+    ["length","(物や時間の)長さ"],
+    ["depth","深さ"],
+    ["width","幅"],
+    ["measure","を測る"],
+    ["obtain","を入手する"],
+    ["acquire","を獲得する"],
+    ["gain","を手に入れる"],
+    ["earn","(お金・名声など)を得る"],
+    ["meanwhile","その間に"],
+    ["impatient","いらいらしている"],
+    ["patient","患者"],
+    ["press","押すこと"],
+    ["urgent","緊急の"],
+    ["receive","を受け取る"],
+    ["reply","返事"],
+    ["inform","に知らせる"],
+    ["announce","を発表する"],
+    ["fire","を解雇する"],
+    ["fail","に落ちる"],
+    ["reluctantly","願いやいやながら、しぶしぶ"],
+    ["reluctant","気の進まない"],
+    ["originally","元来は"],
+    ["poor","貧しい"],
+    ["arrest","を逮捕する"],
+    ["prison","刑務所"],
+    ["allow","を許す"],
+    ["forgive","(人・行為・罪など)を許す"],
+    ["excuse","を許す"],
+    ["permit","を許す"],
+    ["license","を認可する"],
+    ["step","歩み"],
+    ["stage","(発達の)段階"],
+    ["process","過程"],
+    ["lead","(道などが)通じる"],
+    ["direct","を向ける"],
+    ["guide","案内する"],
+    ["control","を支配する"],
+    ["operate","を操作する"],
+    ["persuade","を説得する"],
+    ["convince","(人)を確信(納得)させる"],
+    ["dominate","を支配する"],
+    ["wall","壁"]
+  ],
+  "スペイン人にとっての昼寝 (899-972)": [
+    ["broad","広範囲に及ぶ"],
+    ["wide","幅の広い"],
+    ["narrow","(幅・心・範囲が)狭い"],
+    ["deep","深い"],
+    ["shallow","浅い"],
+    ["extend","を延長する"],
+    ["expand","を拡大する"],
+    ["extent","程度"],
+    ["nap","昼寝"],
+    ["grow","を栽培する"],
+    ["raise","を育てる"],
+    ["rear","(人が)(子供や動物を)育てる"],
+    ["feed","(家族など)を養う"],
+    ["adult","大人"],
+    ["executive","(組織)幹部"],
+    ["government","政府"],
+    ["middle","中央(の)"],
+    ["center","中心"],
+    ["political","政治(上)の"],
+    ["economic","経済(学)の"],
+    ["financial","財政の"],
+    ["expert","専門家"],
+    ["productivity","生産性"],
+    ["religion","宗教"],
+    ["tradition","伝統"],
+    ["still","まだ"],
+    ["task","課題"],
+    ["duty","義務"],
+    ["responsibility","責任"],
+    ["assignment","任務"],
+    ["essential","不可欠の"],
+    ["crucial","決定的な"],
+    ["fundamental","基本的な"],
+    ["attend","に出席する"],
+    ["matter","問題"],
+    ["like","を好む"],
+    ["office","事務所"],
+    ["empty","空の"],
+    ["clear","明白な"],
+    ["evident","明白な"],
+    ["obvious","明白な"],
+    ["plain","明白な"],
+    ["pure","純粋な"],
+    ["remove","を取り除く"],
+    ["foreigner","外国人"],
+    ["enter","に入る"],
+    ["own","自分自身の"],
+    ["possess","を所有している"],
+    ["belong","所属している"],
+    ["property","財産"],
+    ["rhythm","リズム"],
+    ["recall","を思い出す"],
+    ["somewhere","どこかで(へ)"],
+    ["extremely","非常に"],
+    ["outside","の外に(へ・の)"],
+    ["heat","熱"],
+    ["wave","波"],
+    ["ghost","幽霊"],
+    ["unlike","と異なって"],
+    ["action","(1回の)行動"],
+    ["except","を除いて(は)"],
+    ["full","いっぱいの"],
+    ["hungry","空腹の"],
+    ["complete","完全な"],
+    ["absolute","完全な"],
+    ["thorough","徹底的な、完全な"],
+    ["accomplish","を成し遂げる"],
+    ["achieve","を成し遂げる"],
+    ["fulfill","(要求など)を満たす"],
+    ["call","を呼ぶ"],
+    ["family","家族"],
+    ["afterward(s)","後で"],
+    ["relative","親戚"],
+    ["ancestor","先祖"]
+  ]
+};
+
+const tabNames = Object.keys(DATA);
+let currentTab = tabNames[0];
+let questions = [];
+let qIndex = 0;
+let score = 0;
+let answered = false;
+let wrongAnswers = [];
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildQuestions(tabName) {
+  const list = DATA[tabName];
+  const allDefs = list.map(w => w[1]);
+  const qs = shuffle(list).map(([word, correctDef]) => {
+    const distractors = shuffle(allDefs.filter(d => d !== correctDef)).slice(0, 3);
+    const choices = shuffle([correctDef, ...distractors]);
+    return { word, correctDef, choices };
+  });
+  return qs;
+}
+
+function startTab(tabName) {
+  currentTab = tabName;
+  questions = buildQuestions(tabName);
+  qIndex = 0;
+  score = 0;
+  wrongAnswers = [];
+  answered = false;
+  renderTabs();
+  renderQuestion();
+}
+
+function renderTabs() {
+  const tabsEl = document.getElementById('tabs');
+  tabsEl.innerHTML = '';
+  tabNames.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (name === currentTab ? ' active' : '');
+    btn.textContent = name.split(' (')[0];
+    btn.onclick = () => startTab(name);
+    tabsEl.appendChild(btn);
+  });
+}
+
+function renderQuestion() {
+  const card = document.getElementById('card');
+  if (qIndex >= questions.length) {
+    renderScore();
+    return;
+  }
+  const q = questions[qIndex];
+  answered = false;
+  card.innerHTML = `
+    <div class="progress">${qIndex + 1} / ${questions.length}</div>
+    <div class="question-word">${q.word}</div>
+    <div id="choices"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="skipBtn">スキップ</button>
+    </div>
+  `;
+  const choicesEl = document.getElementById('choices');
+  q.choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.textContent = choice;
+    btn.onclick = () => selectChoice(choice, btn);
+    choicesEl.appendChild(btn);
+  });
+  document.getElementById('skipBtn').onclick = () => {
+    if (!answered) {
+      wrongAnswers.push({ word: q.word, correct: q.correctDef, picked: '(スキップ)' });
+    }
+    qIndex++;
+    renderQuestion();
+  };
+}
+
+function selectChoice(choice, btnEl) {
+  if (answered) return;
+  answered = true;
+  const q = questions[qIndex];
+  const allBtns = document.querySelectorAll('.choice');
+  allBtns.forEach(b => {
+    b.classList.add('disabled');
+    if (b.textContent === q.correctDef) b.classList.add('correct');
+  });
+  if (choice === q.correctDef) {
+    score++;
+  } else {
+    btnEl.classList.add('wrong');
+    wrongAnswers.push({ word: q.word, correct: q.correctDef, picked: choice });
+  }
+  setTimeout(() => {
+    qIndex++;
+    renderQuestion();
+  }, 900);
+}
+
+function renderScore() {
+  const card = document.getElementById('card');
+  const pct = Math.round((score / questions.length) * 100);
+  let wrongHtml = '';
+  let reviewBtnHtml = '';
+  if (wrongAnswers.length > 0) {
+    wrongHtml = '<div class="wrong-list"><b>まちがえた単語：</b>' +
+      wrongAnswers.map(w => `<div>${w.word} → ${w.correct}</div>`).join('') +
+      '</div>';
+    reviewBtnHtml = `<button class="retry-btn" id="reviewBtn" style="background:var(--wrong);margin-left:8px;">まちがえた問題だけ再挑戦</button>`;
+  }
+  card.innerHTML = `
+    <div class="score-panel">
+      <div>結果</div>
+      <div class="big">${score} / ${questions.length} (${pct}%)</div>
+      ${wrongHtml}
+      <div>
+        <button class="retry-btn" onclick="startTab('${currentTab}')">もう一度（全問）</button>
+        ${reviewBtnHtml}
+      </div>
+    </div>
+  `;
+  if (wrongAnswers.length > 0) {
+    document.getElementById('reviewBtn').onclick = reviewWrongOnes;
+  }
+}
+
+function reviewWrongOnes() {
+  // まちがえた単語（重複なし）だけを対象に、選択肢を新しく作り直して再挑戦
+  const wrongWords = [...new Set(wrongAnswers.map(w => w.word))];
+  const list = DATA[currentTab];
+  const allDefs = list.map(w => w[1]);
+  const wordMap = Object.fromEntries(list);
+  questions = shuffle(wrongWords).map(word => {
+    const correctDef = wordMap[word];
+    const distractors = shuffle(allDefs.filter(d => d !== correctDef)).slice(0, 3);
+    const choices = shuffle([correctDef, ...distractors]);
+    return { word, correctDef, choices };
+  });
+  qIndex = 0;
+  score = 0;
+  wrongAnswers = [];
+  answered = false;
+  renderQuestion();
+}
+
+startTab(tabNames[0]);
+</script>
+</body>
+</html>
