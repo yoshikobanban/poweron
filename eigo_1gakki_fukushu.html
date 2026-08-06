@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>論理表現II・英コミュ 1学期復習クイズ</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f7fa 100%);
+    margin: 0;
+    padding: 16px;
+    color: #2d2d3a;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 {
+    font-size: 1.3rem;
+    text-align: center;
+    color: #3f4a8a;
+    margin-bottom: 4px;
+  }
+  .sub { text-align:center; color:#777; font-size:0.85rem; margin-bottom:16px; }
+
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid #6c7ae0;
+    background: #fff;
+    color: #6c7ae0;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .tab-btn.active { background: #6c7ae0; color: #fff; }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(80,80,140,0.08);
+    margin-bottom: 16px;
+  }
+
+  .progress {
+    display:flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 8px;
+  }
+  .progress-bar-bg {
+    height: 6px;
+    background: #eee;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: #6c7ae0;
+    transition: width 0.3s;
+  }
+
+  .qtext {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    white-space: pre-wrap;
+  }
+  .qtext .hint { color:#3f4a8a; font-weight:bold; }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice-btn {
+    text-align: left;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    background: #fafafa;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .choice-btn:hover { border-color: #6c7ae0; }
+  .choice-btn.correct { background: #d9f7e6; border-color: #34b378; }
+  .choice-btn.wrong { background: #fde3e3; border-color: #e05c5c; }
+  .choice-btn.disabled { pointer-events: none; opacity: 0.85; }
+
+  .explain {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #f3f4fb;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .explain.show { display: block; }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+    gap: 10px;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .next-btn { background: #6c7ae0; color: #fff; }
+  .next-btn:disabled { background: #ccc; cursor: default; }
+
+  .result-box { text-align: center; }
+  .result-score {
+    font-size: 2.4rem;
+    font-weight: bold;
+    color: #3f4a8a;
+    margin: 10px 0;
+  }
+  .result-msg { font-size: 0.95rem; color: #555; margin-bottom: 18px; }
+
+  .mistake-list { text-align: left; margin-top: 10px; }
+  .mistake-item {
+    background: #fff7f0;
+    border-left: 4px solid #e0a05c;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  .mistake-item b { color:#3f4a8a; }
+
+  .retry-btn {
+    margin-top: 16px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    background: #34b378;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>論理表現II ・ 英コミュII 1学期復習</h1>
+  <div class="sub">7月期末で間違えやすかったポイントを重点的に復習しよう</div>
+
+  <div class="tabs" id="tabs"></div>
+  <div id="quizArea"></div>
+</div>
+
+<script>
+// ===== 問題データ =====
+// 各カテゴリ: 論理表現IIの実際の出題(動詞活用・態変化・関係代名詞・並べ替え)を中心に、
+// 定着用の類題も加えている。英コミュIIは本文語彙の並べ替え系を中心に構成。
+
+const categories = {
+  katsuyou: {
+    label: "動詞活用",
+    questions: [
+      { q: "choose の過去形は?", choices: ["chose", "choosed", "chosen", "choosing"], answer: 0, note: "choose-chose-chosen(不規則)。過去分詞はchosen。" },
+      { q: "drink の過去分詞形は?", choices: ["drank", "drunk", "drinked", "drinking"], answer: 1, note: "drink-drank-drunk。過去形drankと過去分詞drunkを混同しやすい。" },
+      { q: "「(布団に)横たえる」の意味の lay の過去形は?", choices: ["lay", "laid", "lain", "layed"], answer: 1, note: "lay(他動詞・横たえる)-laid-laid。自動詞lie(横たわる)-lay-lainと混同注意。" },
+      { q: "「横たわる」の意味の lie の過去形は?", choices: ["laid", "lied", "lay", "lain"], answer: 2, note: "lie(自動詞・横たわる)-lay-lain。lie(嘘をつく)-lied-liedとは別物。" },
+      { q: "think の過去分詞形は?", choices: ["thinked", "thought", "thoughted", "thinking"], answer: 1, note: "think-thought-thought。過去形も過去分詞も同じ形。" },
+      { q: "write の過去分詞形は?", choices: ["wrote", "written", "writed", "writing"], answer: 1, note: "write-wrote-written。過去形wroteと過去分詞writtenの区別が頻出。" },
+      { q: "「I read a book, ( ) down on the bed.」に入る形は?", choices: ["lying", "lay", "laid", "lie"], answer: 0, note: "分詞構文なので動詞はing形。lie(横たわる)のing形はlying。" },
+      { q: "「( ) along the river, Sally met an old friend.」に入る形は?", choices: ["Walk", "Walked", "Walking", "To walk"], answer: 2, note: "「歩いている時」→分詞構文はing形。Whileを省略した形。" },
+    ]
+  },
+  bunshikoubun: {
+    label: "分詞構文・態",
+    questions: [
+      { q: "「They spent some time together, ( ) in love with each other.」", choices: ["fall", "fell", "falling", "fallen"], answer: 2, note: "andでつながる動作の連続を分詞構文で表す→falling。" },
+      { q: "「( )( ) overtime, Tom was really tired.」(Asを使わず分詞構文で)", choices: ["Have worked", "Having worked", "Worked", "To work"], answer: 1, note: "完了の分詞構文はHaving + 過去分詞。主節より前の時制を表す。" },
+      { q: "「( )( )( ) a panda, he was glad to see one in the zoo.」", choices: ["Never having seen", "Not have seen", "Having never seen", "Never have seen"], answer: 0, note: "完了+否定の分詞構文の語順はNever having + 過去分詞。" },
+      { q: "「She is proud that she is a nurse.」を書き換えると She ( ) proud ( ) ( ) a nurse.", choices: ["is / of / being", "was / of / been", "is / of / been", "was / of / being"], answer: 0, note: "時制が主節と同じなので、She is proud of being a nurse.(単純な動名詞)。" },
+      { q: "「She was proud that she was a nurse.」を書き換えると She ( ) proud ( )( ) a nurse.", choices: ["was / of / being", "is / of / having been", "was / of / having been", "was / of / been"], answer: 2, note: "主節も過去、that節も過去=同時制なので実はof being でも良いが、時制のズレを明示する場合はof having been。テストでは完了動名詞のパターンとして出題。" },
+      { q: "「Look at the girls ( ) on the stage.」", choices: ["dance", "danced", "dancing", "to dance"], answer: 2, note: "「踊っている少女たち」→現在分詞dancingで後置修飾。" },
+      { q: "「My brother often leaves the water ( ).」(水を出しっぱなしにする)", choices: ["run", "ran", "running", "to run"], answer: 2, note: "leave + O + 現在分詞で「Oを~のままにする」。" },
+      { q: "「You must keep the gate ( ) at night.」(門を施錠したままにする)", choices: ["locking", "locked", "lock", "to lock"], answer: 1, note: "keep + O + 過去分詞で「Oを~された状態に保つ」(受け身の意味)。" },
+    ]
+  },
+  kankeishi: {
+    label: "関係代名詞",
+    questions: [
+      { q: "Tom is the only player ___ has played in all the games.", choices: ["whom", "which", "whose", "who"], answer: 3, note: "先行詞Tomは人、後ろに動詞hasが続く(主格)→who。" },
+      { q: "I met a girl ___ sister is a fashion model.", choices: ["who", "whom", "whose", "which"], answer: 2, note: "「彼女の姉が」=所有格→whose。" },
+      { q: "I remember a funny story ___ he told me before.", choices: ["who", "whose", "which", "whom"], answer: 2, note: "先行詞storyは物、目的格(he told 何を?→story)→which(またはthat)。" },
+      { q: "The person ___ Mary respects most is her mother.", choices: ["whose", "which", "whom", "that"], answer: 2, note: "先行詞personは人、目的格(Mary respects 誰を?)→whom。thatも可だが選択肢の中でより明確なのはwhom。" },
+      { q: "「We went to a shopping mall.」+「Its parking lot was very large.」を1文に。", choices: [
+          "We went to a shopping mall whose parking lot was very large.",
+          "We went to a shopping mall which parking lot was very large.",
+          "We went to a shopping mall whom parking lot was very large.",
+          "We went to a shopping mall that parking lot was very large."
+        ], answer: 0, note: "「その(mallの)駐車場」=所有格の関係代名詞whose。" },
+      { q: "「I wrote down a good idea.」+「It came to mind.」を1文に。", choices: [
+          "I wrote down a good idea whose came to mind.",
+          "I wrote down a good idea which came to mind.",
+          "I wrote down a good idea whom came to mind.",
+          "I wrote down a good idea it came to mind."
+        ], answer: 1, note: "先行詞ideaは物、主格(It=idea)→which。" },
+    ]
+  },
+  narabekae: {
+    label: "並べ替え・英作文",
+    questions: [
+      { q: "「その男性は、手荷物をドアにはさまれた。」\nThe man ( ) his baggage caught in the door.", choices: ["had", "was", "did", "has"], answer: 0, note: "have + O + 過去分詞で「Oを~される」。The man had his baggage caught in the door." },
+      { q: "「トムはシャワーを浴びている間に、電話が鳴っているのが聞こえた。」\nTom ( ) taking a shower.", choices: [
+          "heard his phone ringing while",
+          "was while heard his phone ringing",
+          "while heard his phone ringing",
+          "his phone heard ringing while"
+        ], answer: 0, note: "Tom heard his phone ringing while taking a shower.の語順。knock down型の知覚動詞構文。" },
+      { q: "「彼女は主役を演じたことを誇りに思っている。」\n( ) the leading role.", choices: [
+          "She is proud of having played",
+          "She played proud of having",
+          "She is having proud of played",
+          "She of proud is having played"
+        ], answer: 0, note: "be proud of + 動名詞(完了形having played)。She is proud of having played the leading role." },
+      { q: "「私は本当のことを言わなかったことを恥じている。」\nI'm ashamed of ( ) the truth.", choices: ["not having told", "having not told", "not to have told", "having told not"], answer: 0, note: "動名詞の否定はnot + 動名詞(完了形)。not having told が正しい語順。" },
+      { q: "「あなた方全員に歓迎してもらったことを決して忘れない。」\nI will never ( ) by all of you.", choices: ["forget being welcomed", "forget to welcome being", "forgetting welcomed being", "forget welcomed being"], answer: 0, note: "forget + 動名詞(過去のことを忘れない)。受け身の動名詞being welcomed。" },
+    ]
+  },
+  eikomyu: {
+    label: "英コミュII 語彙・並べ替え",
+    questions: [
+      { q: "Our airplane is now flying at a ( ) of 7,000 meters.", choices: ["stop", "tourist", "boundary", "height"], answer: 3, note: "「高度7000メートルを飛行中」→height(高さ)。" },
+      { q: "They want to maintain ( ) over their children.(支配力を維持したい)", choices: ["control", "attendance", "instruction", "dress"], answer: 0, note: "maintain control over〜で「〜に対する支配力を維持する」。" },
+      { q: "Jim ( ) his promise by completing all of his homework.(約束を果たした)", choices: ["won", "fulfilled", "compared", "hunted"], answer: 1, note: "fulfill a promiseで「約束を果たす」。" },
+      { q: "You can ( ) the software with this password.(アクセスできる)", choices: ["apologize", "access", "wake", "prove"], answer: 1, note: "accessは「~にアクセスする」という動詞用法。" },
+      { q: "They made a ( ) investigation into the affair.(徹底的に捜査した)", choices: ["thorough", "rude", "definite", "cooked"], answer: 0, note: "thorough investigationで「徹底的な捜査」。thoroughとthroughのスペル混同に注意。" },
+      { q: "「あなた方全員に歓迎してもらったことを…」のように、日本語の「~するように」に対応する語群並べ替え:\nYou ( ア your children / イ should / ウ let / エ eat / オ not ) sweets so often.\n正しい並べ順は?", choices: [
+          "イ→オ→ウ→ア→エ",
+          "ア→イ→ウ→エ→オ",
+          "イ→ウ→ア→オ→エ",
+          "ウ→イ→ア→エ→オ"
+        ], answer: 0, note: "You should not let your children eat sweets so often.(子どもに甘いものを頻繁に食べさせない方がいい)= should not let O 原形。" },
+    ]
+  }
+};
+
+// ===== ロジック =====
+let currentCat = null;
+let order = [];
+let idx = 0;
+let score = 0;
+let mistakes = [];
+let answered = false;
+
+const tabsEl = document.getElementById("tabs");
+const quizArea = document.getElementById("quizArea");
+
+Object.keys(categories).forEach(key => {
+  const btn = document.createElement("button");
+  btn.className = "tab-btn";
+  btn.textContent = categories[key].label;
+  btn.onclick = () => startQuiz(key, btn);
+  tabsEl.appendChild(btn);
+});
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(key, btnEl) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+  currentCat = key;
+  const qs = categories[key].questions;
+  order = shuffle(qs.map((_, i) => i));
+  idx = 0;
+  score = 0;
+  mistakes = [];
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const qs = categories[currentCat].questions;
+  const qData = qs[order[idx]];
+
+  // 選択肢シャッフル(正答位置の偏り防止)
+  const choiceIdxs = shuffle(qData.choices.map((_, i) => i));
+  const correctShuffledPos = choiceIdxs.indexOf(qData.answer);
+
+  const pct = Math.round((idx / qs.length) * 100);
+
+  let html = `
+    <div class="card">
+      <div class="progress"><span>問題 ${idx + 1} / ${qs.length}</span><span>正答 ${score}</span></div>
+      <div class="progress-bar-bg"><div class="progress-bar" style="width:${pct}%"></div></div>
+      <div class="qtext">${qData.q}</div>
+      <div class="choices" id="choices"></div>
+      <div class="explain" id="explain"></div>
+      <div class="nav-row">
+        <button class="nav-btn next-btn" id="nextBtn" disabled>次へ</button>
+      </div>
+    </div>
+  `;
+  quizArea.innerHTML = html;
+
+  const choicesEl = document.getElementById("choices");
+  choiceIdxs.forEach((origIdx) => {
+    const b = document.createElement("button");
+    b.className = "choice-btn";
+    b.textContent = qData.choices[origIdx];
+    b.onclick = () => selectChoice(origIdx, qData, b, choicesEl);
+    choicesEl.appendChild(b);
+  });
+
+  document.getElementById("nextBtn").onclick = () => {
+    idx++;
+    if (idx < qs.length) {
+      renderQuestion();
+    } else {
+      renderResult();
+    }
+  };
+}
+
+function selectChoice(chosenIdx, qData, btnEl, choicesEl) {
+  if (answered) return;
+  answered = true;
+  const isCorrect = chosenIdx === qData.answer;
+  if (isCorrect) score++;
+  else mistakes.push({ q: qData.q, correct: qData.choices[qData.answer], note: qData.note });
+
+  Array.from(choicesEl.children).forEach((child, i) => {
+    child.classList.add("disabled");
+  });
+  btnEl.classList.add(isCorrect ? "correct" : "wrong");
+  if (!isCorrect) {
+    Array.from(choicesEl.children).forEach(child => {
+      if (child.textContent === qData.choices[qData.answer]) {
+        child.classList.add("correct");
+      }
+    });
+  }
+
+  const explainEl = document.getElementById("explain");
+  explainEl.classList.add("show");
+  explainEl.innerHTML = `<b>${isCorrect ? "正解!" : "解説"}</b><br>${qData.note}`;
+
+  document.getElementById("nextBtn").disabled = false;
+}
+
+function renderResult() {
+  const qs = categories[currentCat].questions;
+  const rate = Math.round((score / qs.length) * 100);
+  let msg = "";
+  if (rate === 100) msg = "パーフェクト!この分野はもう完璧😊";
+  else if (rate >= 80) msg = "よくできました!あと少しで満点";
+  else if (rate >= 50) msg = "半分以上は取れています。間違えた所を見直そう";
+  else msg = "まだ伸びしろあり。解説を読んでもう一周してみよう";
+
+  let mistakeHtml = "";
+  if (mistakes.length > 0) {
+    mistakeHtml = `<div class="mistake-list"><b>間違えた問題の復習:</b>` +
+      mistakes.map(m => `<div class="mistake-item"><b>Q:</b> ${m.q}<br><b>正解:</b> ${m.correct}<br>${m.note}</div>`).join("") +
+      `</div>`;
+  }
+
+  quizArea.innerHTML = `
+    <div class="card result-box">
+      <div>結果</div>
+      <div class="result-score">${score} / ${qs.length}</div>
+      <div class="result-msg">${msg}</div>
+      ${mistakeHtml}
+      <button class="retry-btn" onclick="startQuiz(currentCat)">もう一度挑戦</button>
+    </div>
+  `;
+}
+
+// 最初のタブを自動選択
+startQuiz(Object.keys(categories)[0], tabsEl.children[0]);
+</script>
+</body>
+</html>
