@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>論理表現II 2学期中間 並べ替えPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #2563EB;
+  --main-light: #EFF6FF;
+  --main-mid: #BFDBFE;
+  --green: #16A34A;
+  --green-light: #F0FDF4;
+  --red: #DC2626;
+  --red-light: #FEF2F2;
+  --orange: #EA580C;
+  --orange-light: #FFF7ED;
+  --gray-50: #F9FAFB;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-400: #9CA3AF;
+  --gray-600: #4B5563;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif;
+  background: #EEF4FF;
+  min-height: 100vh;
+  padding: 16px;
+  color: var(--gray-900);
+}
+.container { max-width: 640px; margin: 0 auto; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+.header { padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 17px; font-weight: 700; color: var(--main); }
+.header-sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.score-badge { background: var(--main); color: white; font-size: 15px; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; display: none; }
+
+/* 範囲タブ */
+.sec-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.sec-tab {
+  flex: 1; padding: 10px 4px; border: 2px solid var(--main-mid); background: white; color: var(--main);
+  border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+}
+.sec-tab small { display: block; font-size: 10px; font-weight: 400; color: var(--gray-400); margin-top: 2px; }
+.sec-tab.active { background: var(--main); color: white; border-color: var(--main); }
+.sec-tab.active small { color: #DBEAFE; }
+
+/* 読み上げバー */
+.tts-bar { padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gray-600); }
+.tts-bar input[type=range] { flex: 1; }
+.tts-bar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
+
+/* モード選択 */
+.mode-screen { display: none; }
+.mode-screen.show { display: block; }
+.mode-card { padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; display: flex; gap: 14px; align-items: flex-start; }
+.mode-card:hover { border-color: var(--main); transform: translateY(-2px); }
+.mode-card.main-mode { border-color: var(--orange); }
+.mode-icon { font-size: 30px; line-height: 1; }
+.mode-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.mode-count { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+.mode-count.orange { background: var(--orange-light); color: var(--orange); }
+.mode-count.empty { background: var(--gray-100); color: var(--gray-400); }
+.reco { display: inline-block; background: var(--orange); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+
+/* 進捗 */
+.progress-wrap { padding: 12px 18px; margin-bottom: 12px; display: none; }
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+.progress-bar { background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden; }
+.progress-fill { background: var(--main); height: 8px; border-radius: 4px; transition: width 0.4s ease; }
+.progress-fill.orange { background: var(--orange); }
+
+/* 問題 */
+.question-card { padding: 20px; margin-bottom: 12px; }
+.q-tag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.q-tag.orange-tag { background: var(--orange-light); color: var(--orange); }
+.q-en { font-size: 18px; line-height: 1.8; margin-bottom: 8px; }
+.blank { display: inline-block; border-bottom: 3px solid var(--main); min-width: 90px; }
+.q-ja { font-size: 15px; color: var(--gray-800); padding: 10px 12px; background: var(--gray-50); border-radius: var(--radius-sm); line-height: 1.7; }
+.q-frame { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; }
+.q-frame .gap { color: var(--orange); font-weight: 700; }
+
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.choice-btn {
+  display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 16px; color: var(--gray-800);
+  cursor: pointer; text-align: left; width: 100%;
+}
+.choice-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice-btn:disabled { cursor: default; }
+.choice-label { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--gray-100); font-weight: 700; font-size: 13px; color: var(--gray-600); flex-shrink: 0; }
+.choice-btn.correct, .choice-btn.show-answer { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label, .choice-btn.show-answer .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+
+/* 並べ替え */
+.rearrange-target { display: flex; flex-wrap: wrap; gap: 8px; min-height: 58px; padding: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200); border-radius: var(--radius-sm); margin-top: 14px; align-items: flex-start; }
+.rearrange-target.filled { border-style: solid; background: var(--orange-light); border-color: var(--orange); }
+.rearrange-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.word-chip { padding: 10px 14px; background: white; border: 2px solid var(--gray-200); border-radius: 20px; font-size: 16px; font-family: inherit; cursor: pointer; color: var(--gray-800); }
+.word-chip:hover:not(:disabled) { border-color: var(--orange); }
+.word-chip.in-target { background: var(--orange); color: white; border-color: var(--orange); }
+.word-chip.ok { background: var(--green); border-color: var(--green); color: white; }
+.word-chip.ng { background: var(--red); border-color: var(--red); color: white; }
+.word-chip:disabled { cursor: default; }
+.rearrange-actions { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn { flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.check-btn { width: 100%; margin-top: 12px; padding: 13px; background: var(--orange); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.check-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+
+.explanation { display: none; margin-top: 14px; padding: 14px; background: #F5F9FF; border-left: 4px solid var(--main); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.explanation.orange-border { border-left-color: var(--orange); background: #FFF9F5; }
+.explanation.show { display: block; }
+.ex-correct { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+.ex-correct.wrong-flag { color: var(--red); }
+.ex-text { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+.ex-text strong { color: var(--gray-900); }
+.ex-label { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+.speak-btn { border: 2px solid var(--main-mid); background: white; color: var(--main); border-radius: 20px; padding: 4px 12px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+
+.nav-wrap { display: none; margin-top: 12px; }
+.nav-wrap.show { display: block; }
+.next-btn { width: 100%; padding: 14px; background: var(--main); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.next-btn.orange { background: var(--orange); }
+
+.quiz-area { display: none; }
+.back-link { text-align: center; margin-top: 14px; }
+.back-link a { color: var(--gray-400); font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+/* フラッシュカード */
+.flash-area { display: none; }
+.flash-card { padding: 28px 22px; margin-bottom: 12px; min-height: 230px; cursor: pointer; display: flex; flex-direction: column; justify-content: center; text-align: center; border: 2px solid var(--main-mid); }
+.flash-card.back { border-color: var(--main); background: var(--main-light); }
+.flash-tag { font-size: 12px; font-weight: 700; color: var(--main); margin-bottom: 14px; }
+.flash-ja { font-size: 19px; line-height: 1.7; font-weight: 700; }
+.flash-en { font-size: 21px; line-height: 1.6; font-weight: 700; color: var(--gray-900); }
+.flash-note { font-size: 13px; color: var(--gray-600); margin-top: 14px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.flash-hint { font-size: 12px; color: var(--gray-400); margin-top: 16px; }
+.flash-nav { display: flex; gap: 8px; }
+.flash-nav button { flex: 1; padding: 13px; border-radius: var(--radius-sm); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; border: 2px solid var(--gray-200); background: white; color: var(--gray-600); }
+.flash-nav button.primary { background: var(--main); border-color: var(--main); color: white; }
+
+/* 結果 */
+.result-screen { display: none; }
+.result-screen.show { display: block; }
+.result-hero { padding: 28px 20px; text-align: center; margin-bottom: 12px; }
+.result-icon { font-size: 48px; margin-bottom: 8px; }
+.result-score { font-size: 56px; font-weight: 700; color: var(--main); line-height: 1; }
+.result-denom { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result-pct { font-size: 18px; color: var(--gray-600); margin: 6px 0; }
+.result-msg { font-size: 16px; font-weight: 700; margin-top: 10px; }
+.miss-section { padding: 18px; margin-bottom: 12px; }
+.miss-title { font-size: 14px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+.miss-item { padding: 10px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; line-height: 1.6; }
+.miss-item:last-child { border-bottom: none; }
+.miss-tag { display: inline-block; background: var(--gray-100); color: var(--gray-600); font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.miss-ja { color: var(--gray-600); font-size: 13px; }
+.miss-ans { color: var(--green); font-weight: 700; }
+.btn-row { display: flex; flex-direction: column; gap: 10px; }
+.retry-btn { width: 100%; padding: 15px; background: var(--main); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.retry-btn.outline { background: white; color: var(--gray-600); border: 2px solid var(--gray-200); }
+.retry-btn.wrong-only { background: var(--red); }
+.retry-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="card header">
+    <div style="flex:1">
+      <div class="header-title">論理表現II 2学期中間 並べ替えPRO</div>
+      <div class="header-sub" id="headerSub">Vision Quest 1 Lesson 10-2〜12-2</div>
+    </div>
+    <div class="score-badge" id="scoreBadge">0点</div>
+  </div>
+
+  <div class="sec-tabs" id="secTabs">
+    <button class="sec-tab active" data-sec="all" onclick="setSec('all')">全範囲<small>10-2〜12-2</small></button>
+    <button class="sec-tab" data-sec="rel" onclick="setSec('rel')">関係詞<small>10-2・10-3</small></button>
+    <button class="sec-tab" data-sec="comp" onclick="setSec('comp')">比較<small>11-1・11-2</small></button>
+    <button class="sec-tab" data-sec="subj" onclick="setSec('subj')">仮定法<small>12-1・12-2</small></button>
+  </div>
+
+  <div class="card tts-bar">
+    <span style="white-space:nowrap">🔊 速度</span>
+    <input type="range" id="speedRange" min="0.5" max="1.3" step="0.1" value="0.8" oninput="setSpeed(this.value)">
+    <span id="speedVal">0.8x</span>
+    <label><input type="checkbox" id="autoSpeak" checked>答えを自動で読む</label>
+  </div>
+
+  <!-- モード選択 -->
+  <div class="mode-screen show" id="modeScreen">
+    <div class="card mode-card main-mode" onclick="startMode('rearrange')">
+      <div class="mode-icon">🔀</div>
+      <div>
+        <div class="mode-title">並べ替えクイズ<span class="reco">メイン</span></div>
+        <div class="mode-desc">日本語に合うように語句をタップして英文を組み立てます。答え合わせで、どこから順番がずれたかを色で表示します。</div>
+        <span class="mode-count orange" id="reCount"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('mc')">
+      <div class="mode-icon">📝</div>
+      <div>
+        <div class="mode-title">4択クイズ</div>
+        <div class="mode-desc">ワークのExercises 1と同じ「どっちを選ぶ？」タイプ。並べ替えの前のウォーミングアップに。</div>
+        <span class="mode-count" id="mcCount"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startFlash()">
+      <div class="mode-icon">🃏</div>
+      <div>
+        <div class="mode-title">構文カード</div>
+        <div class="mode-desc">日本語を見て英文を言えるか確認。タップで裏返すと英文と解説、🔊で読み上げ。</div>
+        <span class="mode-count" id="flashCount"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('wrongonly')">
+      <div class="mode-icon">🎯</div>
+      <div>
+        <div class="mode-title">苦手問題だけ復習</div>
+        <div class="mode-desc">間違えた問題がたまります。正解すると消えるので、0問になればクリア！</div>
+        <span class="mode-count empty" id="wrongCount"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card progress-wrap" id="progressWrap">
+    <div class="progress-info"><span id="progressText"></span><span id="progressPct"></span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div class="quiz-area" id="quizArea">
+    <div class="card question-card" id="qCard"></div>
+    <div class="nav-wrap" id="navWrap"><button class="next-btn" id="nextBtn" onclick="nextQ()">次の問題 →</button></div>
+    <div class="back-link"><a onclick="backToMenu()">← モード選択に戻る</a></div>
+  </div>
+
+  <div class="flash-area" id="flashArea">
+    <div class="card flash-card" id="flashCard" onclick="flipCard()"></div>
+    <div class="flash-nav">
+      <button onclick="moveCard(-1)">← 前へ</button>
+      <button onclick="speakCard()">🔊 読む</button>
+      <button class="primary" onclick="moveCard(1)">次へ →</button>
+    </div>
+    <div class="back-link"><a onclick="backToMenu()">← モード選択に戻る</a></div>
+  </div>
+
+  <div class="result-screen" id="resultScreen"></div>
+</div>
+
+<script>
+const SEC_NAME = { rel:'関係詞', comp:'比較', subj:'仮定法' };
+
+/* ===== 並べ替え問題 =====
+   pre / post は固定部分（ワークの（　）の外側）。words は正しい順番で書く（出題時にシャッフル）。 */
+const R = (sec, tag, ja, pre, words, post, ex) => ({ sec, tag, ja, pre, words, post, ex });
+const rearrangeQuestions = [
+  // ---- 関係詞 ----
+  R('rel','関係代名詞 what','私が買いたかったのはスマートフォンだった。','',['What','I','wanted','to','buy','was'],'a smartphone.','what = 「〜するもの・こと」。What I wanted to buy がまとめて主語になる。先行詞は要らない。'),
+  R('rel','非限定用法 who','彼には1人娘がいて、彼女はイタリアで音楽を勉強している。','',['He','has','a','daughter,','who','is','studying','music'],'in Italy.','コンマ＋who で「そして彼女は〜」と追加説明。非限定用法では that は使えない。'),
+  R('rel','前置詞＋関係代名詞','彼女が昼食を一緒にとっている男性は誰ですか。','',['Who','is','the','man','with','whom','she','is','having'],'lunch?','with her → with whom。前置詞を前に出すときは whom（that は不可）。'),
+  R('rel','前置詞＋関係代名詞','これが私が君に話したCDです。','',['This','is','the','CD','about','which','I','told','you.'],'','tell you about the CD → about which。前置詞が前に来たら which の省略はできない。'),
+  R('rel','関係代名詞 what','彼は母親の言うことを気に留めない。','He doesn\'t care',['about','what','his','mother','says.'],'','care about ＋ what節。「〜の言うこと」= what ＋ 人 ＋ says。'),
+  R('rel','前置詞＋関係代名詞','ここが、私が卒業した中学校です。','This is the junior high school',['from','which','I','graduated.'],'','graduate from 〜 の from が which の前に出る形。動詞＋前置詞のセットを忘れないこと。'),
+  R('rel','文を受ける which','彼は弁護士だと言ったが、それは本当ではなかった。','',['He','said','he','was','a','lawyer,','which','wasn\'t','true.'],'','コンマ＋which が前の文全体（彼が弁護士だと言ったこと）を受ける。'),
+  R('rel','非限定用法 where','私たちはパリに滞在し、そこでトムに会った。','',['We','stayed','in','Paris,','where','we','met','Tom.'],'','コンマ＋where =「そしてそこで」。場所の追加説明。'),
+  R('rel','関係副詞 why','あなたが遅れた理由を言いなさい。','',['Tell','me','the','reason','why','you','were','late.'],'','先行詞 the reason ＋ why。'),
+  R('rel','関係副詞 how','そのようにして事故は起こった。','',['That\'s','how','the','accident','happened.'],'','That\'s how 〜 =「そのようにして〜」。the way how とは言わない。'),
+  R('rel','関係副詞 when','月へ旅行に行ける日が来るでしょう。','',['The','day','will','come','when','we'],'can take a trip to the moon.','The day when 〜 will come の when 節が長いので後ろに回った形。'),
+  R('rel','複合関係副詞 whenever','外食する時はいつでも自分のはしを持って行く。','I bring',['my','own','chopsticks','whenever','I','eat','out.'],'','whenever =「〜する時はいつでも」。eat out = 外食する。'),
+  R('rel','複合関係副詞 however','どんなに宿題が難しくても、彼女はやり終えるでしょう。','',['However','difficult','her','homework','is,','she\'ll'],'finish it.','however ＋ 形容詞 ＋ S ＋ V。however の直後に difficult をくっつけるのがポイント。'),
+  R('rel','複合関係代名詞 whatever','私たちが何を提案しようとも、彼らは同意しないでしょう。','',['Whatever','we','suggest,'],'they will disagree.','whatever =「何を〜しようとも」（= no matter what）。'),
+
+  // ---- 比較 ----
+  R('comp','比較級の強調 far','その映画は原作の小説よりずっといい。','',['The','movie','is','far','better','than'],'the original novel.','比較級を強めるときは much / far を比較級の前に。very は使えない。'),
+  R('comp','比較の対象 that','トマトの値段は冬よりも夏が安い。','The price of tomatoes',['is','lower','in','summer','than','that','in','winter.'],'','比べるのは「夏の値段」と「冬の値段」。that = the price のくり返しを避ける代名詞。'),
+  R('comp','差の表し方','フレッドは私より12cm背が高い。','Fred',['is','twelve','centimeters','taller','than','I.'],'','差は比較級の前に置く：twelve centimeters taller。'),
+  R('comp','one of the＋最上級','彼は世界で最も優れた科学者の1人だ。','He is',['one','of','the','greatest','scientists','in'],'the world.','one of the ＋ 最上級 ＋ 複数名詞。scientists の s を忘れずに。'),
+  R('comp','by far the＋最上級','そのグループの中では、彼がずば抜けて多くのファンを持つ。','He',['has','by','far','the','most','fans'],'in the group.','最上級の強調は by far を the の前に。'),
+  R('comp','比較級＋than anything else','健康は何よりも大切である。','',['Health','is','more','important','than','anything','else.'],'','比較級 ＋ than anything else =「何よりも〜」（最上級の意味）。'),
+  R('comp','the＋比較級, the＋比較級','高く上れば上るほど、景色はますます美しくなる。','',['The','higher','you','go,','the','more','beautiful','the','view','becomes.'],'','the ＋ 比較級 ＋ S ＋ V, the ＋ 比較級 ＋ S ＋ V。more beautiful は2語でセットで前に出る。'),
+  R('comp','the＋比較級, the＋比較級','日が短くなればなるほど、ますます寒く感じる。','',['The','shorter','the','days','get,','the','colder','we','feel.'],'','The shorter the days get, the colder we feel. 比較級の直後に S ＋ V。'),
+  R('comp','比較級 and 比較級','だんだん暑くなってきている。','',['It\'s','getting','hotter','and','hotter.'],'','比較級 and 比較級 =「ますます〜」。'),
+  R('comp','No other＋単数名詞','世界にはロシアより大きな国はない。','',['No','other','country','in','the','world','is','larger','than','Russia.'],'','No other ＋ 単数名詞 ＋ 比較級 than 〜 で最上級の意味。country は単数！'),
+  R('comp','比較級＋than any other','ロシアは世界のほかのどの国よりも大きい。','',['Russia','is','larger','than','any','other','country','in','the','world.'],'','比較級 ＋ than any other ＋ 単数名詞。'),
+  R('comp','the＋序数＋最上級','ティムはチームで2番目に背が高い選手だ。','Tim is',['the','second','tallest','player','on'],'the team.','the ＋ second ＋ 最上級 =「2番目に〜」。'),
+  R('comp','倍数表現','ロシアはブラジルの2倍の大きさだ。','',['Russia','is','twice','as','large','as','Brazil.'],'','twice / three times は as 〜 as の前に。as twice の順はまちがい。'),
+  R('comp','not as 〜 as','実際のところ、このレポートは思っていたほど長くはない。','Actually, this report',['isn\'t','as','long','as','I','expected.'],'','not as 〜 as … =「…ほど〜ではない」。'),
+
+  // ---- 仮定法 ----
+  R('subj','仮定法過去','もし10歳若ければ、祖父は私と一緒にテニスをするだろうに。','My grandfather would play tennis with me',['if','he','were','ten','years','younger.'],'','if節は過去形（be動詞は were）。差 ten years は比較級 younger の前。'),
+  R('subj','if S should','万一、大きな台風が襲えば、東京は重大な被害を受けるだろう。','Tokyo would suffer serious damage',['if','a','big','typhoon','should','hit','it.'],'','if ＋ S ＋ should ＋ 原形 =「万一〜すれば」。it = Tokyo。'),
+  R('subj','if節と主節の時制のずれ','もし昨夜夜更かししなかったら、今眠くはないだろうに。','If I hadn\'t stayed up late last night,',['I','would','not','be','sleepy'],'now.','if節は過去のこと → 過去完了。主節は今のこと → would ＋ 原形。'),
+  R('subj','without','水がなければ、人間は3日間しか生きられないだろう。','Without water,',['human','beings','could','live','for','only three','days.'],'','without 〜 =「〜がなければ」。主節は could ＋ 原形。'),
+  R('subj','If it had not been for','彼の努力がなかったら、私たちはその問題を克服できなかったでしょう。','',['If','it','had','not','been','for','his','effort,'],'we couldn\'t have overcome the problem.','If it had not been for 〜 =「（あの時）〜がなかったら」。主節が could have ＋ 過去分詞なので過去完了。'),
+  R('subj','ifの省略（倒置）','昨夜もっと雪が降っていたら、今日スキーができるのに。','',['Had','it','snowed','more','last','night,'],'we could ski today.','If it had snowed … の if を省略 → Had it snowed …（had が前に出る）。'),
+  R('subj','ifの省略（倒置）','もしお金持ちなら、その車が買えるのに。','',['Were','I','rich,','I','could','buy','the','car.'],'','If I were rich の if を省略 → Were I rich。'),
+  R('subj','wish＋仮定法過去','彼の電話番号を知っていればなあ。','',['I','wish','I','knew','his','phone','number.'],'','今の願望 → wish ＋ 過去形。'),
+  R('subj','wish＋仮定法過去完了','もっと勉強していたらなあ。','',['I','wish','I','had','studied','more.'],'','過去への後悔 → wish ＋ had ＋ 過去分詞。'),
+  R('subj','as if','彼は私をまるで幼い子どものように扱う。','',['He','treats','me','as','if','I','were','a','little','child.'],'','as if ＋ 仮定法過去 =「まるで〜のように」。'),
+  R('subj','If it were not for','あなたの助けがなければ、私はこの仕事ができないだろう。','',['If','it','were','not','for','your','help,'],'I would not be able to do this job.','If it were not for 〜 =「（今）〜がなければ」。'),
+  R('subj','It\'s time＋仮定法過去','もうそろそろ寝る時間だよ。','',['It\'s','time','you','went','to','bed.'],'','It\'s time ＋ S ＋ 過去形 =「もう〜してよいころだ」。go ではなく went。'),
+  R('subj','were to','仮にあなたが本を書くとしたら、何についての本ですか。','',['If','you','were','to','write','a','book,'],'what would it be about?','if ＋ S ＋ were to ＋ 原形 =「仮に〜するとしたら」。'),
+  R('subj','仮定法過去','もしあなたが私の立場なら、その議論で何を言いますか。','If you were in my place,',['what','would','you','say'],'in the discussion?','疑問詞 ＋ would ＋ S ＋ 原形。'),
+];
+
+/* ===== 4択問題 ===== */
+const M = (sec, tag, en, ja, choices, ex) => ({ sec, tag, en, ja, choices, ans: 0, ex });
+const mcQuestions = [
+  // 関係詞
+  M('rel','前置詞＋関係代名詞','Sally wants some friends with ___ she can talk.','サリーは一緒に話せる友達が欲しい。',['whom','who','that','which'],'前置詞の直後は whom / which。人なので whom。前置詞の後ろに that は置けない。'),
+  M('rel','前置詞＋関係代名詞','Biology is a subject in ___ I\'m very interested.','生物は私がとても興味のある科目だ。',['which','that','what','whose'],'be interested in the subject → in which。'),
+  M('rel','関係代名詞 what','He didn\'t catch ___ his teacher said.','彼は先生の言ったことが聞き取れなかった。',['what','which','that','who'],'先行詞がない＋「〜のこと」→ what。'),
+  M('rel','非限定用法','Ken has two cousins, ___ live in Hawaii.','ケンにはいとこが2人いて、彼らはハワイに住んでいる。',['who','that','which','what'],'コンマの後（非限定用法）に that は使えない。人なので who。'),
+  M('rel','非限定用法','He read the book, ___ he found very interesting.','彼はその本を読んだが、それはとてもおもしろかった。',['which','that','what','who'],'コンマ＋もの → which。'),
+  M('rel','関係副詞 when','Winter is the season ___ we have a lot of tourists here.','冬はここに観光客がたくさん来る季節だ。',['when','which','where','why'],'先行詞が時（the season）で、後ろが完全な文 → when。'),
+  M('rel','関係副詞 where','He forgot the name of the restaurant ___ he was supposed to go.','彼は行くはずだったレストランの名前を忘れた。',['where','which','when','what'],'go to the restaurant の to がないので where（which なら … to go to）。'),
+  M('rel','関係副詞 how','Please explain to me ___ the jewels were stolen.','宝石がどのようにして盗まれたのか説明してください。',['how','the way how','what','which'],'how と the way は一緒に使わない。'),
+  M('rel','however','___ tired he is, he never complains.','どんなに疲れていても、彼は決して不満を言わない。',['However','Whatever','Whenever','Wherever'],'however ＋ 形容詞 =「どんなに〜でも」。'),
+  M('rel','wherever','You can hang this picture ___ you\'d like to.','この絵は好きなところに掛けていいよ。',['wherever','whatever','however','whoever'],'wherever =「〜するところならどこでも」。'),
+  // 比較
+  M('comp','as 〜 as possible','Sam tried to speak as ___ as possible.','サムはできるだけゆっくり話そうとした。',['slowly','slow','slower','slowest'],'speak を修飾するので副詞 slowly。as と as の間は原級。'),
+  M('comp','倍数表現','That bag is ___ big as this one.','あのバッグはこのバッグの2倍の大きさだ。',['twice as','as twice','two times','double as'],'twice は as 〜 as の前。'),
+  M('comp','the＋比較級, the＋比較級','The older you grow, ___ you become.','年をとればとるほど、賢くなる。',['the wiser','wiser','the more wise','more wiser'],'後半も the ＋ 比較級。wise の比較級は wiser。'),
+  M('comp','比較級 and 比較級','The princess became ___ attractive.','王女はますます魅力的になった。',['more and more','better and better','most','more than'],'more 〜 型の形容詞は more and more ＋ 原級。'),
+  M('comp','最上級＋of','Beth studies the hardest ___ us all.','ベスは私たち全員の中でいちばん一生懸命勉強する。',['of','in','than','with'],'us all（仲間・同類の複数）→ of。場所・範囲なら in。'),
+  M('comp','one of the＋最上級','She is one of the most successful ___ in the world.','彼女は世界で最も成功したデザイナーの1人だ。',['designers','designer','a designer','the designer'],'one of the ＋ 最上級 ＋ 複数名詞。'),
+  M('comp','最上級の強調','I think this question is ___ the most difficult of the five.','この問題は5問の中で断然いちばん難しいと思う。',['by far','very','much more','so'],'最上級の強調 → by far。'),
+  M('comp','the＋序数＋最上級','This shrine is the ___ oldest building in this town.','この神社はこの町で3番目に古い建物だ。',['third','three','three times','thirdly'],'「3番目に」→ the third ＋ 最上級。'),
+  M('comp','No other … as 〜 as','No other desert in the world is as ___ as the Sahara Desert.','世界にサハラ砂漠ほど大きな砂漠はない。',['large','larger','largest','the largest'],'as 〜 as の間は原級。'),
+  M('comp','比較級＋than','Tokyo Prefecture is ___ than Osaka Prefecture.','東京都は大阪府より大きい。',['bigger','more big','the biggest','big'],'big の比較級は g を重ねて bigger。'),
+  // 仮定法
+  M('subj','直説法と仮定法','If it ___ fine next Sunday, I will go fishing.','次の日曜日に晴れたら、釣りに行く。',['is','were','will be','had been'],'実際にありうること（直説法）。主節が will なので if節は現在形。'),
+  M('subj','仮定法過去','It\'s getting warmer. If it ___ cold, we wouldn\'t go hiking in the hill.','暖かくなってきた。もし寒かったら丘へハイキングには行かないだろう。',['were','is','will be','had been'],'今の事実（暖かい）と違う → 仮定法過去 were。'),
+  M('subj','仮定法過去','I would go to see Oda Nobunaga if I ___ go back in time.','もし過去に戻れるなら、織田信長に会いに行くのに。',['could','can','will','may'],'ありえない話 → 過去形 could。'),
+  M('subj','wish','I wish I ___ bilingual.','バイリンガルだったらいいのに。',['were','am','will be','have been'],'今の願望 → wish ＋ 仮定法過去（were）。'),
+  M('subj','wish','We couldn\'t go swimming yesterday. I wish it ___ sunny.','昨日は泳ぎに行けなかった。晴れていたらよかったのに。',['had been','was','were','has been'],'過去への願望 → wish ＋ had ＋ 過去分詞。'),
+  M('subj','as if','He talks as if he ___ the writer.','彼はまるでその作家に会ったことがあるかのように話す。',['had met','met','meets','has met'],'「会ったことがある」＝話している時より前 → as if ＋ 過去完了。'),
+  M('subj','ifの省略（倒置）','___ Mike joined our team, we could have won the game.','もしマイクがチームに入っていたら、試合に勝てただろうに。',['Had','Should','If','Were'],'joined（過去分詞）がある → If Mike had joined の倒置 Had Mike joined。'),
+  M('subj','ifの省略（倒置）','___ he wise, he would not make such a decision.','彼が賢ければ、そんな決定はしないだろう。',['Were','If','Had','Should'],'If he were wise → Were he wise。'),
+  M('subj','時制のずれ','If he had joined the team, he ___ a star now.','そのチームに入っていたら、今ごろ彼はスターだろうに。',['would be','would have been','will be','is'],'主節は「今」→ would ＋ 原形。now が目印。'),
+  M('subj','If it were not for','If it ___ for computers, our life would be very inconvenient.','もしコンピューターがなければ、私たちの生活はとても不便だろう。',['were not','had not been','is not','will not be'],'主節が would ＋ 原形（今）→ If it were not for。'),
+];
+
+/* ===== 構文カード ===== */
+const F = (sec, tag, ja, en, note) => ({ sec, tag, ja, en, note });
+const flashCards = [
+  F('rel','前置詞＋関係代名詞','これが私が君に話したCDです。','This is the CD about which I told you.','前置詞が前 → which は省略不可、that も不可。'),
+  F('rel','関係代名詞 what','必要とされるのは変化だ。','What is needed is change.','what = the thing(s) which。'),
+  F('rel','非限定用法 who','彼女には息子が2人いて、その2人は俳優になった。','She has two sons, who became actors.','コンマあり＝息子は2人だけ。'),
+  F('rel','文を受ける which','彼は突然退部したが、そのことは私たちを驚かせた。','He suddenly left the club, which surprised us.','which が前の文全体を受ける。'),
+  F('rel','関係副詞 where','私たちが泊まったホテルはすばらしかった。','The hotel where we stayed was wonderful.','where = at which。'),
+  F('rel','関係副詞 when','私は初めてあなたに出会った日を覚えている。','I remember the day when I first met you.',''),
+  F('rel','関係副詞 how','そのようにして事故は起こった。','That\'s how the accident happened.','the way how とは言わない。'),
+  F('rel','whatever','あなたが欲しいものは何でもあげますよ。','I\'ll give you whatever you want.','= anything that'),
+  F('rel','wherever','どこへ行こうとも、彼はいつもボディーガードを2人連れている。','Wherever he goes, he always has two bodyguards.','= no matter where'),
+  F('rel','however＋形容詞','どんなに状況が困難でも、彼は決してあきらめない。','He never gives up, however difficult the situation is.','however の直後に形容詞。'),
+  F('comp','倍数表現','ロシアはブラジルの2倍の大きさだ。','Russia is twice as large as Brazil.','X times as 〜 as / half as 〜 as'),
+  F('comp','as many 〜 as','私は兄と同じくらいの数の本を持っている。','I have as many books as my brother.','数えられない名詞なら as much 〜 as。'),
+  F('comp','差の表し方','彼女は姉より2歳年上だ。','She is two years older than her sister.','= older than her sister by two years'),
+  F('comp','比較級 and 比較級','だんだん暑くなってきている。','It\'s getting hotter and hotter.',''),
+  F('comp','the＋比較級, the＋比較級','高く上れば上るほど、景色はますます美しくなる。','The higher you go, the more beautiful the view becomes.',''),
+  F('comp','the＋最上級＋名詞＋関係詞節','彼女は私が知っている中で最も知的な人だ。','She is the most intelligent person I know.',''),
+  F('comp','the＋序数＋最上級','カナダは世界で2番目に大きな国だ。','Canada is the second largest country in the world.',''),
+  F('comp','No other … 比較級 than','世界にはロシアより大きな国はない。','No other country in the world is larger than Russia.','No other ＋ 単数名詞'),
+  F('comp','比較級＋than any other','ロシアは世界のほかのどの国よりも大きい。','Russia is larger than any other country in the world.','any other ＋ 単数名詞'),
+  F('subj','仮定法過去','暇があれば、君と一緒に行けるのに。','If I were free, I could go with you.','If ＋ 過去形, would / could ＋ 原形'),
+  F('subj','仮定法過去完了','暇があったなら、君と一緒に行けたのに。','If I had been free, I could have gone with you.','If ＋ had ＋ 過去分詞, could have ＋ 過去分詞'),
+  F('subj','時制のずれ','そのチームに入っていたなら、今ごろ彼はスターになっているだろうに。','If he had joined the team, he would be a star now.','if節は過去、主節は今。'),
+  F('subj','were to / should','万一気が変わったら、彼は私たちに知らせるだろう。','If he should change his mind, he would let us know.','were to =「仮に」、should =「万一」'),
+  F('subj','wish','もっと勉強していたらなあ。','I wish I had studied more.','今の願望なら wish ＋ 過去形。'),
+  F('subj','as if','まるで恐ろしい悪夢でも見たかのような気分だ。','I feel as if I had had a horrible nightmare.',''),
+  F('subj','If it were not for','あなたの助けがなければ、私はこの仕事ができないだろう。','If it were not for your help, I would not be able to do this job.','= Without your help'),
+  F('subj','If only','お金持ちでありさえすればなあ。','If only I were rich!',''),
+  F('subj','It\'s time＋仮定法過去','もうそろそろ寝る時間だよ。','It\'s time you went to bed.',''),
+  F('subj','with / otherwise','私たちはジムをよく知っている。そうでなければ彼を信用しないだろう。','We know Jim very well; otherwise we would not trust him.','otherwise =「そうでなければ」'),
+  F('subj','ifの省略（倒置）','もしお金持ちなら、その車が買えるのに。','Were I rich, I could buy the car.','Had I 〜 / Were I 〜 / Should I 〜'),
+];
+
+/* ===== 状態 ===== */
+let sec = 'all', mode = null, cur = 0, score = 0, answered = false, wrongList = [], active = [];
+let speed = 0.8;
+const STORAGE_KEY = 'ronri2_chukan2_wrongbank_v1';
+
+const inSec = q => sec === 'all' || q.sec === sec;
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const fullSentence = q => [q.pre, q.words.join(' '), q.post].filter(s => s).join(' ');
+const qKey = (m, q) => m + '::' + (q.en || q.ja);
+
+function loadBank() { try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : []; } catch (e) { return []; } }
+function saveBank(b) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(b)); } catch (e) {} }
+function addBank(m, q) { const b = loadBank(); if (!b.some(x => qKey(x.mode, x.q) === qKey(m, q))) { b.push({ mode: m, q }); saveBank(b); } }
+function removeBank(m, q) { saveBank(loadBank().filter(x => qKey(x.mode, x.q) !== qKey(m, q))); }
+const bankInSec = () => loadBank().filter(x => inSec(x.q));
+
+/* ===== 読み上げ ===== */
+function setSpeed(v) { speed = parseFloat(v); document.getElementById('speedVal').textContent = v + 'x'; }
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = speed;
+  window.speechSynthesis.speak(u);
+}
+const autoSpeak = text => { if (document.getElementById('autoSpeak').checked) speak(text); };
+
+/* ===== 画面 ===== */
+function setSec(s) {
+  sec = s;
+  document.querySelectorAll('.sec-tab').forEach(b => b.classList.toggle('active', b.dataset.sec === s));
+  backToMenu();
+}
+function updateCounts() {
+  const n = (arr) => arr.filter(inSec).length;
+  document.getElementById('reCount').textContent = '全' + n(rearrangeQuestions) + '問';
+  document.getElementById('mcCount').textContent = '全' + n(mcQuestions) + '問';
+  document.getElementById('flashCount').textContent = '全' + n(flashCards) + '枚';
+  const b = bankInSec().length, el = document.getElementById('wrongCount');
+  el.textContent = b ? '苦手問題：' + b + '問' : '苦手問題：0問（まずクイズに挑戦しよう）';
+  el.classList.toggle('empty', !b);
+}
+function show(id, on) { document.getElementById(id).style.display = on ? 'block' : 'none'; }
+function backToMenu() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  mode = null;
+  document.getElementById('modeScreen').classList.add('show');
+  show('progressWrap', false); show('quizArea', false); show('flashArea', false);
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('scoreBadge').style.display = 'none';
+  document.getElementById('secTabs').style.display = 'flex';
+  document.getElementById('headerSub').textContent = 'Vision Quest 1 Lesson 10-2〜12-2';
+  updateCounts();
+}
+function enterQuiz(label) {
+  document.getElementById('modeScreen').classList.remove('show');
+  document.getElementById('secTabs').style.display = 'none';
+  document.getElementById('resultScreen').classList.remove('show');
+  document.getElementById('headerSub').textContent = label + '｜' + (sec === 'all' ? '全範囲' : SEC_NAME[sec]);
+}
+
+function startMode(m) {
+  if (m === 'rearrange') active = shuffle(rearrangeQuestions.filter(inSec));
+  else if (m === 'mc') active = shuffle(mcQuestions.filter(inSec));
+  else {
+    const b = bankInSec();
+    if (!b.length) { alert('苦手問題はまだありません。並べ替えか4択に挑戦しよう！'); return; }
+    active = shuffle(b.map(x => Object.assign({}, x.q, { _m: x.mode })));
+  }
+  mode = m; cur = 0; score = 0; wrongList = [];
+  enterQuiz(m === 'rearrange' ? '並べ替え' : m === 'mc' ? '4択' : '苦手復習');
+  show('progressWrap', true); show('quizArea', true);
+  document.getElementById('scoreBadge').style.display = 'block';
+  renderQ();
+}
+const qType = q => mode === 'wrongonly' ? q._m : mode;
+
+function renderQ() {
+  const q = active[cur], t = qType(q);
+  const pct = Math.round(cur / active.length * 100);
+  document.getElementById('progressText').textContent = (cur + 1) + ' / ' + active.length;
+  document.getElementById('progressPct').textContent = pct + '%';
+  const fill = document.getElementById('progressFill');
+  fill.style.width = pct + '%'; fill.className = 'progress-fill' + (t === 'rearrange' ? ' orange' : '');
+  document.getElementById('scoreBadge').textContent = score + '点';
+  answered = false;
+  document.getElementById('navWrap').classList.remove('show');
+  t === 'rearrange' ? renderRe(q) : renderMC(q);
+  const nb = document.getElementById('nextBtn');
+  nb.className = 'next-btn' + (t === 'rearrange' ? ' orange' : '');
+  nb.textContent = cur + 1 < active.length ? '次の問題 →' : '結果を見る';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ----- 4択 ----- */
+let order = [];
+function renderMC(q) {
+  order = shuffle([0, 1, 2, 3]);
+  const L = ['A', 'B', 'C', 'D'];
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag" id="qtag" style="visibility:hidden">${q.tag}</span>
+    <div class="q-en">${q.en.replace('___', '<span class="blank"></span>')}</div>
+    <div class="q-ja">${q.ja}</div>
+    <div class="choices">${order.map((o, i) => `<button class="choice-btn" onclick="answerMC(${i})"><span class="choice-label">${L[i]}</span><span>${q.choices[o]}</span></button>`).join('')}</div>
+    <div class="explanation" id="explanation">
+      <div class="ex-correct" id="exC"></div>
+      <div class="ex-text"><strong>${q.en.replace('___', q.choices[q.ans])}</strong><br>${q.ex}</div>
+      <button class="speak-btn" onclick="speak('${esc(q.en.replace('___', q.choices[q.ans]))}')">🔊 英文を聞く</button>
+    </div>`;
+}
+function answerMC(i) {
+  if (answered) return; answered = true;
+  const q = active[cur], btns = document.querySelectorAll('.choice-btn'), ci = order.indexOf(q.ans);
+  btns.forEach(b => b.disabled = true);
+  const exC = document.getElementById('exC');
+  if (i === ci) {
+    btns[i].classList.add('correct'); score++; exC.textContent = '✓ 正解！';
+    if (mode === 'wrongonly') removeBank('mc', q);
+  } else {
+    btns[i].classList.add('wrong'); btns[ci].classList.add('show-answer');
+    exC.textContent = '✗ 正解は ' + q.choices[q.ans]; exC.classList.add('wrong-flag');
+    wrongList.push(q); addBank('mc', strip(q));
+  }
+  document.getElementById('qtag').style.visibility = 'visible';
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+  autoSpeak(q.en.replace('___', q.choices[q.ans]));
+}
+
+/* ----- 並べ替え ----- */
+let rs = { pool: [], placed: [] };
+function renderRe(q) {
+  rs = { pool: shuffle(q.words.map((w, i) => ({ w, id: i }))), placed: [] };
+  const frame = (q.pre || q.post) ? `<div class="q-frame">${q.pre ? q.pre + ' ' : ''}<span class="gap">（　　並べ替え　　）</span>${q.post ? ' ' + q.post : ''}</div>` : '';
+  document.getElementById('qCard').innerHTML = `
+    <span class="q-tag orange-tag">${q.tag}</span>
+    <div class="q-ja">${q.ja}</div>
+    ${frame}
+    <div class="rearrange-target" id="rT"></div>
+    <div class="rearrange-pool" id="rP"></div>
+    <div class="rearrange-actions" id="rA">
+      <button class="action-btn" onclick="undoW()">↩️ 1つ戻す</button>
+      <button class="action-btn" onclick="resetW()">🔄 リセット</button>
+    </div>
+    <button class="check-btn" id="checkBtn" onclick="checkRe()" disabled>答え合わせ</button>
+    <div class="explanation orange-border" id="explanation">
+      <div class="ex-correct" id="exC"></div>
+      <div class="ex-text" id="exT"></div>
+      <button class="speak-btn" onclick="speak('${esc(fullSentence(q))}')">🔊 英文を聞く</button>
+    </div>`;
+  drawRe();
+}
+function drawRe() {
+  const t = document.getElementById('rT');
+  t.innerHTML = rs.placed.map(x => `<button class="word-chip in-target" onclick="pickBack(${x.id})">${x.w}</button>`).join('') || '<span style="color:var(--gray-400);font-size:13px">下の語句をタップして並べよう</span>';
+  t.className = 'rearrange-target' + (rs.placed.length ? ' filled' : '');
+  document.getElementById('rP').innerHTML = rs.pool.map(x => `<button class="word-chip" onclick="pick(${x.id})">${x.w}</button>`).join('');
+  document.getElementById('checkBtn').disabled = rs.pool.length !== 0;
+}
+function pick(id) { if (answered) return; const i = rs.pool.findIndex(x => x.id === id); rs.placed.push(rs.pool.splice(i, 1)[0]); drawRe(); }
+function pickBack(id) { if (answered) return; const i = rs.placed.findIndex(x => x.id === id); rs.pool.push(rs.placed.splice(i, 1)[0]); drawRe(); }
+function undoW() { if (answered || !rs.placed.length) return; rs.pool.push(rs.placed.pop()); drawRe(); }
+function resetW() { if (answered) return; rs.pool = rs.pool.concat(rs.placed); rs.placed = []; drawRe(); }
+function checkRe() {
+  if (answered) return; answered = true;
+  const q = active[cur], user = rs.placed.map(x => x.w);
+  const ok = user.join(' ') === q.words.join(' ');
+  // 位置ごとに正誤を色で表示
+  document.getElementById('rT').innerHTML = user.map((w, i) => `<button class="word-chip ${w === q.words[i] ? 'ok' : 'ng'}" disabled>${w}</button>`).join('');
+  document.getElementById('rT').className = 'rearrange-target';
+  document.getElementById('checkBtn').style.display = 'none';
+  document.getElementById('rA').style.display = 'none';
+  const exC = document.getElementById('exC'), exT = document.getElementById('exT');
+  if (ok) {
+    exC.textContent = '✓ 正解！'; score++;
+    if (mode === 'wrongonly') removeBank('rearrange', q);
+  } else {
+    const firstNg = user.findIndex((w, i) => w !== q.words[i]);
+    exC.textContent = '✗ 惜しい！ ' + (firstNg + 1) + '語目からずれています'; exC.classList.add('wrong-flag');
+    wrongList.push(q); addBank('rearrange', strip(q));
+  }
+  exT.innerHTML = `<div class="ex-label">正しい英文</div><strong>${fullSentence(q)}</strong><br><br>${q.ex}`;
+  document.getElementById('explanation').classList.add('show');
+  document.getElementById('navWrap').classList.add('show');
+  document.getElementById('scoreBadge').textContent = score + '点';
+  autoSpeak(fullSentence(q));
+}
+
+function strip(q) { const c = Object.assign({}, q); delete c._m; return c; }
+function esc(s) { return s.replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+
+function nextQ() { cur++; cur >= active.length ? showResult() : renderQ(); }
+
+function showResult() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  show('quizArea', false); show('progressWrap', false);
+  const r = document.getElementById('resultScreen'); r.classList.add('show');
+  const n = active.length, pct = Math.round(score / n * 100);
+  const [icon, msg] = pct === 100 ? ['🏆', '全問正解！完璧！'] : pct >= 80 ? ['🌟', 'すごい！あと少しで完璧！'] : pct >= 60 ? ['⭐', 'よくできました！'] : pct >= 40 ? ['💪', 'もう少し！苦手問題で復習しよう'] : ['📖', '構文カードで確認してから再挑戦！'];
+  const miss = wrongList.length ? `
+    <div class="card miss-section">
+      <div class="miss-title">✗ 間違えた問題（${wrongList.length}問）→ 苦手問題に保存しました</div>
+      ${wrongList.map(q => `<div class="miss-item"><span class="miss-tag">${q.tag}</span>
+        <div class="miss-ja">${q.ja}</div>
+        <div class="miss-ans">${q.words ? fullSentence(q) : q.en.replace('___', q.choices[q.ans])}</div></div>`).join('')}
+    </div>` : '';
+  const b = bankInSec().length;
+  r.innerHTML = `
+    <div class="card result-hero">
+      <div class="result-icon">${icon}</div>
+      <div class="result-score">${score}<span class="result-denom"> / ${n}</span></div>
+      <div class="result-pct">${pct}%</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    ${miss}
+    <div class="btn-row">
+      <button class="retry-btn" onclick="startMode('${mode}')">もう一度 🔄</button>
+      <button class="retry-btn wrong-only" onclick="startMode('wrongonly')" ${b ? '' : 'disabled'}>苦手問題だけ復習（${b}問） 🎯</button>
+      <button class="retry-btn outline" onclick="backToMenu()">モード選択に戻る</button>
+    </div>`;
+}
+
+/* ----- 構文カード ----- */
+let cards = [], ci = 0, flipped = false;
+function startFlash() {
+  cards = shuffle(flashCards.filter(inSec)); ci = 0; flipped = false;
+  enterQuiz('構文カード');
+  show('flashArea', true);
+  drawCard();
+}
+function drawCard() {
+  const c = cards[ci], el = document.getElementById('flashCard');
+  el.className = 'card flash-card' + (flipped ? ' back' : '');
+  el.innerHTML = flipped
+    ? `<div class="flash-tag">${c.tag}　${ci + 1} / ${cards.length}</div><div class="flash-en">${c.en}</div>
+       <div class="flash-ja" style="font-size:14px;font-weight:400;color:var(--gray-600);margin-top:8px">${c.ja}</div>
+       ${c.note ? `<div class="flash-note">💡 ${c.note}</div>` : ''}`
+    : `<div class="flash-tag">${c.tag}　${ci + 1} / ${cards.length}</div><div class="flash-ja">${c.ja}</div>
+       <div class="flash-hint">英語で言ってみてから、タップして確認</div>`;
+}
+function flipCard() { flipped = !flipped; drawCard(); if (flipped) autoSpeak(cards[ci].en); }
+function moveCard(d) { ci = (ci + d + cards.length) % cards.length; flipped = false; drawCard(); }
+function speakCard() { speak(cards[ci].en); }
+
+updateCounts();
+</script>
+</body>
+</html>
