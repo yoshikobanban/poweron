@@ -519,7 +519,11 @@ function answerMC(i) {
 /* ----- 並べ替え ----- */
 let rs = { pool: [], placed: [] };
 function renderRe(q) {
-  rs = { pool: shuffle(q.words.map((w, i) => ({ w, id: i }))), placed: [] };
+  // 正解と同じ並びのまま出ないよう、ずれるまでシャッフルし直す
+  let pool;
+  do { pool = shuffle(q.words.map((w, i) => ({ w, id: i }))); }
+  while (pool.map(x => x.w).join(' ') === q.words.join(' '));
+  rs = { pool, placed: [] };
   const frame = (q.pre || q.post) ? `<div class="q-frame">${q.pre ? q.pre + ' ' : ''}<span class="gap">（　　並べ替え　　）</span>${q.post ? ' ' + q.post : ''}</div>` : '';
   document.getElementById('qCard').innerHTML = `
     <span class="q-tag orange-tag">${q.tag}</span>
