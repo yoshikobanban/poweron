@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7 - Power On II</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #BE185D;
+  --main-light: #FDECF4;
+  --green: #16A34A; --green-light: #F0FDF4;
+  --red: #DC2626; --red-light: #FEF2F2;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF; --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #F5F6F8; color: var(--gray-900); min-height: 100vh; }
+button { font-family: inherit; }
+
+header { background: var(--main); color: white; padding: 14px 16px 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+header .ttl { font-size: 18px; font-weight: 700; }
+header .sub { font-size: 12px; opacity: .9; margin-top: 2px; }
+.tabs { display: flex; gap: 4px; margin-top: 10px; overflow-x: auto; }
+.tab { flex: 1; min-width: 0; padding: 8px 2px; border: none; border-radius: 8px; background: rgba(255,255,255,.18); color: white; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tab.active { background: white; color: var(--main); }
+
+.container { max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+/* Part選択・読み上げ設定 */
+.controls { padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--gray-600); }
+.row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.chip { padding: 5px 10px; border: 2px solid var(--gray-200); border-radius: 20px; background: white; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.chip.active { background: var(--main); border-color: var(--main); color: white; }
+select { flex: 1; min-width: 0; padding: 6px 8px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; background: white; }
+input[type=range] { flex: 1; min-width: 80px; }
+
+/* 本文 */
+.part { padding: 16px; margin-bottom: 14px; }
+.part-title { font-size: 16px; font-weight: 700; color: var(--main); margin-bottom: 4px; }
+.part-pages { font-size: 12px; color: var(--gray-400); margin-bottom: 10px; }
+.study-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.sbtn { padding: 7px 12px; border: 2px solid var(--main); background: white; color: var(--main); border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sbtn.on { background: var(--main); color: white; }
+.sbtn.stop { border-color: var(--gray-400); color: var(--gray-600); }
+.sent { padding: 10px 12px; border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer; border-left: 4px solid transparent; }
+.sent:hover { background: var(--gray-50); }
+.sent.speaking { background: var(--main-light); border-left-color: var(--main); }
+.sent .en { font-size: 17px; line-height: 1.7; }
+.sent .ja { font-size: 13px; color: var(--gray-600); line-height: 1.7; margin-top: 2px; }
+.sent .num { display: inline-block; min-width: 22px; color: var(--main); font-weight: 700; font-size: 13px; }
+.hide-ja .sent .ja { visibility: hidden; }
+.hide-en .sent .en .txt { color: transparent; background: var(--gray-100); border-radius: 4px; }
+.hide-en .sent.revealed .en .txt { color: inherit; background: none; }
+.grammar { background: var(--main-light); border-radius: var(--radius-sm); padding: 10px 12px; margin: 12px 0 10px; font-size: 13px; line-height: 1.8; }
+.grammar b { color: var(--main); }
+.grammar .ex { font-size: 15px; color: var(--gray-900); }
+.vocab { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px; }
+.vocab th { text-align: left; font-size: 12px; color: var(--gray-400); font-weight: 700; padding: 4px 6px; border-bottom: 2px solid var(--gray-200); }
+.vocab td { padding: 7px 6px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+.vocab td:first-child { font-weight: 700; cursor: pointer; }
+.vocab td.pos { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+.hint-line { font-size: 12px; color: var(--gray-400); margin: 6px 0 2px; }
+
+/* カード */
+.flash { padding: 26px 20px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; border: 2px solid var(--main-light); margin-bottom: 12px; }
+.flash.back { background: var(--main-light); border-color: var(--main); }
+.flash .meta { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.flash .big { font-size: 26px; font-weight: 700; color: var(--main); }
+.flash .mid { font-size: 20px; font-weight: 700; }
+.flash .pos { font-size: 13px; color: var(--gray-600); margin-top: 6px; }
+.flash .tip { font-size: 12px; color: var(--gray-400); margin-top: 16px; }
+.nav { display: flex; gap: 8px; }
+.nav button { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: 2px solid var(--gray-200); background: white; font-size: 15px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.nav button.primary { background: var(--main); border-color: var(--main); color: white; }
+
+/* クイズ */
+.start { padding: 22px 18px; text-align: center; }
+.start .big { font-size: 40px; }
+.start p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin: 8px 0 14px; }
+.progress { padding: 10px 14px; margin-bottom: 12px; }
+.pinfo { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
+.pbar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+.pfill { height: 8px; background: var(--main); transition: width .3s; }
+.qcard { padding: 18px; margin-bottom: 12px; }
+.qtag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.qtext { font-size: 17px; line-height: 1.75; margin-bottom: 6px; }
+.qja { font-size: 14px; color: var(--gray-800); background: var(--gray-50); padding: 9px 12px; border-radius: var(--radius-sm); line-height: 1.7; }
+.qframe { font-size: 14px; color: var(--gray-600); margin-top: 8px; line-height: 1.7; }
+.qframe .gap { color: var(--main); font-weight: 700; }
+.choices { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+.choice { display: flex; gap: 10px; align-items: center; text-align: left; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-size: 16px; color: var(--gray-800); cursor: pointer; line-height: 1.5; }
+.choice:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice .lb { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--gray-600); }
+.choice.correct { border-color: var(--green); background: var(--green-light); }
+.choice.correct .lb { background: var(--green); color: white; }
+.choice.wrong { border-color: var(--red); background: var(--red-light); }
+.choice.wrong .lb { background: var(--red); color: white; }
+.choice:disabled { cursor: default; }
+.target { display: flex; flex-wrap: wrap; gap: 7px; min-height: 56px; padding: 10px; margin-top: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200); border-radius: var(--radius-sm); }
+.target.filled { border-style: solid; border-color: var(--main); background: var(--main-light); }
+.pool { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.w { padding: 9px 13px; border: 2px solid var(--gray-200); border-radius: 20px; background: white; font-size: 16px; color: var(--gray-800); cursor: pointer; }
+.w.in { background: var(--main); border-color: var(--main); color: white; }
+.w.ok { background: var(--green); border-color: var(--green); color: white; }
+.w.ng { background: var(--red); border-color: var(--red); color: white; }
+.w:disabled { cursor: default; }
+.acts { display: flex; gap: 8px; margin-top: 10px; }
+.acts button { flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.check { width: 100%; margin-top: 10px; padding: 13px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; }
+.check:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.expl { display: none; margin-top: 12px; padding: 12px 14px; border-left: 4px solid var(--main); background: var(--gray-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.expl.show { display: block; }
+.expl .res { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.expl .res.ng { color: var(--red); }
+.expl .txt { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+.expl .txt strong { color: var(--gray-900); }
+.speak { margin-top: 8px; border: 2px solid var(--main); background: white; color: var(--main); border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.next { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: none; }
+.next.show { display: block; }
+.big-btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.big-btn.outline { background: white; color: var(--gray-600); border: 2px solid var(--gray-200); }
+.big-btn.red { background: var(--red); }
+.big-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.result { padding: 24px 18px; text-align: center; margin-bottom: 12px; }
+.result .score { font-size: 52px; font-weight: 700; color: var(--main); line-height: 1.1; }
+.result .score small { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result .msg { font-size: 16px; font-weight: 700; margin-top: 8px; }
+.miss { padding: 16px; margin-bottom: 12px; }
+.miss h3 { font-size: 14px; color: var(--red); margin-bottom: 8px; }
+.miss .item { padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; line-height: 1.6; }
+.miss .item:last-child { border-bottom: none; }
+.miss .ans { color: var(--green); font-weight: 700; }
+.small { font-size: 12px; color: var(--gray-400); }
+.view { display: none; }
+.view.show { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <div class="ttl" id="hTitle"></div>
+  <div class="sub" id="hSub"></div>
+  <div class="tabs">
+    <button class="tab active" data-v="study" onclick="go('study')">📖 本文</button>
+    <button class="tab" data-v="flash" onclick="go('flash')">🃏 単語</button>
+    <button class="tab" data-v="mc" onclick="go('mc')">✏️ 4択</button>
+    <button class="tab" data-v="re" onclick="go('re')">🔀 並べ替え</button>
+    <button class="tab" data-v="wrong" onclick="go('wrong')">🎯 苦手</button>
+  </div>
+</header>
+
+<div class="container">
+  <div class="card controls">
+    <div class="row" id="partChips"></div>
+    <div class="row">
+      <span>🔊 声</span><select id="voiceSel" onchange="setVoice(this.value)"><option>読み込み中…</option></select>
+    </div>
+    <div class="row">
+      <span>速度</span><input type="range" min="0.5" max="1.3" step="0.1" value="0.8" oninput="setSpeed(this.value)">
+      <span id="speedVal">0.8x</span>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="autoSpeak" checked>答えを自動で読む</label>
+    </div>
+  </div>
+
+  <div class="view show" id="v-study"></div>
+  <div class="view" id="v-flash"></div>
+  <div class="view" id="v-mc"></div>
+  <div class="view" id="v-re"></div>
+  <div class="view" id="v-wrong"></div>
+</div>
+
+<script>
+const D = {"no": 7, "titleJa": "色の秘密", "titleEn": "Some Secrets about Colors", "parts": [{"title": "警告標識の色", "pages": "pp.108-109", "sents": [["Have you ever noticed that red and yellow are often used for warning signs?", "警告標識に赤や黄色がよく使われていることに気づいたことがありますか。"], ["Vivid and warm colors are chosen because they catch people's attention.", "鮮やかで暖かい色が選ばれるのは、それらが人々の注意を引くからです。"], ["They help people notice signs whose messages should be understood immediately.", "それらは、メッセージがすぐに理解されるべき標識に人々が気づくのに役立ちます。"], ["Besides the choice of colors, the contrast of colors plays an important role in conveying messages clearly and quickly.", "色の選択に加えて、色のコントラストも、メッセージをはっきりと素早く伝えるのに重要な役割を果たします。"], ["For example, emergency exit signs show a picture of a green figure on a white background.", "たとえば、非常口の標識は白い背景に緑色の人の絵を示しています。"], ["The contrast between green and white parts helps us distinguish the figure clearly from its background even in smoke or fire.", "緑と白の部分のコントラストは、煙や火の中でも、人の形を背景からはっきりと区別するのに役立ちます。"]], "grammar": ["関係代名詞（所有格）whose", "whose ＋ 名詞 が後ろの部分とともに先行詞を説明する（「その～が…な」）。先行詞は人でももの でもよい。", "Vivid and warm colors help people notice signs whose messages should be understood immediately.", "Can you see that warning sign whose background is green?"], "vocab": [["warning", "名詞", "警告"], ["vivid", "形容詞", "鮮やかな"], ["immediately", "副詞", "ただちに"], ["contrast", "名詞", "コントラスト、対比"], ["convey(ing)", "動詞", "…を伝える"], ["emergency exit", "名詞", "非常口"], ["background", "名詞", "背景"], ["distinguish", "動詞", "…を区別する"], ["smoke", "名詞", "煙"], ["catch a person's attention", "熟語", "…の注意を引く"], ["play a role in ...", "熟語", "…において役割を果たす"], ["distinguish ... from ~", "熟語", "…を～と区別する"]]}, {"title": "色が私たちに与える効果", "pages": "pp.110-111", "sents": [["Colors have various effects on us.", "色は私たちにさまざまな効果を及ぼします。"], ["Let's look at the effects of white.", "白の効果を見てみましょう。"], ["The two go stones in the photo seem to be the same size, but actually they are not.", "写真の2つの碁石は同じ大きさに見えますが、実はそうではありません。"], ["The white stone is made slightly smaller because of the fact that white objects look larger than they really are.", "白い物は実際よりも大きく見えるという事実のため、白い石は少し小さく作られています。"], ["The effects of colors are also important when grocery stores sell fresh fruit or vegetables.", "色の効果は、食料品店が新鮮な果物や野菜を売るときにも重要です。"], ["For example, oranges are sold in bright red mesh bags because red makes the color of the fruit look more vivid.", "たとえば、オレンジは明るい赤のネットの袋に入れて売られています。赤は果物の色をより鮮やかに見せるからです。"], ["For the same reason, okra is sold in green mesh bags.", "同じ理由で、オクラは緑のネットの袋に入れて売られています。"], ["In this way, fruit and vegetables look fresher and more delicious.", "このようにして、果物や野菜はより新鮮でおいしそうに見えます。"], ["This stimulates consumers to buy them.", "これが、消費者がそれらを買いたくなるよう刺激するのです。"]], "grammar": ["同格を表す接続詞 that", "「…という」。the fact / the news / an opinion などの名詞の後ろに that ＋ S ＋ V を続けて、その内容を表す。", "The white stone is made smaller because of the fact that white objects look larger.", "We heard the news that there was a fire in the building."], "vocab": [["effect(s)", "名詞", "効果"], ["stone(s)", "名詞", "石"], ["slightly", "副詞", "わずかに"], ["object(s)", "名詞", "物、物体"], ["grocery store", "名詞", "食料品店"], ["fresh", "形容詞", "新鮮な"], ["mesh", "名詞", "網、メッシュ"], ["okra", "名詞", "オクラ"], ["stimulate(s)", "動詞", "…を刺激する"], ["consumer(s)", "名詞", "消費者"], ["have an effect on ...", "熟語", "…に効果を及ぼす"], ["in this way", "熟語", "このようにして"]]}, {"title": "商品と色の心理的効果", "pages": "pp.112-113", "sents": [["Companies often pay attention to the psychological effects of colors.", "企業はよく、色の心理的効果に注意を払っています。"], ["They consider the colors of a package to attract customers.", "彼らは客を引きつけるために、パッケージの色を考えます。"], ["For example, gold is a packaging color of which people have a positive image as \"effective\" or \"special.\"", "たとえば金色は、人々が「効果的」や「特別」といった良いイメージを持っているパッケージの色です。"], ["In a study conducted by a drug company, one out of four people answered that they would choose a product if the color of the package was gold.", "ある製薬会社が行った研究では、4人に1人が、パッケージの色が金色ならその製品を選ぶと答えました。"], ["When companies choose the main color of their logos, they take the impact and image of the color into consideration.", "企業はロゴの主な色を選ぶとき、その色の印象やイメージを考慮に入れます。"], ["Food companies often use red in their logos.", "食品会社はロゴに赤をよく使います。"], ["It makes customers excited and hungry.", "赤は客をわくわくさせ、お腹をすかせるのです。"], ["If a company is highly conscious of the environment, green is a natural choice.", "環境を強く意識している企業なら、緑が自然な選択です。"], ["Green reminds people of nature.", "緑は人々に自然を連想させます。"]], "grammar": ["前置詞＋関係代名詞", "関係代名詞が前置詞の目的語になるとき、前置詞を関係代名詞の前に置ける。前置詞の後ろでは that は使えない。", "Gold is a packaging color of which people have a positive image.", "The product for which I designed a package was on sale."], "vocab": [["psychological", "形容詞", "心理的な"], ["package", "名詞", "パッケージ"], ["packaging", "名詞", "包装"], ["conduct(ed)", "動詞", "…を行う"], ["drug", "名詞", "薬"], ["logo(s)", "名詞", "ロゴ"], ["impact", "名詞", "影響（力）、印象"], ["consideration", "名詞", "考慮"], ["highly", "副詞", "非常に"], ["conscious", "形容詞", "意識している"], ["take ... into consideration", "熟語", "…を考慮する"], ["be conscious of ...", "熟語", "…を意識している"], ["remind ... of ~", "熟語", "…に～を連想させる"]]}, {"title": "部屋の色の選び方", "pages": "pp.114-115", "sents": [["Considering the choice of colors is useful when you want to create a comfortable atmosphere in your house.", "家の中に心地よい雰囲気を作りたいとき、色の選び方を考えることは役に立ちます。"], ["According to the purpose, choose a different color for your room, where you usually spend most of your time.", "あなたの部屋、つまりふだん最も長い時間を過ごす場所には、目的に応じて違う色を選んでください。"], ["When you need to concentrate on your studies, choose blue.", "勉強に集中する必要があるときは、青を選びましょう。"], ["It makes you feel calm.", "青はあなたを落ち着いた気分にさせます。"], ["If you want to feel relaxed, choose brown, the color of soil.", "くつろぎたいなら、土の色である茶色を選びましょう。"], ["It is believed to have a healing power.", "茶色には癒しの力があると信じられています。"], ["If you want to feel refreshed and clean, white is a good choice.", "さわやかで清潔な気分になりたいなら、白が良い選択です。"], ["It also makes your room look more spacious.", "白は部屋をより広く見せてもくれます。"], ["Now that you know some secrets of colors, you can use this knowledge to enhance the quality of your life.", "色の秘密をいくつか知った今、その知識を使って生活の質を高めることができます。"]], "grammar": ["関係副詞 where の非制限用法", "コンマ＋where で、「場所」を表す先行詞に情報を加える（「そしてそこで～」）。", "According to your purpose, choose a different color for your room, where you spend most of your time.", "This is a picture of our living room, where I used to spend a lot of time with my sister."], "vocab": [["atmosphere", "名詞", "雰囲気"], ["concentrate", "動詞", "集中する"], ["calm", "形容詞", "落ち着いた"], ["relaxed", "形容詞", "くつろいだ"], ["soil", "名詞", "土"], ["healing", "名詞", "癒し"], ["refreshed", "形容詞", "さわやかな"], ["spacious", "形容詞", "広々とした"], ["quality", "名詞", "質"], ["concentrate on ...", "熟語", "…に集中する"], ["now that ...", "熟語", "今はもう…だから"]]}], "mc": [{"part": 1, "tag": "内容 T/F", "q": "Red and yellow are often used for warning signs because vivid and warm colors catch people's attention.", "ja": "鮮やかで暖かい色は注意を引くので、警告標識に赤や黄色がよく使われる。", "choices": ["⭕ True", "❌ False"], "hint": "Part1①②：Vivid and warm colors are chosen because they catch people's attention."}, {"part": 1, "tag": "内容 T/F", "q": "The contrast of colors is more important than the choice of colors.", "ja": "色のコントラストは色の選択よりも重要だ。", "choices": ["❌ False", "⭕ True"], "hint": "Part1④：Besides the choice of colors（色の選択に加えて）。どちらが重要とは言っていない。"}, {"part": 1, "tag": "内容 T/F", "q": "Emergency exit signs show a white figure on a green background.", "ja": "非常口の標識は緑の背景に白い人の形を示している。", "choices": ["❌ False", "⭕ True"], "hint": "Part1⑤：a green figure on a white background（白い背景に緑の人）。逆！"}, {"part": 1, "tag": "文法：whose", "q": "I have a friend ___ mother is a teacher.", "ja": "私には母親が先生をしている友達がいる。", "choices": ["whose", "who", "which", "whom"], "hint": "「その友達の母親」→ 所有格 whose ＋ 名詞。", "say": "I have a friend whose mother is a teacher."}, {"part": 1, "tag": "文法：whose", "q": "Can you see that house ___ roof is blue?", "ja": "屋根が青いあの家が見えますか。", "choices": ["whose", "which", "that", "where"], "hint": "「その家の屋根」→ whose roof。先行詞がもの でも whose が使える。", "say": "Can you see that house whose roof is blue?"}, {"part": 1, "tag": "文法：whose", "q": "Do you remember the man ___ job is teaching the guitar?", "ja": "ギターを教えるのが仕事の男性を覚えていますか。", "choices": ["whose", "what", "who", "which"], "hint": "「その男性の仕事」→ whose job。", "say": "Do you remember the man whose job is teaching the guitar?"}, {"part": 1, "tag": "語句", "q": "Her vivid dress ___ people's attention.", "ja": "彼女の鮮やかなドレスは人々の注意を引いた。", "choices": ["caught", "took", "made", "gave"], "hint": "catch a person's attention ＝「…の注意を引く」。過去形 caught。", "say": ""}, {"part": 1, "tag": "語句", "q": "My dog ___ an important role in my family.", "ja": "私の犬は家族の中で重要な役割を果たしている。", "choices": ["plays", "does", "makes", "gives"], "hint": "play a role in ... ＝「…において役割を果たす」。", "say": ""}, {"part": 2, "tag": "内容 T/F", "q": "The black go stones are made slightly smaller than the white ones.", "ja": "黒い碁石は白い碁石より少し小さく作られている。", "choices": ["❌ False", "⭕ True"], "hint": "Part2④：The white stone is made slightly smaller（小さいのは白）。"}, {"part": 2, "tag": "内容 T/F", "q": "Grocery stores use the effects of colors to sell their vegetables.", "ja": "食料品店は野菜を売るために色の効果を使っている。", "choices": ["⭕ True", "❌ False"], "hint": "Part2⑤〜⑦：オレンジは赤、オクラは緑のネットで売られている。"}, {"part": 2, "tag": "文法：同格の that", "q": "Do you know the fact ___ he can't swim?", "ja": "あなたは、彼が泳げないという事実を知っていますか。", "choices": ["that", "which", "what", "whose"], "hint": "the fact that ... ＝「…という事実」。that の後ろは完全な文。", "say": "Do you know the fact that he can't swim?"}, {"part": 2, "tag": "文法：同格の that", "q": "We were excited to hear the ___ Ayumi won first place in the speech contest.", "ja": "私たちは亜由美がスピーチコンテストで1位を取ったというニュースを聞いて興奮した。", "choices": ["news that", "news which", "news what", "fact which"], "hint": "the news that ... ＝「…というニュース」。", "say": ""}, {"part": 2, "tag": "語句", "q": "___, I improved my English skills.", "ja": "このようにして、私は英語の技能を向上させた。", "choices": ["In this way", "By the way", "On the way", "In the way"], "hint": "in this way ＝「このようにして」。（By the way ＝「ところで」）", "say": ""}, {"part": 2, "tag": "語句", "q": "The teacher's words had a good ___ on the students.", "ja": "先生の言葉は生徒たちに良い効果を及ぼした。", "choices": ["effect", "affect", "effort", "reason"], "hint": "have an effect on ... ＝「…に効果を及ぼす」。affect は動詞なので注意。", "say": ""}, {"part": 3, "tag": "内容 T/F", "q": "Companies always choose gold for their packages.", "ja": "企業はいつもパッケージに金色を選ぶ。", "choices": ["❌ False", "⭕ True"], "hint": "Part3③：金色は良いイメージを持たれる色の「例」。いつも選ぶとは言っていない。"}, {"part": 3, "tag": "内容 T/F", "q": "In a study, about 25% of people answered they would choose a product in a gold package.", "ja": "ある研究で、約25％の人が金色のパッケージの製品を選ぶと答えた。", "choices": ["⭕ True", "❌ False"], "hint": "Part3④：one out of four people（4人に1人 ＝ 25％）"}, {"part": 3, "tag": "内容 T/F", "q": "Red makes customers hungry, and so it is used by food companies.", "ja": "赤は客をお腹すかせるので、食品会社に使われる。", "choices": ["⭕ True", "❌ False"], "hint": "Part3⑥⑦：Food companies often use red ... It makes customers excited and hungry."}, {"part": 3, "tag": "文法：前置詞＋関係代名詞", "q": "Bon is the period during ___ we respect our ancestors.", "ja": "お盆は私たちが先祖を敬う期間だ。", "choices": ["which", "whom", "that", "what"], "hint": "前置詞 during の後ろ、先行詞 the period（もの）→ which。前置詞の後ろに that は置けない。", "say": "Bon is the period during which we respect our ancestors."}, {"part": 3, "tag": "文法：前置詞＋関係代名詞", "q": "This is the hospital ___ my mother is working.", "ja": "これは母が働いている病院だ。", "choices": ["at which", "which at", "at what", "at that"], "hint": "前置詞は関係代名詞の前 → at which。", "say": "This is the hospital at which my mother is working."}, {"part": 3, "tag": "文法：前置詞＋関係代名詞", "q": "That is the woman to ___ I talked at the station.", "ja": "あれは私が駅で話しかけた女性だ。", "choices": ["whom", "who", "which", "that"], "hint": "前置詞 to の後ろ、先行詞は人 → whom。", "say": "That is the woman to whom I talked at the station."}, {"part": 3, "tag": "文法：前置詞＋関係代名詞", "q": "The man ___ my mother is walking is my teacher.", "ja": "母が一緒に歩いている男性は私の先生だ。", "choices": ["with whom", "who with", "with that", "with which"], "hint": "walk with the man → with whom。", "say": "The man with whom my mother is walking is my teacher."}, {"part": 3, "tag": "語句", "q": "Young women tend to ___ their weight.", "ja": "若い女性は体重を意識しがちだ。", "choices": ["be conscious of", "take into", "remind of", "pay to"], "hint": "be conscious of ... ＝「…を意識している」。", "say": ""}, {"part": 4, "tag": "内容 T/F", "q": "If you choose blue for your room, you can feel relaxed.", "ja": "部屋に青を選ぶと、くつろいだ気分になれる。", "choices": ["❌ False", "⭕ True"], "hint": "Part4③④⑤：青は「落ち着いた（calm）」気分。「くつろぐ（relaxed）」なら茶色。"}, {"part": 4, "tag": "内容 T/F", "q": "White is effective when you want to make your room look more spacious.", "ja": "部屋をより広く見せたいときは白が効果的だ。", "choices": ["⭕ True", "❌ False"], "hint": "Part4⑧：It also makes your room look more spacious."}, {"part": 4, "tag": "文法：where の非制限用法", "q": "Toyama, ___ I went last year, is a beautiful place.", "ja": "富山は、私が去年行ったところで、美しい場所だ。", "choices": ["where", "which", "that", "what"], "hint": "went（自動詞）の後ろに目的語がない＋場所 → where。which なら went to が必要。", "say": "Toyama, where I went last year, is a beautiful place."}, {"part": 4, "tag": "文法：where の非制限用法", "q": "This hospital, ___ I was born, is the biggest in the city.", "ja": "この病院は、私が生まれたところで、市内で一番大きい。", "choices": ["where", "that", "which", "what"], "hint": "I was born は完全な文＋場所 → where。コンマの後に that は使えない。", "say": "This hospital, where I was born, is the biggest in the city."}, {"part": 4, "tag": "文法：where の非制限用法", "q": "This is Shinjuku Station, ___ many people get on and off.", "ja": "これは新宿駅で、そこでは多くの人が乗り降りする。", "choices": ["where", "which", "that", "what"], "hint": "many people get on and off は完全な文 → where。", "say": "This is Shinjuku Station, where many people get on and off."}, {"part": 4, "tag": "語句", "q": "___ we have smartphones, we can do almost everything outside.", "ja": "今はもうスマートフォンがあるので、外でほとんど何でもできる。", "choices": ["Now that", "So that", "Even though", "As if"], "hint": "now that ... ＝「今はもう…だから」。", "say": ""}, {"part": 4, "tag": "語彙", "q": "It makes your room look more spacious. の spacious の意味は？", "ja": "", "choices": ["広々とした", "落ち着いた", "さわやかな", "特別な"], "hint": "spacious ＝「広々とした」（space ＝ 空間）。", "say": ""}], "re": [{"part": 1, "tag": "whose", "ja": "長谷川という名前の先生を知っていますか。", "pre": "Do you know", "words": ["a", "teacher", "whose", "name", "is"], "post": "Hasegawa?", "ex": "a teacher ＋ whose name is ...「名前が…である先生」。"}, {"part": 1, "tag": "distinguish ... from ~", "ja": "私は亜希を彼女の妹と見分けることができませんでした。", "pre": "", "words": ["I", "couldn't", "distinguish", "Aki", "from", "her sister"], "post": ".", "ex": "distinguish A from B ＝「AをBと区別する」。"}, {"part": 1, "tag": "whose", "ja": "彼は、最近歌が人気になっている若い歌手です。", "pre": "He is", "words": ["a young singer", "whose", "song", "has", "become", "popular"], "post": "recently.", "ex": "whose song has become popular ＝「その歌が人気になった」。"}, {"part": 1, "tag": "whose（Try It!）", "ja": "色が赤い警告標識を見ましたか。", "pre": "Did you see the warning sign", "words": ["whose", "color", "is", "red"], "post": "?", "ex": ""}, {"part": 1, "tag": "whose（Try It!）", "ja": "メッセージが簡単に理解できるおもしろいポスターを見ました。", "pre": "I saw an interesting poster", "words": ["whose", "message", "can", "be"], "post": "understood easily.", "ex": "whose message can be understood ＝「そのメッセージが理解されうる」。"}, {"part": 2, "tag": "have an effect on", "ja": "先生の言葉は生徒たちに良い効果を及ぼしました。", "pre": "The teacher's words", "words": ["had", "a", "good", "effect", "on", "the students"], "post": ".", "ex": "have an effect on ... ＝「…に効果を及ぼす」。"}, {"part": 2, "tag": "同格の that", "ja": "私たちの町について考えるべきだという意見がありました。", "pre": "There was", "words": ["an", "opinion", "that", "we", "should", "think"], "post": "about our town.", "ex": "an opinion that ... ＝「…という意見」。"}, {"part": 2, "tag": "同格の that", "ja": "その時は、学校を創設しようという考えは私には全くありませんでした。", "pre": "At that time, I had", "words": ["no", "idea", "that", "I", "would", "found", "a school"], "post": ".", "ex": "no idea that ... ＝「…という考えはない」。found ＝「設立する」。"}, {"part": 2, "tag": "同格の that（Try It!）", "ja": "オレンジは赤いネットの袋に入っているとよりおいしそうに見えるという事実に気づきました。", "pre": "I noticed", "words": ["the", "fact", "that"], "post": "oranges look more delicious in red mesh bags.", "ex": ""}, {"part": 2, "tag": "同格の that（Try It!）", "ja": "来月新しい食料品店が開店するというニュースを聞いたところです。", "pre": "I just heard", "words": ["the", "news", "that"], "post": "a new grocery store will open next month.", "ex": ""}, {"part": 3, "tag": "前置詞＋関係代名詞", "ja": "私たちが泊まったホテルは浜辺の近くにありました。", "pre": "", "words": ["The hotel", "at", "which", "we", "stayed", "was"], "post": "near the beach.", "ex": "stay at the hotel → at which。"}, {"part": 3, "tag": "前置詞＋関係代名詞", "ja": "健太は私が手紙を書いた人です。", "pre": "Kenta is", "words": ["the person", "to", "whom", "I", "wrote", "a letter"], "post": ".", "ex": "write a letter to the person → to whom。"}, {"part": 3, "tag": "take ... into consideration", "ja": "あなたは、色の効果を考慮しなければなりません。", "pre": "You should", "words": ["take", "the effect", "of", "colors", "into", "consideration"], "post": ".", "ex": "take A into consideration ＝「Aを考慮する」。"}, {"part": 3, "tag": "前置詞＋関係代名詞（Try It!）", "ja": "彼が最近パッケージをデザインした製品をどう思いますか。", "pre": "What do you think of the product", "words": ["for", "which", "he"], "post": "designed a package recently?", "ex": "design a package for the product → for which。"}, {"part": 3, "tag": "前置詞＋関係代名詞（Try It!）", "ja": "赤は人々がよく引きつけられるパッケージの色です。", "pre": "Red is a packaging color", "words": ["to", "which", "people"], "post": "are often attracted.", "ex": "be attracted to ... → to which。"}, {"part": 4, "tag": "where の非制限用法", "ja": "ロンドンには数年住みましたが、あまりにも寒かったです。", "pre": "London,", "words": ["where", "I", "lived", "for", "a few", "years"], "post": ", was too cold.", "ex": "コンマで挟んで London に情報を追加。"}, {"part": 4, "tag": "where の非制限用法", "ja": "私たちはアフリカの村を訪れましたが、そこには十分な飲み水がありません。", "pre": "We visited", "words": ["a village", "in Africa", ",", "where", "there", "is", "not"], "post": "enough water to drink.", "ex": ""}, {"part": 4, "tag": "where の非制限用法", "ja": "学生たちは老人ホームを訪れ、そこでお年寄りを手伝いました。", "pre": "The students visited", "words": ["a nursing home", ",", "where", "they", "helped", "the elderly people"], "post": ".", "ex": ""}, {"part": 4, "tag": "where の非制限用法（Try It!）", "ja": "ケンの家を訪れたら、そこで家族が私を歓迎してくれました。", "pre": "I visited Ken's house,", "words": ["where", "his family", "welcomed", "me"], "post": ".", "ex": ""}, {"part": 4, "tag": "where の非制限用法（Try It!）", "ja": "こちらが個室で、そこではくつろいでいただけます。", "pre": "Here is a private room,", "words": ["where", "you", "can", "feel"], "post": "at home.", "ex": "feel at home ＝「くつろぐ」。"}]};
+
+/* ===== 共通 ===== */
+const $ = id => document.getElementById(id);
+const STORE = 'pwr2_L' + D.no + '_wrong_v1';
+let view = 'study', part = 0; // 0 = 全Part
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+const inPart = x => part === 0 || x.part === part;
+const tidy = s => s.replace(/\s+([,.?!])/g, '$1').replace(/\s+/g, ' ').trim();
+function loadBank() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch (e) { return []; } }
+function saveBank(b) { try { localStorage.setItem(STORE, JSON.stringify(b)); } catch (e) {} }
+const keyOf = (t, q) => t + '::' + (q.q || q.ja);
+function addBank(t, q) { const b = loadBank(); if (!b.some(x => keyOf(x.t, x.q) === keyOf(t, q))) { b.push({ t, q }); saveBank(b); } }
+function rmBank(t, q) { saveBank(loadBank().filter(x => keyOf(x.t, x.q) !== keyOf(t, q))); }
+
+/* ===== 読み上げ ===== */
+const PREFERRED = ['Samantha', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Alex', 'Karen', 'Daniel', 'Google UK English Female'];
+const NOVELTY = ['Albert','Bad News','Bahh','Bells','Boing','Bubbles','Cellos','Good News','Jester','Organ','Superstar','Trinoids','Whisper','Wobble','Zarvox','Junior','Ralph','Fred','Kathy','Grandma','Grandpa','Rocko','Shelley','Eddy','Flo','Reed','Sandy'];
+let voice = null, jaVoice = null, speed = 0.8;
+const hasTTS = 'speechSynthesis' in window;
+function pickVoice() {
+  if (!hasTTS) return;
+  const all = speechSynthesis.getVoices();
+  const en = all.filter(v => /^en[-_]/i.test(v.lang) && !NOVELTY.some(n => v.name.startsWith(n)));
+  jaVoice = all.find(v => /^ja[-_]/i.test(v.lang)) || null;
+  if (!en.length) return;
+  let saved = null; try { saved = localStorage.getItem('pwr2_voice'); } catch (e) {}
+  voice = en.find(v => v.name === saved) || PREFERRED.map(n => en.find(v => v.name.startsWith(n))).find(v => v) || en.find(v => /en[-_]US/i.test(v.lang)) || en[0];
+  $('voiceSel').innerHTML = en.map(v => `<option value="${esc(v.name)}" ${v === voice ? 'selected' : ''}>${esc(v.name.replace(/\s*\(.*\)/, ''))}</option>`).join('');
+}
+function setVoice(name) {
+  voice = speechSynthesis.getVoices().find(v => v.name === name) || voice;
+  try { localStorage.setItem('pwr2_voice', name); } catch (e) {}
+  speak('This is how I sound.');
+}
+function setSpeed(v) { speed = parseFloat(v); $('speedVal').textContent = v + 'x'; }
+function utter(text, lang) {
+  const u = new SpeechSynthesisUtterance(text);
+  if (lang === 'ja') { u.lang = 'ja-JP'; if (jaVoice) u.voice = jaVoice; u.rate = Math.min(speed + 0.2, 1.3); }
+  else { u.lang = voice ? voice.lang : 'en-US'; if (voice) u.voice = voice; u.rate = speed; }
+  return u;
+}
+function speak(text, lang) { if (!hasTTS) return; stopAll(); speechSynthesis.speak(utter(text, lang)); }
+const autoSpeak = t => { if ($('autoSpeak').checked) speak(t); };
+let queueToken = 0;
+function stopAll() {
+  if (!hasTTS) return;
+  queueToken++; speechSynthesis.cancel();
+  document.querySelectorAll('.sent.speaking').forEach(e => e.classList.remove('speaking'));
+}
+if (hasTTS) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+
+/* ===== 画面切り替え ===== */
+function go(v) {
+  stopAll(); view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.v === v));
+  document.querySelectorAll('.view').forEach(e => e.classList.remove('show'));
+  $('v-' + v).classList.add('show');
+  render();
+  window.scrollTo({ top: 0 });
+}
+function setPart(p) { part = p; drawChips(); stopAll(); render(); }
+function drawChips() {
+  const labels = ['全Part'].concat(D.parts.map((_, i) => 'Part ' + (i + 1)));
+  $('partChips').innerHTML = labels.map((l, i) => `<button class="chip ${i === part ? 'active' : ''}" onclick="setPart(${i})">${l}</button>`).join('');
+}
+function render() {
+  if (view === 'study') renderStudy();
+  else if (view === 'flash') startFlash();
+  else if (view === 'mc') quizStart('mc');
+  else if (view === 're') quizStart('re');
+  else quizStart('wrong');
+}
+
+/* ===== 本文 ===== */
+let hideJa = false, hideEn = false;
+function renderStudy() {
+  const parts = D.parts.map((p, i) => ({ p, i })).filter(x => part === 0 || x.i + 1 === part);
+  $('v-study').innerHTML = `
+    <div class="study-btns" style="margin-bottom:12px">
+      <button class="sbtn ${hideJa ? 'on' : ''}" onclick="hideJa=!hideJa;renderStudy()">訳を隠す</button>
+      <button class="sbtn ${hideEn ? 'on' : ''}" onclick="hideEn=!hideEn;renderStudy()">英文を隠す（暗唱練習）</button>
+    </div>` + parts.map(({ p, i }) => `
+    <div class="card part ${hideJa ? 'hide-ja' : ''} ${hideEn ? 'hide-en' : ''}">
+      <div class="part-title">Part ${i + 1}　${esc(p.title)}</div>
+      <div class="part-pages">教科書 ${esc(p.pages)}</div>
+      <div class="study-btns">
+        <button class="sbtn" onclick="playPart(${i},'en')">▶ 英語を通して聞く</button>
+        <button class="sbtn" onclick="playPart(${i},'both')">▶ 英→日で聞く</button>
+        <button class="sbtn stop" onclick="stopAll()">⏹ 停止</button>
+      </div>
+      ${p.sents.map((s, j) => `<div class="sent" id="s${i}_${j}" onclick="tapSent(${i},${j})">
+        <div class="en"><span class="num">${j + 1}</span><span class="txt">${esc(s[0])}</span></div>
+        <div class="ja">${esc(s[1])}</div></div>`).join('')}
+      <div class="hint-line">👆 文をタップするとその文だけ読み上げます${hideEn ? '（英文を隠しているときは、1回目で読み上げ、2回目で表示）' : ''}</div>
+      <div class="grammar"><b>📌 文法：${esc(p.grammar[0])}</b><br>${esc(p.grammar[1])}<br>${p.grammar.slice(2).map(e => `<span class="ex">${esc(e)}</span>`).join('<br>')}</div>
+      <table class="vocab"><thead><tr><th>単語・熟語</th><th>品詞</th><th>意味</th></tr></thead><tbody>
+        ${p.vocab.map(v => `<tr><td onclick="speak('${esc(v[0]).replace(/'/g, "\\'")}')">${esc(v[0])}</td><td class="pos">${esc(v[1])}</td><td>${esc(v[2])}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`).join('');
+}
+function tapSent(i, j) {
+  const el = $('s' + i + '_' + j);
+  if (hideEn && el.classList.contains('speaking')) { el.classList.add('revealed'); return; }
+  stopAll(); el.classList.add('speaking');
+  const u = utter(D.parts[i].sents[j][0]);
+  u.onend = () => el.classList.remove('speaking');
+  speechSynthesis.speak(u);
+}
+function playPart(i, mode) {
+  stopAll();
+  const token = queueToken, list = [];
+  D.parts[i].sents.forEach((s, j) => { list.push([j, s[0], 'en']); if (mode === 'both') list.push([j, s[1], 'ja']); });
+  let k = 0;
+  const next = () => {
+    if (token !== queueToken) return;
+    document.querySelectorAll('.sent.speaking').forEach(e => e.classList.remove('speaking'));
+    if (k >= list.length) return;
+    const [j, text, lang] = list[k++], el = $('s' + i + '_' + j);
+    el.classList.add('speaking'); el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const u = utter(text, lang); u.onend = next; speechSynthesis.speak(u);
+  };
+  next();
+}
+
+/* ===== 単語カード ===== */
+let cards = [], ci = 0, flipped = false, jaFirst = false;
+function startFlash() {
+  cards = shuffle(D.parts.flatMap((p, i) => p.vocab.map(v => ({ w: v[0], pos: v[1], m: v[2], part: i + 1 }))).filter(inPart));
+  ci = 0; flipped = false; drawCard();
+}
+function drawCard() {
+  const c = cards[ci];
+  const front = jaFirst ? `<div class="mid">${esc(c.m)}</div><div class="pos">${esc(c.pos)}</div>` : `<div class="big">${esc(c.w)}</div><div class="pos">${esc(c.pos)}</div>`;
+  const back = jaFirst ? `<div class="big">${esc(c.w)}</div><div class="pos">${esc(c.m)}</div>` : `<div class="mid">${esc(c.m)}</div><div class="pos">${esc(c.w)}（${esc(c.pos)}）</div>`;
+  $('v-flash').innerHTML = `
+    <div class="study-btns">
+      <button class="sbtn ${jaFirst ? '' : 'on'}" onclick="jaFirst=false;flipped=false;drawCard()">英→日</button>
+      <button class="sbtn ${jaFirst ? 'on' : ''}" onclick="jaFirst=true;flipped=false;drawCard()">日→英</button>
+    </div>
+    <div class="card flash ${flipped ? 'back' : ''}" onclick="flip()">
+      <div class="meta">Part ${c.part}　${ci + 1} / ${cards.length}</div>
+      ${flipped ? back : front}
+      ${flipped ? '' : `<div class="tip">${jaFirst ? '英語を言ってから' : '意味を言ってから'}タップして確認</div>`}
+    </div>
+    <div class="nav">
+      <button onclick="moveCard(-1)">← 前へ</button>
+      <button onclick="speak(cards[ci].w)">🔊 読む</button>
+      <button class="primary" onclick="moveCard(1)">次へ →</button>
+    </div>`;
+}
+function flip() { flipped = !flipped; drawCard(); if (flipped && jaFirst) autoSpeak(cards[ci].w); if (!flipped && !jaFirst) {} }
+function moveCard(d) { ci = (ci + d + cards.length) % cards.length; flipped = false; drawCard(); if (!jaFirst) autoSpeak(cards[ci].w); }
+
+/* ===== クイズ（4択・並べ替え・苦手） ===== */
+let qmode = null, qs = [], cur = 0, score = 0, answered = false, missed = [];
+const VIEW_OF = { mc: 'v-mc', re: 'v-re', wrong: 'v-wrong' };
+function quizStart(m) {
+  qmode = m;
+  const el = $(VIEW_OF[m]);
+  const n = m === 'mc' ? D.mc.filter(inPart).length : m === 're' ? D.re.filter(inPart).length : loadBank().filter(x => inPart(x.q)).length;
+  const info = {
+    mc: ['✏️', '4択・正誤問題', 'ワークの「内容の確認」「文法」「語句」から。選択肢の並びは毎回変わります。'],
+    re: ['🔀', '並べ替え', 'ワークの並べ替え問題と教科書のTry It!から。語句をタップして英文を組み立てます。'],
+    wrong: ['🎯', '苦手問題だけ復習', '4択・並べ替えで間違えた問題がたまります。正解すると消えるので、0問になればクリア！'],
+  }[m];
+  el.innerHTML = `<div class="card start"><div class="big">${info[0]}</div><h2>${info[1]}</h2><p>${info[2]}</p>
+    <div class="small">${part === 0 ? '全Part' : 'Part ' + part}：${n}問</div>
+    <button class="big-btn" ${n ? '' : 'disabled'} onclick="quizBegin()">スタート</button></div>`;
+}
+function quizBegin() {
+  if (qmode === 'mc') qs = shuffle(D.mc.filter(inPart)).map(q => Object.assign({}, q, { _t: 'mc' }));
+  else if (qmode === 're') qs = shuffle(D.re.filter(inPart)).map(q => Object.assign({}, q, { _t: 're' }));
+  else qs = shuffle(loadBank().filter(x => inPart(x.q)).map(x => Object.assign({}, x.q, { _t: x.t })));
+  cur = 0; score = 0; missed = []; drawQ();
+}
+function drawQ() {
+  const q = qs[cur], el = $(VIEW_OF[qmode]);
+  answered = false;
+  el.innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${cur + 1} / ${qs.length}</span><span>${score}点</span></div>
+      <div class="pbar"><div class="pfill" style="width:${cur / qs.length * 100}%"></div></div></div>
+    <div class="card qcard" id="qc"></div>
+    <button class="next" id="nextBtn" onclick="nextQ()">${cur + 1 < qs.length ? '次の問題 →' : '結果を見る'}</button>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="quizStart(qmode)">← やめる</a></div>`;
+  q._t === 're' ? drawRe(q) : drawMC(q);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function finishQ(ok, q, speakText) {
+  if (ok) { score++; if (qmode === 'wrong') rmBank(q._t, strip(q)); }
+  else { missed.push(q); addBank(q._t, strip(q)); }
+  $('expl').classList.add('show'); $('nextBtn').classList.add('show');
+  if (speakText) autoSpeak(speakText);
+}
+function strip(q) { const c = Object.assign({}, q); delete c._t; delete c._order; return c; }
+function nextQ() { cur++; cur >= qs.length ? showResult() : drawQ(); }
+
+/* 4択 */
+function drawMC(q) {
+  q._order = shuffle(q.choices.map((_, i) => i));
+  const L = 'ABCD';
+  $('qc').innerHTML = `
+    <span class="qtag">Part ${q.part}　${esc(q.tag)}</span>
+    <div class="qtext">${esc(q.q).replace('___', '<span style="display:inline-block;min-width:70px;border-bottom:3px solid var(--main)"></span>')}</div>
+    ${q.ja ? `<div class="qja">${esc(q.ja)}</div>` : ''}
+    <div class="choices">${q._order.map((o, i) => `<button class="choice" onclick="answerMC(${i})"><span class="lb">${L[i]}</span><span>${esc(q.choices[o])}</span></button>`).join('')}</div>
+    <div class="expl" id="expl"><div class="res" id="res"></div><div class="txt">${esc(q.hint)}</div>
+      ${q.say ? `<button class="speak" onclick="speak(qs[cur].say)">🔊 英文を聞く</button>` : ''}</div>`;
+}
+function answerMC(i) {
+  if (answered) return; answered = true;
+  const q = qs[cur], btns = document.querySelectorAll('.choice'), ci = q._order.indexOf(0);
+  btns.forEach(b => b.disabled = true);
+  const ok = i === ci;
+  btns[ci].classList.add('correct'); if (!ok) btns[i].classList.add('wrong');
+  const r = $('res'); r.textContent = ok ? '⭕ 正解！' : '❌ 正解は「' + q.choices[0] + '」'; if (!ok) r.classList.add('ng');
+  finishQ(ok, q, q.say);
+}
+
+/* 並べ替え */
+let rs = { pool: [], placed: [] };
+const reAnswer = q => tidy([q.pre, q.words.join(' '), q.post].filter(Boolean).join(' '));
+function drawRe(q) {
+  let pool;
+  do { pool = shuffle(q.words.map((w, i) => ({ w, id: i }))); } while (q.words.length > 1 && pool.map(x => x.w).join('|') === q.words.join('|'));
+  rs = { pool, placed: [] };
+  const frame = (q.pre || q.post) ? `<div class="qframe">${esc(q.pre || '')} <span class="gap">（　並べ替え　）</span> ${esc(q.post || '')}</div>` : '';
+  $('qc').innerHTML = `
+    <span class="qtag">Part ${q.part}　${esc(q.tag)}</span>
+    <div class="qja">${esc(q.ja)}</div>${frame}
+    <div class="target" id="rT"></div><div class="pool" id="rP"></div>
+    <div class="acts" id="rA"><button onclick="undoW()">↩️ 1つ戻す</button><button onclick="resetW()">🔄 リセット</button></div>
+    <button class="check" id="chk" onclick="checkRe()" disabled>答え合わせ</button>
+    <div class="expl" id="expl"><div class="res" id="res"></div><div class="txt" id="extxt"></div>
+      <button class="speak" onclick="speak(reAnswer(qs[cur]))">🔊 英文を聞く</button></div>`;
+  drawPool();
+}
+function drawPool() {
+  $('rT').innerHTML = rs.placed.map(x => `<button class="w in" onclick="back(${x.id})">${esc(x.w)}</button>`).join('') || '<span class="small">下の語句をタップして並べよう</span>';
+  $('rT').className = 'target' + (rs.placed.length ? ' filled' : '');
+  $('rP').innerHTML = rs.pool.map(x => `<button class="w" onclick="pick(${x.id})">${esc(x.w)}</button>`).join('');
+  $('chk').disabled = rs.pool.length > 0;
+}
+function pick(id) { if (answered) return; const i = rs.pool.findIndex(x => x.id === id); rs.placed.push(rs.pool.splice(i, 1)[0]); drawPool(); }
+function back(id) { if (answered) return; const i = rs.placed.findIndex(x => x.id === id); rs.pool.push(rs.placed.splice(i, 1)[0]); drawPool(); }
+function undoW() { if (answered || !rs.placed.length) return; rs.pool.push(rs.placed.pop()); drawPool(); }
+function resetW() { if (answered) return; rs.pool = rs.pool.concat(rs.placed); rs.placed = []; drawPool(); }
+function checkRe() {
+  if (answered) return; answered = true;
+  const q = qs[cur], user = rs.placed.map(x => x.w);
+  const ok = user.join('|') === q.words.join('|') || (q.alt || []).some(a => a.join('|') === user.join('|'));
+  $('rT').innerHTML = user.map((w, i) => `<button class="w ${ok || w === q.words[i] ? 'ok' : 'ng'}" disabled>${esc(w)}</button>`).join('');
+  $('rT').className = 'target';
+  $('chk').style.display = 'none'; $('rA').style.display = 'none';
+  const r = $('res');
+  if (ok) r.textContent = '⭕ 正解！';
+  else { const n = user.findIndex((w, i) => w !== q.words[i]); r.textContent = '❌ 惜しい！ ' + (n + 1) + '番目からずれています'; r.classList.add('ng'); }
+  $('extxt').innerHTML = `<div class="small">正しい英文</div><strong>${esc(reAnswer(q))}</strong>${q.ex ? '<br>' + esc(q.ex) : ''}`;
+  finishQ(ok, q, reAnswer(q));
+}
+
+/* 結果 */
+function showResult() {
+  const n = qs.length, pct = Math.round(score / n * 100);
+  const msg = pct === 100 ? '🏆 全問正解！完璧！' : pct >= 80 ? '🌟 すごい！あと少しで完璧！' : pct >= 60 ? '⭐ よくできました！' : pct >= 40 ? '💪 もう少し！苦手問題で復習しよう' : '📖 本文を読み直してから再挑戦！';
+  const b = loadBank().filter(x => inPart(x.q)).length;
+  $(VIEW_OF[qmode]).innerHTML = `
+    <div class="card result"><div class="score">${score}<small> / ${n}</small></div><div class="small">${pct}%</div><div class="msg">${msg}</div></div>
+    ${missed.length ? `<div class="card miss"><h3>❌ 間違えた問題（${missed.length}問）→ 苦手に保存しました</h3>
+      ${missed.map(q => `<div class="item"><span class="small">Part ${q.part}　${esc(q.tag)}</span><br>${q._t === 're' ? esc(q.ja) + '<br><span class="ans">' + esc(reAnswer(q)) + '</span>' : esc(q.q) + '<br><span class="ans">正解：' + esc(q.choices[0]) + '</span>'}</div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="quizBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手問題だけ復習（${b}問） 🎯</button>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* 起動 */
+$('hTitle').textContent = '📖 Lesson ' + D.no + '　' + D.titleJa;
+$('hSub').textContent = D.titleEn + '｜Power On English Communication II';
+drawChips(); render();
+</script>
+</body>
+</html>
