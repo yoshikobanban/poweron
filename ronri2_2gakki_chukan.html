@@ -53,7 +53,9 @@ body {
 .sec-tab.active small { color: #DBEAFE; }
 
 /* 読み上げバー */
-.tts-bar { padding: 10px 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gray-600); }
+.tts-bar { padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: var(--gray-600); display: flex; flex-direction: column; gap: 8px; }
+.tts-row { display: flex; align-items: center; gap: 10px; }
+.tts-bar select { flex: 1; min-width: 0; padding: 6px 8px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; background: white; }
 .tts-bar input[type=range] { flex: 1; }
 .tts-bar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
 
@@ -191,10 +193,16 @@ body {
   </div>
 
   <div class="card tts-bar">
-    <span style="white-space:nowrap">🔊 速度</span>
-    <input type="range" id="speedRange" min="0.5" max="1.3" step="0.1" value="0.8" oninput="setSpeed(this.value)">
-    <span id="speedVal">0.8x</span>
-    <label><input type="checkbox" id="autoSpeak" checked>答えを自動で読む</label>
+    <div class="tts-row">
+      <span style="white-space:nowrap">🔊 声</span>
+      <select id="voiceSel" onchange="setVoice(this.value)"><option>読み込み中…</option></select>
+    </div>
+    <div class="tts-row">
+      <span style="white-space:nowrap">速度</span>
+      <input type="range" id="speedRange" min="0.5" max="1.3" step="0.1" value="0.8" oninput="setSpeed(this.value)">
+      <span id="speedVal">0.8x</span>
+      <label><input type="checkbox" id="autoSpeak" checked>答えを自動で読む</label>
+    </div>
   </div>
 
   <!-- モード選択 -->
@@ -403,12 +411,36 @@ function removeBank(m, q) { saveBank(loadBank().filter(x => qKey(x.mode, x.q) !=
 const bankInSec = () => loadBank().filter(x => inSec(x.q));
 
 /* ===== 読み上げ ===== */
+// Chromeは声を指定しないと変な声（ネタ系の声など）を選ぶことがあるので、自然な英語の声を選んで固定する
+const PREFERRED_VOICES = ['Samantha', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Alex', 'Karen', 'Daniel', 'Google UK English Female'];
+const NOVELTY_VOICES = ['Albert','Bad News','Bahh','Bells','Boing','Bubbles','Cellos','Good News','Jester','Organ','Superstar','Trinoids','Whisper','Wobble','Zarvox','Junior','Ralph','Fred','Kathy','Grandma','Grandpa','Rocko','Shelley','Eddy','Flo','Reed','Sandy'];
+let voice = null;
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const all = window.speechSynthesis.getVoices();
+  const en = all.filter(v => /^en[-_]/i.test(v.lang) && !NOVELTY_VOICES.some(n => v.name.startsWith(n)));
+  if (!en.length) return;
+  const sel = document.getElementById('voiceSel');
+  let saved = null; try { saved = localStorage.getItem('ronri2_voice'); } catch (e) {}
+  voice = en.find(v => v.name === saved)
+       || PREFERRED_VOICES.map(n => en.find(v => v.name.startsWith(n))).find(v => v)
+       || en.find(v => /en[-_]US/i.test(v.lang)) || en[0];
+  sel.innerHTML = en.map(v => `<option value="${v.name}" ${v === voice ? 'selected' : ''}>${v.name.replace(/\s*\(.*\)/, '')}</option>`).join('');
+}
+function setVoice(name) {
+  voice = window.speechSynthesis.getVoices().find(v => v.name === name) || voice;
+  try { localStorage.setItem('ronri2_voice', name); } catch (e) {}
+  speak('This is how I sound.');
+}
+if ('speechSynthesis' in window) { pickVoice(); window.speechSynthesis.onvoiceschanged = pickVoice; }
+
 function setSpeed(v) { speed = parseFloat(v); document.getElementById('speedVal').textContent = v + 'x'; }
 function speak(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = speed;
+  u.lang = voice ? voice.lang : 'en-US'; u.rate = speed;
+  if (voice) u.voice = voice;
   window.speechSynthesis.speak(u);
 }
 const autoSpeak = text => { if (document.getElementById('autoSpeak').checked) speak(text); };
