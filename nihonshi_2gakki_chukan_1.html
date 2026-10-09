@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本史 2学期中間対策</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=BIZ+UDPMincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #9A3412; --main-light: #FDF0E8;
+  --green: #16A34A; --green-light: #F0FDF4; --red: #DC2626; --red-light: #FEF2F2;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF; --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #F5F6F8; color: var(--gray-900); min-height: 100vh; }
+button { font-family: inherit; }
+header { background: var(--main); color: white; padding: 14px 16px 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+header .ttl { font-size: 18px; font-weight: 700; }
+header .sub { font-size: 12px; opacity: .9; margin-top: 2px; }
+.tabs { display: flex; gap: 4px; margin-top: 10px; }
+.tab { flex: 1; min-width: 0; padding: 9px 2px; border: none; border-radius: 8px; background: rgba(255,255,255,.18); color: white; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tab.active { background: white; color: var(--main); }
+.container { max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.secs { padding: 10px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 11px; border: 2px solid var(--gray-200); border-radius: 20px; background: white; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.chip.active { background: var(--main); border-color: var(--main); color: white; }
+.chip small { font-weight: 400; opacity: .8; }
+.start { padding: 22px 18px; text-align: center; }
+.start .big { font-size: 40px; }
+.start h2 { font-size: 18px; margin-top: 4px; }
+.start p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin: 8px 0 12px; }
+.small { font-size: 12px; color: var(--gray-400); }
+.progress { padding: 10px 14px; margin-bottom: 12px; }
+.pinfo { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
+.pbar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+.pfill { height: 8px; background: var(--main); transition: width .3s; }
+.qcard { padding: 18px; margin-bottom: 12px; }
+.qtag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.qtext { font-size: 17px; line-height: 1.8; }
+.qtext .blank { display: inline-block; min-width: 72px; border-bottom: 3px solid var(--main); margin: 0 2px; }
+.qtext.kana { font-size: 24px; font-weight: 700; text-align: center; color: var(--main); padding: 8px 0; }
+.choices { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+.choice { display: flex; gap: 10px; align-items: center; text-align: left; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-size: 16px; color: var(--gray-800); cursor: pointer; line-height: 1.5; }
+.choice.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 24px; justify-content: flex-start; }
+.choice:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice .lb { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--gray-600); font-family: 'BIZ UDPGothic', sans-serif; }
+.choice.correct { border-color: var(--green); background: var(--green-light); }
+.choice.correct .lb { background: var(--green); color: white; }
+.choice.wrong { border-color: var(--red); background: var(--red-light); }
+.choice.wrong .lb { background: var(--red); color: white; }
+.choice:disabled { cursor: default; }
+.expl { display: none; margin-top: 12px; padding: 12px 14px; border-left: 4px solid var(--main); background: var(--gray-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.expl.show { display: block; }
+.expl .res { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.expl .res.ng { color: var(--red); }
+.expl .txt { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+.next { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: none; }
+.next.show { display: block; }
+.big-btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.big-btn.red { background: var(--red); }
+.big-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.result { padding: 24px 18px; text-align: center; margin-bottom: 12px; }
+.result .score { font-size: 52px; font-weight: 700; color: var(--main); line-height: 1.1; }
+.result .score small { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result .msg { font-size: 16px; font-weight: 700; margin-top: 8px; }
+.miss { padding: 16px; margin-bottom: 12px; }
+.miss h3 { font-size: 14px; color: var(--red); margin-bottom: 8px; }
+.miss .item { padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; line-height: 1.6; }
+.miss .item:last-child { border-bottom: none; }
+.miss .ans { color: var(--green); font-weight: 700; }
+.flash { padding: 24px 18px; min-height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; border: 2px solid var(--main-light); margin-bottom: 12px; }
+.flash.back { background: var(--main-light); border-color: var(--main); }
+.flash .meta { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.flash .q { font-size: 17px; line-height: 1.8; }
+.flash .a { font-size: 26px; font-weight: 700; color: var(--main); }
+.flash .a.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 32px; }
+.flash .h { font-size: 13px; color: var(--gray-600); margin-top: 12px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.flash .tip { font-size: 12px; color: var(--gray-400); margin-top: 14px; }
+.nav { display: flex; gap: 8px; }
+.nav button { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: 2px solid var(--gray-200); background: white; font-size: 15px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.nav button.primary { background: var(--main); border-color: var(--main); color: white; }
+.oral-q { font-size: 18px; line-height: 1.8; }
+.oral-q.kana { font-size: 26px; font-weight: 700; text-align: center; color: var(--main); }
+.oral-step { font-size: 13px; color: var(--gray-600); background: var(--gray-50); border-radius: var(--radius-sm); padding: 8px 12px; margin: 12px 0; line-height: 1.7; }
+.oral-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.obtn { flex: 1; min-width: 120px; padding: 12px; border: 2px solid var(--main); background: white; color: var(--main); border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; }
+.obtn.fill { background: var(--main); color: white; }
+.reveal { display: none; margin-top: 14px; padding: 16px; background: var(--main-light); border-radius: var(--radius-sm); text-align: center; }
+.reveal.show { display: block; }
+.reveal .ans { font-size: 26px; font-weight: 700; color: var(--main); }
+.reveal .ans.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 40px; letter-spacing: .05em; }
+.reveal .hint { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.judge { display: flex; gap: 8px; margin-top: 12px; }
+.judge button { flex: 1; padding: 14px; border: none; border-radius: var(--radius-sm); font-size: 17px; font-weight: 700; cursor: pointer; color: white; }
+.judge .ok { background: var(--green); } .judge .ng { background: var(--red); }
+.opt { font-size: 13px; color: var(--gray-600); display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="ttl" id="hTitle"></div>
+  <div class="sub" id="hSub"></div>
+  <div class="tabs">
+    <button class="tab active" data-v="quiz" onclick="go('quiz')">✏️ 4択</button>
+    <button class="tab" data-v="oral" onclick="go('oral')">🎤 口頭</button>
+    <button class="tab" data-v="card" onclick="go('card')">🃏 カード</button>
+    <button class="tab" data-v="wrong" onclick="go('wrong')">🎯 苦手</button>
+  </div>
+</header>
+<div class="container">
+  <div class="card secs" id="secs"></div>
+  <div id="main"></div>
+</div>
+<script>
+const D = {"key": "nihonshi_2gakki_chukan", "title": "🏯 日本史 2学期中間対策", "sub": "飛鳥の朝廷〜律令国家の成立（プリントNO.7・NO.8）", "secs": [{"id": "a", "name": "飛鳥の朝廷", "desc": "プリントNO.7 前半：磐井の乱・蘇我氏と物部氏・聖徳太子の政治・遣隋使"}, {"id": "b", "name": "飛鳥文化", "desc": "プリントNO.7 後半：寺院・仏像・工芸・伽藍配置"}, {"id": "c", "name": "大化の改新", "desc": "プリントNO.8 前半：乙巳の変・改新政府・改新の詔"}, {"id": "d", "name": "天智〜持統", "desc": "プリントNO.8 後半：白村江の戦い・壬申の乱・天武天皇・藤原京"}, {"id": "e", "name": "史料", "desc": "憲法十七条・『隋書』倭国伝・改新の詔、プリントの共通テスト型問題"}, {"id": "k", "name": "漢字テスト", "desc": "告知プリントの15語。まちがえやすい字形の中から正しい漢字を選ぼう。", "kanji": true, "extra": true}], "qs": [{"sec": "a", "q": "527年、筑紫国造の磐井が新羅と結んで起こした反乱を ___ という。", "c": ["磐井の乱", "壬申の乱", "乙巳の変", "白村江の戦い"], "h": "527年 磐井の乱。近江毛野ら6万の百済応援軍を妨害した。"}, {"sec": "a", "q": "磐井の乱で、磐井が結んだ朝鮮半島の国は ___ 。", "c": ["新羅", "百済", "高句麗", "隋"], "h": "百済・新羅が加耶諸国を圧迫していた時期。磐井は新羅と結んだ。"}, {"sec": "a", "q": "磐井の墓といわれる、福岡県八女市の古墳は ___ 。", "c": ["岩戸山古墳", "大仙陵古墳", "稲荷山古墳", "高松塚古墳"], "h": "岩戸山古墳には石人・石馬が置かれていた。"}, {"sec": "a", "q": "磐井の乱を鎮圧した物部氏の人物は ___ 。", "c": ["物部麁鹿火", "物部尾輿", "物部守屋", "大伴金村"], "h": "物部麁鹿火（あらかい）が鎮圧した。"}, {"sec": "a", "q": "継体天皇を擁立して勢力を広げたが、任那四県を百済に割譲して失脚したのは ___ 。", "c": ["大伴金村", "物部尾輿", "蘇我稲目", "物部麁鹿火"], "h": "512年に任那四県を百済に割譲 → 物部尾輿らに批判されて失脚。"}, {"sec": "a", "q": "仏教の受け入れをめぐって、崇仏派の蘇我稲目と対立した排仏派は ___ 。", "c": ["物部尾輿", "物部守屋", "大伴金村", "蘇我馬子"], "h": "欽明朝の崇仏論争：物部尾輿〔排仏派〕と蘇我稲目〔崇仏派〕。"}, {"sec": "a", "q": "大臣として勢力を広げ、三蔵（財政）を管理し、のちに崇峻天皇を暗殺したのは ___ 。", "c": ["蘇我馬子", "蘇我稲目", "蘇我入鹿", "蘇我蝦夷"], "h": "蘇我氏：稲目 → 馬子 → 蝦夷 → 入鹿 の順。"}, {"sec": "a", "q": "587年に蘇我馬子に敗れて滅んだ大連は ___ 。", "c": ["物部守屋", "物部尾輿", "大伴金村", "物部麁鹿火"], "h": "蘇我馬子と物部守屋の抗争 → 守屋敗死（587年）→ 蘇我氏が政権を握る。"}, {"sec": "a", "q": "589年に南北朝を統一した中国の王朝は ___ 。", "c": ["隋", "唐", "魏", "宋"], "h": "隋（581〜618）。高句麗遠征に失敗し、618年に滅亡。"}, {"sec": "a", "q": "592年、蘇我馬子と対立して暗殺された天皇は ___ 。", "c": ["崇峻天皇", "推古天皇", "欽明天皇", "孝徳天皇"], "h": "崇峻天皇の暗殺（592年）→ 推古天皇を擁立。"}, {"sec": "a", "q": "592年に即位した、日本初の女帝は ___ 。", "c": ["推古天皇", "皇極天皇", "持統天皇", "斉明天皇"], "h": "推古天皇。おいの聖徳太子が摂政として協力した。"}, {"sec": "a", "q": "推古天皇の摂政として政治を行ったのは ___ 。", "c": ["聖徳太子（厩戸王）", "蘇我馬子", "中大兄皇子", "小野妹子"], "h": "摂政＝天皇が幼い・女性・病気のときに代わって政治を行う役職。"}, {"sec": "a", "q": "603年に定められた、才能や功績に応じて個人に位を与える制度は ___ 。", "c": ["冠位十二階", "憲法十七条", "八色の姓", "公地公民"], "h": "徳・仁・礼・信・義・智をそれぞれ大小に分け、冠の色で区別した。一代限り。"}, {"sec": "a", "q": "冠位十二階で、いちばん上の位は ___ 。", "c": ["大徳", "大仁", "大礼", "大智"], "h": "徳 → 仁 → 礼 → 信 → 義 → 智 の順で、それぞれ大・小。小野妹子は大礼。"}, {"sec": "a", "q": "604年に制定された、仏教・儒教の影響を受け、天皇中心の国家の理想を示したものは ___ 。", "c": ["憲法十七条", "冠位十二階", "改新の詔", "近江令"], "h": "日本初の成文法とされる。「和を以て貴しと為し」。"}, {"sec": "a", "q": "聖徳太子らが編纂した、天皇の系譜や事績をまとめた歴史書は ___ 。", "c": ["天皇記", "国記", "古事記", "日本書紀"], "h": "『天皇記』『国記』は現存しない。のちの『古事記』（712年）『日本書紀』（720年）につながる。"}, {"sec": "a", "q": "聖徳太子らが編纂した、国家成立の歴史と地誌をまとめた歴史書は ___ 。", "c": ["国記", "天皇記", "風土記", "日本書紀"], "h": "『天皇記』＝天皇の系譜や事績、『国記』＝国家成立の歴史と地誌。"}, {"sec": "a", "q": "607年に隋に派遣された使節を ___ という。", "c": ["遣隋使", "遣唐使", "朝貢使", "防人"], "h": "600年が1回目、607年が2回目の遣隋使。"}, {"sec": "a", "q": "607年に遣隋使として隋に渡り、対等外交を主張したのは ___ 。", "c": ["小野妹子", "裴世清", "高向玄理", "中臣鎌足"], "h": "小野妹子は608年に裴世清とともに帰国し、再び隋へ渡った。"}, {"sec": "a", "q": "遣隋使のようすが記された中国の歴史書は ___ 。", "c": ["『隋書』倭国伝", "『魏志』倭人伝", "『宋書』倭国伝", "『漢書』地理志"], "h": "著者は魏徴。「日出づる処の天子…」の国書が記されている。"}, {"sec": "a", "q": "倭の国書を見て怒った隋の皇帝は ___ 。", "c": ["煬帝", "文帝", "太宗", "光武帝"], "h": "煬帝（ようだい）。「蛮夷の書、無礼なるもの有り」。"}, {"sec": "a", "q": "608年、答礼使として隋から日本に派遣されたのは ___ 。", "c": ["裴世清", "小野妹子", "曇徴", "観勒"], "h": "裴世清（はいせいせい）。"}, {"sec": "a", "q": "608年の遣隋使に同行した留学生・学問僧の組み合わせは ___ 。", "c": ["高向玄理・南淵請安・旻", "小野妹子・裴世清・旻", "曇徴・観勒・恵慈", "中臣鎌足・南淵請安・旻"], "h": "3人とも長く中国で学び、帰国後に大化の改新に影響を与えた。"}, {"sec": "b", "q": "6世紀後半〜7世紀中頃の、日本最初の仏教文化を ___ という。", "c": ["飛鳥文化", "白鳳文化", "天平文化", "国風文化"], "h": "推古朝の仏教興隆策がもと。"}, {"sec": "b", "q": "飛鳥文化に大きな影響を与えた中国の時代は ___ 。", "c": ["南北朝", "唐", "漢", "宋"], "h": "ほかにギリシア・ペルシアの影響も → エンタシス・忍冬唐草文様。"}, {"sec": "b", "q": "法隆寺の柱の中ほどのふくらみなどに見られる、ギリシアの影響を受けた技法は ___ 。", "c": ["エンタシス", "アルカイックスマイル", "忍冬唐草文様", "伽藍配置"], "h": "エンタシス＝柱の中ほどをふくらませる技法。"}, {"sec": "b", "q": "蘇我馬子が建立した日本最初の仏教寺院（正式名称は法興寺）は ___ 。", "c": ["飛鳥寺", "法隆寺", "四天王寺", "広隆寺"], "h": "596年建立。"}, {"sec": "b", "q": "聖徳太子が建立した（607年）、現存する世界最古の木造建築は ___ 。", "c": ["法隆寺", "飛鳥寺", "四天王寺", "中宮寺"], "h": "別名 斑鳩寺。"}, {"sec": "b", "q": "670年に法隆寺が焼失したと記す『日本書紀』の記述を裏づける、法隆寺の再建説の根拠となった遺跡は ___ 。", "c": ["若草伽藍跡", "飛鳥池遺跡", "岩戸山古墳", "藤原宮跡"], "h": "若草伽藍跡の発掘で、法隆寺は再建されたものと考えられるようになった。"}, {"sec": "b", "q": "聖徳太子が593年に建立した、大阪の寺は ___ 。", "c": ["四天王寺", "法隆寺", "広隆寺", "飛鳥寺"], "h": "四天王寺式の伽藍配置で有名。"}, {"sec": "b", "q": "秦河勝が建立し、聖徳太子から賜った仏像を安置した京都の寺は ___ 。", "c": ["広隆寺", "四天王寺", "中宮寺", "飛鳥寺"], "h": "622年建立。京都太秦。秦氏は渡来人。"}, {"sec": "b", "q": "端正で厳しい表情、杏仁形の目・仰月形の唇が特徴の彫刻様式は ___ 。", "c": ["北魏様式", "百済（中国南朝）様式", "唐様式", "天平様式"], "h": "北魏様式は金銅像が中心。"}, {"sec": "b", "q": "柔和で丸みのある表情が特徴の彫刻様式は ___ 。", "c": ["百済（中国南朝）様式", "北魏様式", "唐様式", "天平様式"], "h": "百済（中国南朝）様式は木像が中心。「北は金銅、南は木」。"}, {"sec": "b", "q": "法隆寺金堂にある、北魏様式の金銅像は ___ 。", "c": ["釈迦三尊像", "百済観音像", "半跏思惟像", "救世観音像"], "h": "法隆寺金堂釈迦三尊像。作者は鞍作鳥。"}, {"sec": "b", "q": "法隆寺金堂釈迦三尊像や飛鳥大仏をつくった仏師は ___ 。", "c": ["鞍作鳥（止利仏師）", "曇徴", "観勒", "秦河勝"], "h": "鞍作鳥（くらつくりのとり）。北魏様式。"}, {"sec": "b", "q": "1884年にフェノロサが発見した、聖徳太子の等身像とされる像は ___ 。", "c": ["法隆寺夢殿救世観音像", "法隆寺百済観音像", "中宮寺半跏思惟像", "飛鳥寺釈迦如来像"], "h": "木造。北魏様式。"}, {"sec": "b", "q": "中宮寺や広隆寺にある、弥勒菩薩を表した像は ___ 。", "c": ["半跏思惟像", "釈迦三尊像", "百済観音像", "救世観音像"], "h": "片足をもう一方のひざにのせて考えるポーズ。百済（南朝）様式の木像。"}, {"sec": "b", "q": "北魏様式の仏像に見られる、口元の独特なほほえみを ___ という。", "c": ["アルカイックスマイル（古拙の微笑）", "エンタシス", "忍冬唐草文様", "杏仁形"], "h": "アルカイックスマイル＝古拙の微笑。"}, {"sec": "b", "q": "610年に来日し、彩色・紙・墨の製法を伝えた高句麗の僧は ___ 。", "c": ["曇徴", "観勒", "恵慈", "旻"], "h": "曇徴（どんちょう）＝高句麗、絵の具・紙・墨。"}, {"sec": "b", "q": "602年に来日し、暦法・天文・地理などを伝えた百済の僧は ___ 。", "c": ["観勒", "曇徴", "恵慈", "旻"], "h": "観勒（かんろく）＝百済、暦。"}, {"sec": "b", "q": "聖徳太子の師となった高句麗の僧は ___ 。", "c": ["恵慈", "観勒", "曇徴", "鞍作鳥"], "h": "恵慈（えじ）。"}, {"sec": "b", "q": "須弥座や扉の絵、玉虫の羽の装飾で知られる法隆寺の工芸品は ___ 。", "c": ["玉虫厨子", "天寿国繡帳", "三経義疏", "百済観音像"], "h": "玉虫厨子（たまむしのずし）。"}, {"sec": "b", "q": "聖徳太子の妃・橘大郎女の作とされる、中宮寺の刺繡は ___ 。", "c": ["天寿国繡帳", "玉虫厨子", "三経義疏", "天皇記"], "h": "天寿国繡帳（てんじゅこくしゅうちょう）。"}, {"sec": "b", "q": "法華経・維摩経・勝鬘経の注釈書で、聖徳太子が編纂したとされるのは ___ 。", "c": ["三経義疏", "天皇記", "国記", "日本書紀"], "h": "三経義疏（さんぎょうぎしょ）。現存するのは法華経の注釈書。"}, {"sec": "b", "q": "塔を中心に、3つの金堂が囲む伽藍配置は ___ 。", "c": ["飛鳥寺式", "四天王寺式", "法隆寺式", "薬師寺式"], "h": "飛鳥寺式：塔を3つの金堂が囲む。"}, {"sec": "b", "q": "中門・塔・金堂・講堂が一直線に並ぶ伽藍配置は ___ 。", "c": ["四天王寺式", "飛鳥寺式", "法隆寺式", "東大寺式"], "h": "四天王寺式：一直線。"}, {"sec": "b", "q": "塔と金堂が左右に並ぶ伽藍配置は ___ 。", "c": ["法隆寺式", "四天王寺式", "飛鳥寺式", "薬師寺式"], "h": "法隆寺式：塔と金堂が横並び。"}, {"sec": "b", "q": "金堂の前に東西2つの塔を置く、白鳳文化の伽藍配置は ___ 。", "c": ["薬師寺式", "東大寺式", "法隆寺式", "飛鳥寺式"], "h": "薬師寺式＝白鳳文化、東大寺式＝天平文化（塔が回廊の外）。"}, {"sec": "c", "q": "618年に隋が滅んだあと、中国を統一した王朝は ___ 。", "c": ["唐", "宋", "魏", "新羅"], "h": "唐（618〜907）。"}, {"sec": "c", "q": "7世紀前半の朝鮮半島で主導権を争ったのは、高句麗・新羅と ___ 。", "c": ["百済", "隋", "加耶", "渤海"], "h": "高句麗・百済・新羅の三国。"}, {"sec": "c", "q": "蘇我氏の専横を行った父子の組み合わせは ___ 。", "c": ["蘇我蝦夷・入鹿", "蘇我稲目・馬子", "蘇我馬子・蝦夷", "物部尾輿・守屋"], "h": "蝦夷（えみし）が父、入鹿（いるか）が子。"}, {"sec": "c", "q": "643年、蘇我入鹿に攻められて自殺した聖徳太子の子は ___ 。", "c": ["山背大兄王", "大友皇子", "中大兄皇子", "大海人皇子"], "h": "山背大兄王（やましろのおおえのおう）。"}, {"sec": "c", "q": "645年、蘇我入鹿が暗殺され、蘇我蝦夷が自殺した事件を ___ という。", "c": ["乙巳の変", "壬申の乱", "磐井の乱", "白村江の戦い"], "h": "乙巳の変（いっしのへん）。"}, {"sec": "c", "q": "乙巳の変で蘇我入鹿を暗殺した中心人物の組み合わせは ___ 。", "c": ["中大兄皇子・中臣鎌足", "大海人皇子・中臣鎌足", "中大兄皇子・蘇我馬子", "聖徳太子・小野妹子"], "h": "蘇我倉山田石川麻呂も加わった。"}, {"sec": "c", "q": "蘇我入鹿が暗殺された宮は ___ 。", "c": ["飛鳥板蓋宮", "難波長柄豊碕宮", "近江大津宮", "飛鳥浄御原宮"], "h": "飛鳥板蓋宮（あすかいたぶきのみや）の大極殿。"}, {"sec": "c", "q": "乙巳の変のあと、皇極天皇に代わって即位した天皇（軽皇子）は ___ 。", "c": ["孝徳天皇", "天智天皇", "斉明天皇", "天武天皇"], "h": "孝徳天皇。皇太子は中大兄皇子。"}, {"sec": "c", "q": "改新政府で皇太子となったのは ___ 。", "c": ["中大兄皇子", "中臣鎌足", "大海人皇子", "山背大兄王"], "h": "中大兄皇子はのちの天智天皇。"}, {"sec": "c", "q": "改新政府で内臣となったのは ___ 。", "c": ["中臣鎌足", "阿倍内麻呂", "蘇我倉山田石川麻呂", "旻"], "h": "中臣鎌足はのちの藤原鎌足。"}, {"sec": "c", "q": "改新政府で左大臣となったのは ___ 。", "c": ["阿倍内麻呂", "蘇我倉山田石川麻呂", "中臣鎌足", "高向玄理"], "h": "左大臣＝阿倍内麻呂、右大臣＝蘇我倉山田石川麻呂。"}, {"sec": "c", "q": "改新政府で右大臣となったのは ___ 。", "c": ["蘇我倉山田石川麻呂", "阿倍内麻呂", "中臣鎌足", "蘇我入鹿"], "h": "蘇我氏だけど改新側。"}, {"sec": "c", "q": "改新政府で国博士（政治顧問）となった2人は ___ 。", "c": ["旻・高向玄理", "南淵請安・裴世清", "小野妹子・曇徴", "観勒・恵慈"], "h": "どちらも遣隋使に同行した留学生・学問僧。"}, {"sec": "c", "q": "645年に定められた、日本初の年号は ___ 。", "c": ["大化", "大宝", "白鳳", "天平"], "h": "大化の改新の「大化」。"}, {"sec": "c", "q": "改新政府が飛鳥から移した都は ___ 。", "c": ["難波長柄豊碕宮", "近江大津宮", "藤原京", "飛鳥浄御原宮"], "h": "難波（なにわ）に遷都。"}, {"sec": "c", "q": "646年に発布された、全4カ条の改革方針を ___ という。", "c": ["改新の詔", "憲法十七条", "大宝律令", "近江令"], "h": "『日本書紀』に記されている。"}, {"sec": "c", "q": "改新の詔で示された、土地と人民を国家のものとする原則を ___ という。", "c": ["公地公民", "班田収授", "冠位十二階", "八色の姓"], "h": "豪族の私有地・私有民を廃止した。"}, {"sec": "c", "q": "改新の詔で廃止された、豪族の私有地を ___ という。", "c": ["田荘", "屯倉", "子代", "部曲"], "h": "田荘（たどころ）＝豪族の私有地、部曲（かきべ）＝豪族の私有民、屯倉＝王家の直轄地、子代＝王家の私有民。"}, {"sec": "c", "q": "改新の詔で廃止された、豪族の私有民を ___ という。", "c": ["部曲", "田荘", "屯倉", "防人"], "h": "部曲（かきべ）。"}, {"sec": "c", "q": "私有地・私有民を失った豪族（大夫以上）に、代わりに支給されたものは ___ 。", "c": ["食封", "屯倉", "口分田", "冠位"], "h": "食封（じきふ）。"}, {"sec": "c", "q": "7世紀後半より前は、「郡」の代わりに ___ という文字が使われていた。", "c": ["評", "県", "国", "里"], "h": "郡評論争。木簡の発見で「評」が使われていたとわかった。"}, {"sec": "c", "q": "改新の詔で作成を命じられた、人民を把握するための台帳は ___ 。", "c": ["戸籍・計帳", "天皇記・国記", "庚午年籍・庚寅年籍", "風土記・日本書紀"], "h": "戸籍・計帳をもとに班田収授法を行う。"}, {"sec": "c", "q": "戸籍にもとづいて人々に田を与える法を ___ という。", "c": ["班田収授法", "公地公民", "墾田永年私財法", "八色の姓"], "h": "班田収授法（はんでんしゅうじゅのほう）。"}, {"sec": "c", "q": "645年からの一連の改革をまとめて ___ という。", "c": ["大化の改新", "乙巳の変", "律令国家", "壬申の乱"], "h": "乙巳の変は「事件」、大化の改新は「改革全体」。"}, {"sec": "d", "q": "皇極天皇がもう一度即位して ___ 天皇となった。", "c": ["斉明", "推古", "持統", "天智"], "h": "一度退位した天皇が再び即位することを「重祚（ちょうそ）」という。"}, {"sec": "d", "q": "一度退位した天皇が再び即位することを ___ という。", "c": ["重祚", "摂政", "称制", "譲位"], "h": "皇極天皇 → 斉明天皇。"}, {"sec": "d", "q": "660年に唐・新羅に滅ぼされ、日本に救援を求めた国は ___ 。", "c": ["百済", "高句麗", "新羅", "隋"], "h": "救援に向かう途中、斉明天皇は九州の朝倉宮で死去（661年）。"}, {"sec": "d", "q": "663年、日本が唐・新羅の連合軍に大敗した戦いを ___ という。", "c": ["白村江の戦い", "壬申の乱", "乙巳の変", "磐井の乱"], "h": "白村江（はくすきのえ）の戦い → 以後、朝鮮半島経営を断念。"}, {"sec": "d", "q": "白村江の戦いのあと、大宰府を守るために築いた堤防と堀の防衛施設は ___ 。", "c": ["水城", "大野城", "基肄城", "藤原京"], "h": "水城（みずき）。大野城・基肄城は山城。"}, {"sec": "d", "q": "白村江の戦いのあと、九州の防衛のために置かれた兵士を ___ という。", "c": ["防人", "国博士", "大連", "烽"], "h": "防人（さきもり）。烽（とぶひ）＝のろし台。"}, {"sec": "d", "q": "667年、中大兄皇子が都を移した場所は ___ 。", "c": ["近江大津宮", "難波長柄豊碕宮", "飛鳥浄御原宮", "藤原京"], "h": "近江大津宮（おうみおおつのみや）。"}, {"sec": "d", "q": "中大兄皇子が即位した天皇名は ___ 。", "c": ["天智天皇", "天武天皇", "孝徳天皇", "斉明天皇"], "h": "661〜667年は称制（即位せずに政治）、668年に即位。"}, {"sec": "d", "q": "668年に制定されたとされる最初の令は ___ 。", "c": ["近江令", "飛鳥浄御原令", "大宝律令", "養老律令"], "h": "近江令は現存せず、完成を疑う説もある。"}, {"sec": "d", "q": "670年に作られた、最初の全国的な戸籍は ___ 。", "c": ["庚午年籍", "庚寅年籍", "計帳", "国記"], "h": "庚午年籍（こうごねんじゃく）。永久保存とされた。"}, {"sec": "d", "q": "672年、天智天皇の死後に起きた古代史最大の内乱は ___ 。", "c": ["壬申の乱", "乙巳の変", "磐井の乱", "白村江の戦い"], "h": "壬申の乱（じんしんのらん）。"}, {"sec": "d", "q": "壬申の乱で近江朝廷側だった、天智天皇の子は ___ 。", "c": ["大友皇子", "大海人皇子", "山背大兄王", "草壁皇子"], "h": "大友皇子（のちに弘文天皇の名を贈られる）。"}, {"sec": "d", "q": "吉野で挙兵し、美濃を本拠地に壬申の乱に勝利した天智天皇の弟は ___ 。", "c": ["大海人皇子", "大友皇子", "中大兄皇子", "草壁皇子"], "h": "豪族の支持を得て勝利。"}, {"sec": "d", "q": "大海人皇子が即位した宮は ___ 。", "c": ["飛鳥浄御原宮", "近江大津宮", "難波長柄豊碕宮", "藤原京"], "h": "飛鳥浄御原宮（あすかきよみはらのみや）。"}, {"sec": "d", "q": "大海人皇子が即位した天皇名は ___ 。", "c": ["天武天皇", "天智天皇", "持統天皇", "文武天皇"], "h": "天武天皇（位673〜686年）。皇親政治を行った。"}, {"sec": "d", "q": "天武天皇のころから、「大王」に代わって使われはじめた称号は ___ 。", "c": ["天皇", "皇帝", "摂政", "大臣"], "h": "天皇の神格化。"}, {"sec": "d", "q": "681年に天武天皇が制定を始め、689年に持統天皇が施行した令は ___ 。", "c": ["飛鳥浄御原令", "近江令", "大宝律令", "改新の詔"], "h": "飛鳥浄御原令（あすかきよみはらりょう）。"}, {"sec": "d", "q": "684年、豪族を天皇中心に再編成した8つの姓の制度は ___ 。", "c": ["八色の姓", "冠位十二階", "公地公民", "部曲"], "h": "真人・朝臣・宿禰・忌寸・道師・臣・連・稲置。"}, {"sec": "d", "q": "1999年に奈良県の飛鳥池遺跡から出土した、天武天皇のころの銭は ___ 。", "c": ["富本銭", "和同開珎", "永楽通宝", "寛永通宝"], "h": "富本銭（ふほんせん）。和同開珎（708年）より古い。"}, {"sec": "d", "q": "天武天皇の皇后で、天武天皇の死後に即位した天皇は ___ 。", "c": ["持統天皇", "斉明天皇", "推古天皇", "皇極天皇"], "h": "天智天皇の娘。皇太子の草壁皇子が亡くなったため即位。"}, {"sec": "d", "q": "690年に作られ、6年ごとの戸籍作成と班田収授のもとになった戸籍は ___ 。", "c": ["庚寅年籍", "庚午年籍", "計帳", "国記"], "h": "庚寅年籍（こういんねんじゃく）。庚午＝670年、庚寅＝690年。"}, {"sec": "d", "q": "694年に持統天皇が遷都した、条坊制による初の都城は ___ 。", "c": ["藤原京", "平城京", "平安京", "近江大津宮"], "h": "耳成山・畝傍山・天香具山の大和三山に囲まれた地。唐の長安を模した。"}, {"sec": "e", "q": "「一に曰く、和を以て貴しと為し、忤ふること無きを宗と為す」が記された史料は ___ 。", "c": ["憲法十七条", "改新の詔", "『隋書』倭国伝", "『魏志』倭人伝"], "h": "604年、聖徳太子が制定。"}, {"sec": "e", "q": "憲法十七条の「篤く三宝を敬え」の三宝とは ___ のこと。", "c": ["仏・法・僧", "天・地・人", "君・臣・民", "儒・仏・道"], "h": "三宝＝仏（ほとけ）・法（教え）・僧（僧侶）。仏教を重んじる内容。"}, {"sec": "e", "q": "憲法十七条の「詔を承りては必ず謹め」の「詔」とは ___ 。", "c": ["天皇の命令", "豪族の命令", "仏の教え", "中国皇帝の命令"], "h": "詔（みことのり）＝天皇の命令。"}, {"sec": "e", "q": "憲法十七条や改新の詔が収められている書物（出典）は ___ 。", "c": ["『日本書紀』", "『古事記』", "『隋書』", "『天皇記』"], "h": "出典を答えさせる問題もある！"}, {"sec": "e", "q": "「日出づる処の天子、書を日没する処の天子に致す」という国書が記された史料は ___ 。", "c": ["『隋書』倭国伝", "『魏志』倭人伝", "『宋書』倭国伝", "『日本書紀』"], "h": "607年の遣隋使が持って行った国書。"}, {"sec": "e", "q": "『隋書』倭国伝の「大業三年」は西暦 ___ 年。", "c": ["607", "600", "604", "608"], "h": "小野妹子が派遣された年。"}, {"sec": "e", "q": "「其の一に曰く、昔在の天皇等の立てたまへる子代の民、処々の屯倉…を罷めよ」という史料は ___ 。", "c": ["改新の詔", "憲法十七条", "『隋書』倭国伝", "近江令"], "h": "646年。公地公民の方針。"}, {"sec": "e", "q": "改新の詔・其の三で「初めて造れ」と命じられたのは ___ 。", "c": ["戸籍・計帳・班田収授の法", "冠位十二階", "憲法十七条", "天皇記・国記"], "h": "「初めて戸籍・計帳・班田収授の法を造れ」。"}, {"sec": "e", "q": "592年、馬子は崇峻天皇を暗殺し、姪の（ア）を即位させた。645年の蝦夷・（イ）父子の滅亡…。（ア）（イ）の組み合わせは ___ 。", "c": ["ア 推古天皇　イ 入鹿", "ア 推古天皇　イ 稲目", "ア 皇極天皇　イ 稲目", "ア 皇極天皇　イ 入鹿"], "h": "プリントNO.8の共通テスト型問題（1）。答え②。"}, {"sec": "e", "q": "7世紀の東アジアの歴史について、誤っている文は ___ 。", "c": ["斉明天皇は、中国皇帝に朝貢して「親魏倭王」と認められた。", "滅亡した百済からは、貴族たちが倭（日本）に亡命した。", "朝鮮半島の政治的統一に相前後して、日本列島でも中央集権国家の形成が進んだ。", "古代の日本では、官僚制などを整えるため、中国の律令法を取り入れた。"], "h": "「親魏倭王」は3世紀の卑弥呼。プリントNO.8（2）、答え③。"}, {"sec": "e", "q": "7世紀後半の東アジア情勢や日本の対応策について、誤っている文は ___ 。", "c": ["孝徳天皇は、都を近江大津宮へ遷した。", "唐・新羅の連合軍が、高句麗を滅ぼした。", "朝鮮半島は、新羅によって統一された。", "白村江の敗戦後、大宰府を守るため大野城を築いた。"], "h": "近江大津宮に遷都したのは中大兄皇子（天智天皇）。孝徳天皇は難波。プリントNO.8（3）、答え④。"}, {"sec": "k", "q": "たかむこのくろまろ", "c": ["高向玄理", "高向弦理", "高向玄里", "高句玄理"], "h": "「玄」に弓へんはつかない。「理」は王へん＋里。「向」は「句」とまちがえない。"}, {"sec": "k", "q": "すいこてんのう", "c": ["推古天皇", "椎古天皇", "推吉天皇", "推古天王"], "h": "「推」はてへん（「椎」はきへん）。「皇」は白＋王。"}, {"sec": "k", "q": "はいせいせい", "c": ["裴世清", "斐世清", "裴世晴", "輩世清"], "h": "「裴」は非の下に「衣」（「斐」は下が「文」）。「清」はさんずい。"}, {"sec": "k", "q": "おののいもこ", "c": ["小野妹子", "小野妺子", "小野姉子", "小野味子"], "h": "「妹」は女へん＋未（上の横棒が短い）。「妺」（末）や「姉」（市）とまちがえない。"}, {"sec": "k", "q": "もののべのもりや", "c": ["物部守屋", "物部守谷", "物部宇屋", "物辺守屋"], "h": "「屋」（や・おく）。「部」は「辺」ではない。「守」は「宇」とまちがえない。"}, {"sec": "k", "q": "みん（僧）", "c": ["旻", "昊", "晏", "閔"], "h": "「旻」は日の下に「文」（「昊」は日の下に「天」）。"}, {"sec": "k", "q": "しょうとくたいし", "c": ["聖徳太子", "聖得太子", "聖徳大子", "聖徳太士"], "h": "「徳」はぎょうにんべん（「得」とまちがえない）。「太」は点がある（「大」ではない）。"}, {"sec": "k", "q": "みなぶちのしょうあん", "c": ["南淵請安", "南淵清安", "南淵晴安", "南淵請案"], "h": "「請」はごんべん＋青（「清」はさんずい）。「安」に木はつかない。"}, {"sec": "k", "q": "てんのうき", "c": ["天皇記", "天皇紀", "天王記", "天皇誌"], "h": "「記」はごんべん（『日本書紀』の「紀」とまちがえやすい！）。"}, {"sec": "k", "q": "けんずいし", "c": ["遣隋使", "遺隋使", "遣随使", "遣隋史"], "h": "「遣」（つかわす）。「遺」（のこす）ではない。「隋」は「随」とまちがえない。「使」はにんべん。"}, {"sec": "k", "q": "かんいじゅうにかい", "c": ["冠位十二階", "官位十二階", "冠位十二皆", "冠威十二階"], "h": "「冠」（かんむり）。「階」はこざとへん。"}, {"sec": "k", "q": "そがのうまこ", "c": ["蘇我馬子", "蘇我午子", "蘇賀馬子", "藊我馬子"], "h": "「蘇」はくさかんむり＋魚＋禾。「我」。"}, {"sec": "k", "q": "いわいのらん", "c": ["磐井の乱", "盤井の乱", "般井の乱", "磐居の乱"], "h": "「磐」は下が「石」（「盤」は下が「皿」）。"}, {"sec": "k", "q": "けんぽうじゅうななじょう", "c": ["憲法十七条", "憲法十七状", "県法十七条", "憲方十七条"], "h": "「憲」。「条」は夂＋木。"}, {"sec": "k", "q": "ようだい（隋の皇帝）", "c": ["煬帝", "陽帝", "揚帝", "楊帝"], "h": "「煬」は火へん（陽＝こざとへん、揚＝てへん、楊＝きへん）。"}], "read": {"磐井の乱": "いわいのらん", "磐井": "いわい", "筑紫国造": "つくしのくにのみやつこ", "国造": "くにのみやつこ", "新羅": "しらぎ", "百済": "くだら", "高句麗": "こうくり", "岩戸山古墳": "いわとやまこふん", "八女市": "やめし", "大仙陵古墳": "だいせんりょうこふん", "稲荷山古墳": "いなりやまこふん", "高松塚古墳": "たかまつづかこふん", "物部麁鹿火": "もののべのあらかい", "物部尾輿": "もののべのおこし", "物部守屋": "もののべのもりや", "大伴金村": "おおとものかなむら", "蘇我稲目": "そがのいなめ", "蘇我馬子": "そがのうまこ", "蘇我入鹿": "そがのいるか", "蘇我蝦夷": "そがのえみし", "蝦夷": "えみし", "入鹿": "いるか", "稲目": "いなめ", "継体天皇": "けいたいてんのう", "任那四県": "みまなよんけん", "大連": "おおむらじ", "左大臣": "さだいじん", "右大臣": "うだいじん", "大臣": "おおおみ", "三蔵": "さんぞう", "崇仏派": "すうぶつは", "排仏派": "はいぶつは", "崇峻天皇": "すしゅんてんのう", "推古天皇": "すいこてんのう", "欽明天皇": "きんめいてんのう", "孝徳天皇": "こうとくてんのう", "皇極天皇": "こうぎょくてんのう", "持統天皇": "じとうてんのう", "斉明天皇": "さいめいてんのう", "天智天皇": "てんじてんのう", "天武天皇": "てんむてんのう", "文武天皇": "もんむてんのう", "聖徳太子": "しょうとくたいし", "厩戸王": "うまやとおう", "摂政": "せっしょう", "冠位十二階": "かんいじゅうにかい", "大徳": "だいとく", "大仁": "だいにん", "大礼": "だいらい", "大智": "だいち", "憲法十七条": "けんぽうじゅうななじょう", "天皇記": "てんのうき", "国記": "こっき", "古事記": "こじき", "日本書紀": "にほんしょき", "風土記": "ふどき", "遣隋使": "けんずいし", "遣唐使": "けんとうし", "朝貢使": "ちょうこうし", "小野妹子": "おののいもこ", "裴世清": "はいせいせい", "高向玄理": "たかむこのくろまろ", "中臣鎌足": "なかとみのかまたり", "隋書": "ずいしょ", "倭国伝": "わこくでん", "魏志": "ぎし", "倭人伝": "わじんでん", "宋書": "そうじょ", "漢書": "かんじょ", "地理志": "ちりし", "魏徴": "ぎちょう", "煬帝": "ようだい", "文帝": "ぶんてい", "太宗": "たいそう", "光武帝": "こうぶてい", "曇徴": "どんちょう", "観勒": "かんろく", "恵慈": "えじ", "南淵請安": "みなぶちのしょうあん", "旻": "みん", "飛鳥寺式": "あすかでらしき", "飛鳥寺": "あすかでら", "法興寺": "ほうこうじ", "法隆寺": "ほうりゅうじ", "四天王寺": "してんのうじ", "広隆寺": "こうりゅうじ", "中宮寺": "ちゅうぐうじ", "薬師寺": "やくしじ", "東大寺": "とうだいじ", "若草伽藍跡": "わかくさがらんあと", "伽藍配置": "がらんはいち", "伽藍": "がらん", "飛鳥池遺跡": "あすかいけいせき", "秦河勝": "はたのかわかつ", "北魏": "ほくぎ", "杏仁形": "きょうにんけい", "仰月形": "ぎょうげつけい", "金銅像": "こんどうぞう", "釈迦三尊像": "しゃかさんぞんぞう", "鞍作鳥": "くらつくりのとり", "止利仏師": "とりぶっし", "夢殿": "ゆめどの", "救世観音像": "くせかんのんぞう", "百済観音像": "くだらかんのんぞう", "釈迦如来像": "しゃかにょらいぞう", "半跏思惟像": "はんかしゆいぞう", "弥勒菩薩": "みろくぼさつ", "古拙": "こせつ", "忍冬唐草文様": "にんどうからくさもんよう", "須弥座": "しゅみざ", "玉虫厨子": "たまむしのずし", "橘大郎女": "たちばなのおおいらつめ", "天寿国繡帳": "てんじゅこくしゅうちょう", "刺繡": "ししゅう", "法華経": "ほけきょう", "維摩経": "ゆいまぎょう", "勝鬘経": "しょうまんぎょう", "三経義疏": "さんぎょうぎしょ", "白鳳": "はくほう", "天平": "てんぴょう", "山背大兄王": "やましろのおおえのおう", "乙巳の変": "いっしのへん", "中大兄皇子": "なかのおおえのおうじ", "飛鳥板蓋宮": "あすかのいたぶきのみや", "軽皇子": "かるのみこ", "内臣": "うちつおみ", "阿倍内麻呂": "あべのうちまろ", "蘇我倉山田石川麻呂": "そがのくらやまだのいしかわまろ", "国博士": "くにのはかせ", "大化": "たいか", "大宝律令": "たいほうりつりょう", "大宝": "たいほう", "養老律令": "ようろうりつりょう", "難波長柄豊碕宮": "なにわのながらのとよさきのみや", "改新の詔": "かいしんのみことのり", "詔": "みことのり", "公地公民": "こうちこうみん", "田荘": "たどころ", "屯倉": "みやけ", "子代": "こしろ", "部曲": "かきべ", "食封": "じきふ", "大夫": "たいふ", "戸籍": "こせき", "計帳": "けいちょう", "班田収授法": "はんでんしゅうじゅほう", "班田収授": "はんでんしゅうじゅ", "墾田永年私財法": "こんでんえいねんしざいほう", "重祚": "ちょうそ", "称制": "しょうせい", "譲位": "じょうい", "朝倉宮": "あさくらのみや", "白村江": "はくすきのえ", "水城": "みずき", "大野城": "おおのじょう", "基肄城": "きいじょう", "大宰府": "だざいふ", "防人": "さきもり", "烽": "とぶひ", "近江大津宮": "おうみおおつのみや", "近江朝廷": "おうみちょうてい", "近江令": "おうみりょう", "飛鳥浄御原令": "あすかきよみはらりょう", "飛鳥浄御原宮": "あすかきよみはらのみや", "庚午年籍": "こうごねんじゃく", "庚寅年籍": "こういんねんじゃく", "壬申の乱": "じんしんのらん", "大友皇子": "おおとものおうじ", "大海人皇子": "おおあまのおうじ", "草壁皇子": "くさかべのおうじ", "八色の姓": "やくさのかばね", "富本銭": "ふほんせん", "和同開珎": "わどうかいちん", "永楽通宝": "えいらくつうほう", "寛永通宝": "かんえいつうほう", "藤原京": "ふじわらきょう", "平城京": "へいじょうきょう", "平安京": "へいあんきょう", "条坊制": "じょうぼうせい", "都城": "とじょう", "三宝": "さんぽう", "仏・法・僧": "ぶつ、ほう、そう", "篤く": "あつく", "承りては": "うけたまわりては", "謹め": "つつしめ", "和を以て貴しと為し": "わをもってとうとしとなし", "忤ふること無きを宗と為す": "さからうことなきをむねとなす", "日出づる処の天子、書を日没する処の天子に致す": "ひいづるところのてんし、しょをひぼっするところのてんしにいたす", "倭の国書": "わのこくしょ", "大業三年": "たいぎょうさんねん", "昔在の": "むかしの", "罷めよ": "やめよ", "初めて造れ": "はじめてつくれ", "親魏倭王": "しんぎわおう", "姪": "めい", "斉明": "さいめい", "馬子": "うまこ", "立てたまへる": "たてたまえる", "処々": "しょしょ", "其の": "その", "加耶": "かや", "渤海": "ぼっかい", "隋": "ずい", "唐": "とう", "魏": "ぎ", "宋": "そう", "倭": "わ", "郡評論争": "ぐんぴょうろんそう", "評": "こおり", "郡": "ぐん"}};
+const $ = id => document.getElementById(id);
+const STORE = D.key + '_wrong_v1';
+let view = 'quiz', sec = 'all';
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+const secOf = id => D.secs.find(s => s.id === id);
+const inSec = q => sec === 'all' ? !secOf(q.sec).extra : q.sec === sec;
+const qText = q => esc(q.q).replace('___', '<span class="blank"></span>');
+const isKanji = q => !!secOf(q.sec).kanji;
+function loadBank() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch (e) { return []; } }
+function saveBank(b) { try { localStorage.setItem(STORE, JSON.stringify(b)); } catch (e) {} }
+const ALL = D.qs.map((q, i) => Object.assign({ id: i }, q));
+const byId = id => ALL.find(q => q.id === id);
+function addBank(q) { const b = loadBank(); if (!b.includes(q.id)) { b.push(q.id); saveBank(b); } }
+function rmBank(q) { saveBank(loadBank().filter(x => x !== q.id)); }
+const bankList = () => loadBank().map(byId).filter(q => q && (sec === 'all' || q.sec === sec));
+
+function drawSecs() {
+  const n = id => ALL.filter(q => id === 'all' ? !secOf(q.sec).extra : q.sec === id).length;
+  $('secs').innerHTML = [{ id: 'all', name: '全部' }].concat(D.secs).map(s =>
+    `<button class="chip ${sec === s.id ? 'active' : ''}" onclick="setSec('${s.id}')">${esc(s.name)} <small>${n(s.id)}</small></button>`).join('');
+}
+function setSec(s) { sec = s; drawSecs(); render(); }
+function go(v) {
+  view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.v === v));
+  render(); window.scrollTo({ top: 0 });
+}
+function render() { if (hasTTS) speechSynthesis.cancel(); view === 'card' ? startCard() : view === 'oral' ? oralStart() : quizStart(); }
+
+/* ===== 4択 ===== */
+let qs = [], cur = 0, score = 0, answered = false, missed = [], order = [];
+function quizStart() {
+  const list = view === 'wrong' ? bankList() : ALL.filter(inSec);
+  const s = sec === 'all' ? null : secOf(sec);
+  const [icon, title, desc] = view === 'wrong'
+    ? ['🎯', '苦手問題だけ復習', '間違えた問題がたまります。正解すると消えるので、0問になればクリア！']
+    : ['✏️', s ? s.name : '全部まとめて', s && s.desc ? s.desc : 'プリントの空欄を中心にした4択です。選択肢の並びは毎回変わります。'];
+  $('main').innerHTML = `<div class="card start"><div class="big">${icon}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>
+    <div class="small">${list.length}問${sec === 'all' && view !== 'wrong' && D.secs.some(x => x.extra) ? '（「漢字テスト」などの別枠は、上のボタンから選んでね）' : ''}</div>
+    <button class="big-btn" ${list.length ? '' : 'disabled'} onclick="quizBegin()">スタート</button></div>`;
+}
+function quizBegin() {
+  qs = shuffle(view === 'wrong' ? bankList() : ALL.filter(inSec));
+  cur = 0; score = 0; missed = []; drawQ();
+}
+function drawQ() {
+  const q = qs[cur], L = 'ABCD', kj = isKanji(q);
+  answered = false; order = shuffle(q.c.map((_, i) => i));
+  $('main').innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${cur + 1} / ${qs.length}</span><span>${score}点</span></div>
+      <div class="pbar"><div class="pfill" style="width:${cur / qs.length * 100}%"></div></div></div>
+    <div class="card qcard">
+      <span class="qtag">${esc(secOf(q.sec).name)}</span>
+      ${kj ? `<div class="small" style="text-align:center">正しい漢字はどれ？</div><div class="qtext kana">${esc(q.q)}</div>` : `<div class="qtext">${qText(q)}</div>`}
+      <div class="choices">${order.map((o, i) => `<button class="choice ${kj ? 'kanji' : ''}" onclick="answer(${i})"><span class="lb">${L[i]}</span><span>${esc(q.c[o])}</span></button>`).join('')}</div>
+      <div class="expl" id="expl"><div class="res" id="res"></div><div class="txt">${esc(q.h || '')}</div></div>
+    </div>
+    <button class="next" id="nextBtn" onclick="nextQ()">${cur + 1 < qs.length ? '次の問題 →' : '結果を見る'}</button>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="quizStart()">← やめる</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function answer(i) {
+  if (answered) return; answered = true;
+  const q = qs[cur], btns = document.querySelectorAll('.choice'), ci = order.indexOf(0), ok = i === ci;
+  btns.forEach(b => b.disabled = true);
+  btns[ci].classList.add('correct'); if (!ok) btns[i].classList.add('wrong');
+  const r = $('res');
+  r.textContent = ok ? '⭕ 正解！' : '❌ 正解は「' + q.c[0] + '」';
+  if (!ok) r.classList.add('ng');
+  if (ok) { score++; if (view === 'wrong') rmBank(q); } else { missed.push(q); addBank(q); }
+  $('expl').classList.add('show'); $('nextBtn').classList.add('show');
+}
+function nextQ() { cur++; cur >= qs.length ? showResult() : drawQ(); }
+function showResult() {
+  const n = qs.length, pct = Math.round(score / n * 100);
+  const msg = pct === 100 ? '🏆 全問正解！完璧！' : pct >= 80 ? '🌟 すごい！あと少し！' : pct >= 60 ? '⭐ よくできました！' : pct >= 40 ? '💪 苦手問題でもう1回！' : '📖 暗記カードで確認してから再挑戦！';
+  const b = bankList().length;
+  $('main').innerHTML = `
+    <div class="card result"><div class="score">${score}<small> / ${n}</small></div><div class="small">${pct}%</div><div class="msg">${msg}</div></div>
+    ${missed.length ? `<div class="card miss"><h3>❌ 間違えた問題（${missed.length}問）→ 苦手に保存しました</h3>
+      ${missed.map(q => `<div class="item"><span class="small">${esc(secOf(q.sec).name)}</span><br>${esc(q.q.replace('___', '（　）'))}<br><span class="ans">正解：${esc(q.c[0])}</span></div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="quizBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手問題だけ復習（${b}問） 🎯</button>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== 暗記カード ===== */
+let cards = [], ci = 0, flipped = false;
+function startCard() { cards = shuffle(ALL.filter(inSec)); ci = 0; flipped = false; drawCard(); }
+function drawCard() {
+  if (!cards.length) { $('main').innerHTML = '<div class="card start"><p>カードがありません</p></div>'; return; }
+  const q = cards[ci], kj = isKanji(q);
+  const front = kj ? `<div class="a" style="color:var(--gray-900)">${esc(q.q)}</div><div class="tip">漢字を思い浮かべてからタップ</div>`
+                   : `<div class="q">${qText(q)}</div><div class="tip">答えを言ってからタップ</div>`;
+  const back = `<div class="a ${kj ? 'kanji' : ''}">${esc(q.c[0])}</div>${q.h ? `<div class="h">💡 ${esc(q.h)}</div>` : ''}`;
+  $('main').innerHTML = `
+    <div class="card flash ${flipped ? 'back' : ''}" onclick="flipped=!flipped;drawCard()">
+      <div class="meta">${esc(secOf(q.sec).name)}　${ci + 1} / ${cards.length}</div>${flipped ? back : front}</div>
+    <div class="nav"><button onclick="moveCard(-1)">← 前へ</button><button class="primary" onclick="moveCard(1)">次へ →</button></div>`;
+}
+function moveCard(d) { ci = (ci + d + cards.length) % cards.length; flipped = false; drawCard(); }
+
+/* ===== 読み上げ（日本語） ===== */
+const hasTTS = 'speechSynthesis' in window;
+let oralRate = '0.9', autoRead = true;
+const READ_KEYS = Object.keys(D.read || {}).sort((a, b) => b.length - a.length);
+function toSpeech(s) {
+  s = s.replace(/___/g, '、なに、').replace(/[『』「」〔〕]/g, '').replace(/（\s*）/g, '、なに、');
+  for (const k of READ_KEYS) s = s.split(k).join(D.read[k]);
+  return s.replace(/（/g, '、').replace(/）/g, '、').replace(/→/g, '、つぎに、').replace(/〜/g, 'から');
+}
+let jaVoice = null;
+function pickJa() { if (hasTTS) jaVoice = speechSynthesis.getVoices().find(v => /^ja[-_]/i.test(v.lang)) || null; }
+if (hasTTS) { pickJa(); speechSynthesis.onvoiceschanged = pickJa; }
+function sayJa(text) {
+  if (!hasTTS) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(toSpeech(text));
+  u.lang = 'ja-JP'; if (jaVoice) u.voice = jaVoice;
+  u.rate = parseFloat(oralRate);
+  speechSynthesis.speak(u);
+}
+
+/* ===== 口頭・書くモード ===== */
+let oq = [], oc = 0, oscore = 0, omissed = [];
+function oralStart() {
+  const list = ALL.filter(inSec);
+  const kanji = sec !== 'all' && secOf(sec).kanji;
+  $('main').innerHTML = `<div class="card start"><div class="big">${kanji ? '✍️' : '🎤'}</div>
+    <h2>${kanji ? '漢字を紙に書いて確認' : '口頭で一問一答'}</h2>
+    <p>${kanji ? '読みを見て（聞いて）、紙に漢字を書く → 「答えを見る」で正しい字と見分け方を確認 → 書けたかどうか自分で ⭕ ❌。'
+               : '問題を聞く → 声に出して答える → 「答えを見る」で確認 → 言えたかどうか自分で ⭕ ❌。❌は苦手に保存されます。'}</p>
+    <div class="small">${esc(sec === 'all' ? '全部' : secOf(sec).name)}：${list.length}問${!kanji && D.secs.some(x => x.kanji) ? '（漢字15語を紙に書く練習は、上の「漢字テスト」を選んでね）' : ''}</div>
+    <div class="opt">読み上げ速度 <select id="oralRate"><option value="0.8">ゆっくり</option><option value="0.9" selected>ふつう</option><option value="1.1">はやめ</option></select>
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="autoRead" checked>問題を自動で読む</label></div>
+    <button class="big-btn" ${list.length ? '' : 'disabled'} onclick="oralBegin()">スタート</button></div>`;
+}
+function oralBegin() {
+  oralRate = $('oralRate').value; autoRead = $('autoRead').checked;
+  oq = shuffle(ALL.filter(inSec)); oc = 0; oscore = 0; omissed = []; drawOral();
+}
+function oralQText(q) { return isKanji(q) ? q.q.replace(/（.*）/, '') + '。漢字で書いてみよう。' : q.q; }
+function drawOral() {
+  const q = oq[oc], kj = isKanji(q);
+  $('main').innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${oc + 1} / ${oq.length}</span><span>⭕ ${oscore}</span></div>
+      <div class="pbar"><div class="pfill" style="width:${oc / oq.length * 100}%"></div></div></div>
+    <div class="card qcard">
+      <span class="qtag">${esc(secOf(q.sec).name)}</span>
+      ${kj ? `<div class="oral-q kana">${esc(q.q)}</div>` : `<div class="oral-q">${qText(q)}</div>`}
+      <div class="oral-step">${kj ? '✍️ 紙に漢字を書いてから「答えを見る」' : '🎤 声に出して答えてから「答えを見る」'}</div>
+      <div class="oral-btns">
+        <button class="obtn" onclick="sayJa(oralQText(oq[oc]))">🔊 問題を聞く</button>
+        <button class="obtn fill" id="showBtn" onclick="reveal()">答えを見る</button>
+      </div>
+      <div class="reveal" id="rev">
+        <div class="ans ${kj ? 'kanji' : ''}">${esc(q.c[0])}</div>
+        ${q.h ? `<div class="hint">💡 ${esc(q.h)}</div>` : ''}
+        ${kj ? '' : `<button class="obtn" style="margin-top:10px;width:100%" onclick="sayJa(oq[oc].c[0])">🔊 答えを聞く</button>`}
+        <div class="judge"><button class="ok" onclick="judge(true)">⭕ ${kj ? '書けた' : '言えた'}</button><button class="ng" onclick="judge(false)">❌ ${kj ? 'まちがえた' : '言えなかった'}</button></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="oralStart()">← やめる</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (autoRead) sayJa(oralQText(q));
+}
+function reveal() {
+  const q = oq[oc];
+  $('rev').classList.add('show'); $('showBtn').style.display = 'none';
+  if (!isKanji(q)) sayJa(q.c[0]); else if (hasTTS) speechSynthesis.cancel();
+}
+function judge(ok) {
+  const q = oq[oc];
+  if (ok) { oscore++; rmBank(q); } else { omissed.push(q); addBank(q); }
+  oc++;
+  if (oc < oq.length) return drawOral();
+  if (hasTTS) speechSynthesis.cancel();
+  const n = oq.length, b = bankList().length;
+  $('main').innerHTML = `
+    <div class="card result"><div class="score">${oscore}<small> / ${n}</small></div><div class="small">⭕ の数</div>
+      <div class="msg">${oscore === n ? '🏆 全部できた！' : '❌ の問題は「苦手」に入りました'}</div></div>
+    ${omissed.length ? `<div class="card miss"><h3>❌ もう一度覚えよう（${omissed.length}問）</h3>
+      ${omissed.map(q => `<div class="item">${esc(isKanji(q) ? q.q : q.q.replace('___', '（　）'))}<br><span class="ans">${esc(q.c[0])}</span></div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="oralBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手を4択で復習（${b}問） 🎯</button>`;
+}
+
+$('hTitle').textContent = D.title; $('hSub').textContent = D.sub;
+drawSecs(); render();
+</script>
+</body>
+</html>
