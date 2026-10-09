@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公共 2学期中間対策</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=BIZ+UDPMincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #1D4ED8; --main-light: #EAF0FE;
+  --green: #16A34A; --green-light: #F0FDF4; --red: #DC2626; --red-light: #FEF2F2;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF; --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #F5F6F8; color: var(--gray-900); min-height: 100vh; }
+button { font-family: inherit; }
+header { background: var(--main); color: white; padding: 14px 16px 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+header .ttl { font-size: 18px; font-weight: 700; }
+header .sub { font-size: 12px; opacity: .9; margin-top: 2px; }
+.tabs { display: flex; gap: 4px; margin-top: 10px; }
+.tab { flex: 1; min-width: 0; padding: 9px 2px; border: none; border-radius: 8px; background: rgba(255,255,255,.18); color: white; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tab.active { background: white; color: var(--main); }
+.container { max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.secs { padding: 10px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 11px; border: 2px solid var(--gray-200); border-radius: 20px; background: white; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.chip.active { background: var(--main); border-color: var(--main); color: white; }
+.chip small { font-weight: 400; opacity: .8; }
+.start { padding: 22px 18px; text-align: center; }
+.start .big { font-size: 40px; }
+.start h2 { font-size: 18px; margin-top: 4px; }
+.start p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin: 8px 0 12px; }
+.small { font-size: 12px; color: var(--gray-400); }
+.progress { padding: 10px 14px; margin-bottom: 12px; }
+.pinfo { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
+.pbar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+.pfill { height: 8px; background: var(--main); transition: width .3s; }
+.qcard { padding: 18px; margin-bottom: 12px; }
+.qtag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.qtext { font-size: 17px; line-height: 1.8; }
+.qtext .blank { display: inline-block; min-width: 72px; border-bottom: 3px solid var(--main); margin: 0 2px; }
+.qtext.kana { font-size: 24px; font-weight: 700; text-align: center; color: var(--main); padding: 8px 0; }
+.choices { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+.choice { display: flex; gap: 10px; align-items: center; text-align: left; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-size: 16px; color: var(--gray-800); cursor: pointer; line-height: 1.5; }
+.choice.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 24px; justify-content: flex-start; }
+.choice:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice .lb { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--gray-600); font-family: 'BIZ UDPGothic', sans-serif; }
+.choice.correct { border-color: var(--green); background: var(--green-light); }
+.choice.correct .lb { background: var(--green); color: white; }
+.choice.wrong { border-color: var(--red); background: var(--red-light); }
+.choice.wrong .lb { background: var(--red); color: white; }
+.choice:disabled { cursor: default; }
+.expl { display: none; margin-top: 12px; padding: 12px 14px; border-left: 4px solid var(--main); background: var(--gray-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.expl.show { display: block; }
+.expl .res { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.expl .res.ng { color: var(--red); }
+.expl .txt { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+.next { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: none; }
+.next.show { display: block; }
+.big-btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.big-btn.red { background: var(--red); }
+.big-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.result { padding: 24px 18px; text-align: center; margin-bottom: 12px; }
+.result .score { font-size: 52px; font-weight: 700; color: var(--main); line-height: 1.1; }
+.result .score small { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result .msg { font-size: 16px; font-weight: 700; margin-top: 8px; }
+.miss { padding: 16px; margin-bottom: 12px; }
+.miss h3 { font-size: 14px; color: var(--red); margin-bottom: 8px; }
+.miss .item { padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; line-height: 1.6; }
+.miss .item:last-child { border-bottom: none; }
+.miss .ans { color: var(--green); font-weight: 700; }
+.flash { padding: 24px 18px; min-height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; border: 2px solid var(--main-light); margin-bottom: 12px; }
+.flash.back { background: var(--main-light); border-color: var(--main); }
+.flash .meta { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.flash .q { font-size: 17px; line-height: 1.8; }
+.flash .a { font-size: 26px; font-weight: 700; color: var(--main); }
+.flash .a.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 32px; }
+.flash .h { font-size: 13px; color: var(--gray-600); margin-top: 12px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.flash .tip { font-size: 12px; color: var(--gray-400); margin-top: 14px; }
+.nav { display: flex; gap: 8px; }
+.nav button { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: 2px solid var(--gray-200); background: white; font-size: 15px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.nav button.primary { background: var(--main); border-color: var(--main); color: white; }
+</style>
+</head>
+<body>
+<header>
+  <div class="ttl" id="hTitle"></div>
+  <div class="sub" id="hSub"></div>
+  <div class="tabs">
+    <button class="tab active" data-v="quiz" onclick="go('quiz')">✏️ 4択クイズ</button>
+    <button class="tab" data-v="card" onclick="go('card')">🃏 暗記カード</button>
+    <button class="tab" data-v="wrong" onclick="go('wrong')">🎯 苦手だけ</button>
+  </div>
+</header>
+<div class="container">
+  <div class="card secs" id="secs"></div>
+  <div id="main"></div>
+</div>
+<script>
+const D = {"key": "koukyo_2gakki_chukan", "title": "⚖️ 公共 2学期中間対策", "sub": "刑事裁判と裁判員制度（教科書p.82〜83・課題プリント）", "secs": [{"id": "a", "name": "刑事裁判のしくみ", "desc": "検察官・裁判官・弁護士の役割、起訴・被告人、推定無罪の原則"}, {"id": "b", "name": "刑罰と被害者", "desc": "刑罰の目的・種類、犯罪被害者支援"}, {"id": "c", "name": "裁判員制度", "desc": "目的・選ばれ方・役割・課題"}], "qs": [{"sec": "a", "q": "刑事裁判で、罪を犯した疑いのある者を起訴し、事実を証明するのは ___ 。", "c": ["検察官", "裁判官", "弁護士", "裁判員"], "h": "プリント1：検察官＝起訴して、事実を証明する。"}, {"sec": "a", "q": "刑事裁判で、被告人が有罪か無罪かを決め、有罪なら刑罰を言い渡すのは ___ 。", "c": ["裁判官", "検察官", "弁護士", "警察官"], "h": "プリント2：裁判官＝有罪か無罪かを決め、刑罰を言い渡す。"}, {"sec": "a", "q": "刑事裁判で、被告人を弁護して、被告人の権利を守るのは ___ 。", "c": ["弁護士", "検察官", "裁判官", "裁判員"], "h": "プリント3：弁護士＝被告人を弁護し、権利を保障する。"}, {"sec": "a", "q": "検察官が、罪を犯した疑いのある者について裁判所に裁判を求めることを ___ という。", "c": ["起訴", "控訴", "上告", "評決"], "h": "起訴（きそ）。控訴・上告は判決に不服なときに上級の裁判所へ訴えること。"}, {"sec": "a", "q": "刑事裁判で、起訴された人のことを ___ という。", "c": ["被告人", "被告", "原告", "被疑者"], "h": "刑事裁判は「被告人」。「被告」は民事裁判で訴えられた側。起訴される前は「被疑者」。"}, {"sec": "a", "q": "検察官が示した証拠だけでは無罪かもしれないという疑いが残る限り、被告人を有罪としてはならないという原則を ___ という。", "c": ["推定無罪の原則", "罪刑法定主義", "法の支配", "三審制"], "h": "プリント11：推定無罪の原則（「疑わしきは被告人の利益に」）。"}, {"sec": "a", "q": "推定無罪の原則：検察官が示した（ ___ ）だけでは「もしかしたら無罪かもしれない」という疑いが残る限り…", "c": ["証拠", "意見", "判決", "感覚"], "h": "プリント11：検察官が示した証拠だけでは…"}, {"sec": "a", "q": "推定無罪の原則：どんなに疑わしい被告人でも、（ ___ ）としてはならない。", "c": ["有罪", "無罪", "起訴", "弁護"], "h": "プリント11：…どんなに疑わしい被告人でも、有罪としてはならないという原則。"}, {"sec": "b", "q": "刑罰の目的（第一の立場）：社会の（ ___ ）の確保。", "c": ["安全", "自由", "平等", "福祉"], "h": "プリント4：第一の立場＝社会の安全の確保。"}, {"sec": "b", "q": "刑罰の目的（第二の立場）：法に違反した（行為）に応じて受ける（ ___ ）である。", "c": ["苦痛", "利益", "賠償", "名誉"], "h": "プリント4：第二の立場＝法に違反した行為に応じて受ける苦痛（応報）。"}, {"sec": "b", "q": "「法に違反した行為に応じて受ける苦痛である」という刑罰の考え方を ___ という。", "c": ["応報", "更生", "抑止", "救済"], "h": "応報（おうほう）＝やったことに応じたむくい。"}, {"sec": "b", "q": "プリントにある刑罰5種類（死刑・拘禁刑・拘留・罰金・科料）にふくまれないのは ___ 。", "c": ["過料", "科料", "拘留", "罰金"], "h": "科料（とがりょう）は刑罰。過料（あやまちりょう）は刑罰ではない行政上の罰。"}, {"sec": "b", "q": "2025年から、懲役と禁錮を一本化してできた刑罰は ___ 。", "c": ["拘禁刑", "拘留", "科料", "死刑"], "h": "拘禁刑（こうきんけい）。"}, {"sec": "b", "q": "1日以上30日未満、刑事施設に入れる刑罰は ___ 。", "c": ["拘留", "拘禁刑", "罰金", "科料"], "h": "拘留（こうりゅう）。拘禁刑より短い。"}, {"sec": "b", "q": "財産刑のうち、金額が少ない（1,000円以上1万円未満）ものは ___ 。", "c": ["科料", "罰金", "過料", "拘留"], "h": "罰金＝1万円以上、科料＝1,000円以上1万円未満。"}, {"sec": "b", "q": "犯罪被害者やその遺族に対して、国が給付金を支給する制度を定めた法律は ___ 。", "c": ["犯罪被害者支援法", "裁判員法", "刑事訴訟法", "少年法"], "h": "プリント5①：犯罪被害者やその遺族に対して、国が給付金を支給する。"}, {"sec": "b", "q": "犯罪被害者支援法では、（ ___ ）が犯罪被害者やその遺族に給付金を支給する。", "c": ["国", "加害者", "裁判所", "都道府県"], "h": "プリント5①。"}, {"sec": "b", "q": "被害者参加制度：犯罪の被害者が刑事裁判の（ ___ ）に出席し、証人や被告人に質問などをおこなう。", "c": ["公判", "評議", "選任手続き", "取り調べ"], "h": "プリント5②：刑事裁判の公判に出席し、証人や被告人に対する質問などをおこなう。"}, {"sec": "b", "q": "被害者が刑事裁判に出席し、証人や被告人に質問できる制度は ___ 。", "c": ["被害者参加制度", "裁判員制度", "犯罪被害者支援法", "推定無罪の原則"], "h": "プリント5②。"}, {"sec": "c", "q": "裁判員制度の目的①：刑事裁判に（ ___ ）の感覚を反映させること。", "c": ["一般市民", "専門家", "国会議員", "被害者"], "h": "プリント7①：一般市民の感覚を反映させる。"}, {"sec": "c", "q": "裁判員制度の目的①：刑事裁判に一般市民の（ ___ ）を反映させること。", "c": ["感覚", "知識", "要求", "投票"], "h": "プリント7①。"}, {"sec": "c", "q": "裁判員制度の目的②：裁判を（ ___ ）化し、裁判の手続きや判決をわかりやすくすること。", "c": ["迅速", "厳格", "長期", "非公開"], "h": "プリント7②：迅速（じんそく）＝すばやい。"}, {"sec": "c", "q": "裁判員を選ぶもとになる、いちばん最初の名簿は ___ 。", "c": ["選挙人名簿", "住民基本台帳", "戸籍", "裁判官名簿"], "h": "プリント8：選挙人名簿 → 裁判員候補者名簿 → 候補者の呼び出し → 選任手続き。"}, {"sec": "c", "q": "裁判員の選任方法の順番として正しいのは ___ 。", "c": ["選挙人名簿 → 裁判員候補者名簿 → 候補者の呼び出し → 選任手続き", "裁判員候補者名簿 → 選挙人名簿 → 選任手続き → 候補者の呼び出し", "選挙人名簿 → 候補者の呼び出し → 裁判員候補者名簿 → 選任手続き", "候補者の呼び出し → 選挙人名簿 → 裁判員候補者名簿 → 選任手続き"], "h": "プリント8の流れ図。"}, {"sec": "c", "q": "裁判員裁判は、裁判員（ ___ ）で審理に出席する。", "c": ["6人と裁判官3人", "3人と裁判官6人", "9人と裁判官3人", "6人と裁判官1人"], "h": "プリント9：裁判員6人と裁判官3人。"}, {"sec": "c", "q": "裁判員は、（ ___ ）の取り調べを見て、被告人に対する（質問）をする。", "c": ["証拠", "判決", "起訴", "評決"], "h": "プリント9：証拠の取り調べ、被告人に対する質問。"}, {"sec": "c", "q": "裁判員は、証拠の取り調べを見て、被告人に対する（ ___ ）をする。", "c": ["質問", "弁護", "起訴", "判決"], "h": "プリント9。"}, {"sec": "c", "q": "裁判員と裁判官が、（事実）を認定し、有罪か無罪か、どんな（刑罰）を科すべきかを話し合うことを ___ という。", "c": ["評議", "評決", "公判", "起訴"], "h": "プリント9：評議（ひょうぎ）＝話し合い。"}, {"sec": "c", "q": "意見が一致しないとき、裁判官を含めた多数決で決めることを ___ という。", "c": ["評決", "評議", "判決", "起訴"], "h": "プリント9：評決（ひょうけつ）＝決定。評議（話し合い）→ 評決（決める）の順。"}, {"sec": "c", "q": "評議では、（ ___ ）を認定し、有罪か無罪か、どんな刑罰を科すべきかを話し合う。", "c": ["事実", "法律", "証人", "判決"], "h": "プリント9：事実を認定する。"}, {"sec": "c", "q": "裁判員裁判で、法律の解釈を判断するのは ___ 。", "c": ["裁判官", "裁判員", "裁判官と裁判員", "検察官"], "h": "プリント9：法律の解釈は裁判官。"}, {"sec": "c", "q": "裁判員裁判で、判決を宣告するのは ___ 。", "c": ["裁判長", "裁判員", "検察官", "弁護士"], "h": "プリント9：裁判長が判決を宣告。"}, {"sec": "c", "q": "裁判員制度の課題：裁判員候補者の（ ___ ）率が上がっている。", "c": ["辞退", "出席", "合格", "投票"], "h": "プリント10：辞退（じたい）率が上がっている。"}, {"sec": "c", "q": "裁判員制度の課題：選任手続きの出席率が（ ___ ）している。", "c": ["低下", "上昇", "安定", "増加"], "h": "プリント10：出席率は低下。"}, {"sec": "c", "q": "裁判員制度の課題の背景には、審理の（ ___ ）がある。", "c": ["長期化", "短期化", "公開", "非公開"], "h": "プリント10：審理の長期化。"}, {"sec": "c", "q": "裁判員裁判の対象となるのは ___ 。", "c": ["重大な刑事事件の第一審", "すべての民事裁判", "最高裁判所の裁判", "すべての刑事裁判の控訴審"], "h": "殺人など重大な刑事事件の、地方裁判所での第一審。"}]};
+const $ = id => document.getElementById(id);
+const STORE = D.key + '_wrong_v1';
+let view = 'quiz', sec = 'all';
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+const secOf = id => D.secs.find(s => s.id === id);
+const inSec = q => sec === 'all' ? !secOf(q.sec).extra : q.sec === sec;
+const qText = q => esc(q.q).replace('___', '<span class="blank"></span>');
+const isKanji = q => !!secOf(q.sec).kanji;
+function loadBank() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch (e) { return []; } }
+function saveBank(b) { try { localStorage.setItem(STORE, JSON.stringify(b)); } catch (e) {} }
+const ALL = D.qs.map((q, i) => Object.assign({ id: i }, q));
+const byId = id => ALL.find(q => q.id === id);
+function addBank(q) { const b = loadBank(); if (!b.includes(q.id)) { b.push(q.id); saveBank(b); } }
+function rmBank(q) { saveBank(loadBank().filter(x => x !== q.id)); }
+const bankList = () => loadBank().map(byId).filter(q => q && (sec === 'all' || q.sec === sec));
+
+function drawSecs() {
+  const n = id => ALL.filter(q => id === 'all' ? !secOf(q.sec).extra : q.sec === id).length;
+  $('secs').innerHTML = [{ id: 'all', name: '全部' }].concat(D.secs).map(s =>
+    `<button class="chip ${sec === s.id ? 'active' : ''}" onclick="setSec('${s.id}')">${esc(s.name)} <small>${n(s.id)}</small></button>`).join('');
+}
+function setSec(s) { sec = s; drawSecs(); render(); }
+function go(v) {
+  view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.v === v));
+  render(); window.scrollTo({ top: 0 });
+}
+function render() { view === 'card' ? startCard() : quizStart(); }
+
+/* ===== 4択 ===== */
+let qs = [], cur = 0, score = 0, answered = false, missed = [], order = [];
+function quizStart() {
+  const list = view === 'wrong' ? bankList() : ALL.filter(inSec);
+  const s = sec === 'all' ? null : secOf(sec);
+  const [icon, title, desc] = view === 'wrong'
+    ? ['🎯', '苦手問題だけ復習', '間違えた問題がたまります。正解すると消えるので、0問になればクリア！']
+    : ['✏️', s ? s.name : '全部まとめて', s && s.desc ? s.desc : 'プリントの空欄を中心にした4択です。選択肢の並びは毎回変わります。'];
+  $('main').innerHTML = `<div class="card start"><div class="big">${icon}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>
+    <div class="small">${list.length}問${sec === 'all' && view !== 'wrong' && D.secs.some(x => x.extra) ? '（「漢字テスト」などの別枠は、上のボタンから選んでね）' : ''}</div>
+    <button class="big-btn" ${list.length ? '' : 'disabled'} onclick="quizBegin()">スタート</button></div>`;
+}
+function quizBegin() {
+  qs = shuffle(view === 'wrong' ? bankList() : ALL.filter(inSec));
+  cur = 0; score = 0; missed = []; drawQ();
+}
+function drawQ() {
+  const q = qs[cur], L = 'ABCD', kj = isKanji(q);
+  answered = false; order = shuffle(q.c.map((_, i) => i));
+  $('main').innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${cur + 1} / ${qs.length}</span><span>${score}点</span></div>
+      <div class="pbar"><div class="pfill" style="width:${cur / qs.length * 100}%"></div></div></div>
+    <div class="card qcard">
+      <span class="qtag">${esc(secOf(q.sec).name)}</span>
+      ${kj ? `<div class="small" style="text-align:center">正しい漢字はどれ？</div><div class="qtext kana">${esc(q.q)}</div>` : `<div class="qtext">${qText(q)}</div>`}
+      <div class="choices">${order.map((o, i) => `<button class="choice ${kj ? 'kanji' : ''}" onclick="answer(${i})"><span class="lb">${L[i]}</span><span>${esc(q.c[o])}</span></button>`).join('')}</div>
+      <div class="expl" id="expl"><div class="res" id="res"></div><div class="txt">${esc(q.h || '')}</div></div>
+    </div>
+    <button class="next" id="nextBtn" onclick="nextQ()">${cur + 1 < qs.length ? '次の問題 →' : '結果を見る'}</button>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="quizStart()">← やめる</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function answer(i) {
+  if (answered) return; answered = true;
+  const q = qs[cur], btns = document.querySelectorAll('.choice'), ci = order.indexOf(0), ok = i === ci;
+  btns.forEach(b => b.disabled = true);
+  btns[ci].classList.add('correct'); if (!ok) btns[i].classList.add('wrong');
+  const r = $('res');
+  r.textContent = ok ? '⭕ 正解！' : '❌ 正解は「' + q.c[0] + '」';
+  if (!ok) r.classList.add('ng');
+  if (ok) { score++; if (view === 'wrong') rmBank(q); } else { missed.push(q); addBank(q); }
+  $('expl').classList.add('show'); $('nextBtn').classList.add('show');
+}
+function nextQ() { cur++; cur >= qs.length ? showResult() : drawQ(); }
+function showResult() {
+  const n = qs.length, pct = Math.round(score / n * 100);
+  const msg = pct === 100 ? '🏆 全問正解！完璧！' : pct >= 80 ? '🌟 すごい！あと少し！' : pct >= 60 ? '⭐ よくできました！' : pct >= 40 ? '💪 苦手問題でもう1回！' : '📖 暗記カードで確認してから再挑戦！';
+  const b = bankList().length;
+  $('main').innerHTML = `
+    <div class="card result"><div class="score">${score}<small> / ${n}</small></div><div class="small">${pct}%</div><div class="msg">${msg}</div></div>
+    ${missed.length ? `<div class="card miss"><h3>❌ 間違えた問題（${missed.length}問）→ 苦手に保存しました</h3>
+      ${missed.map(q => `<div class="item"><span class="small">${esc(secOf(q.sec).name)}</span><br>${esc(q.q.replace('___', '（　）'))}<br><span class="ans">正解：${esc(q.c[0])}</span></div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="quizBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手問題だけ復習（${b}問） 🎯</button>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== 暗記カード ===== */
+let cards = [], ci = 0, flipped = false;
+function startCard() { cards = shuffle(ALL.filter(inSec)); ci = 0; flipped = false; drawCard(); }
+function drawCard() {
+  if (!cards.length) { $('main').innerHTML = '<div class="card start"><p>カードがありません</p></div>'; return; }
+  const q = cards[ci], kj = isKanji(q);
+  const front = kj ? `<div class="a" style="color:var(--gray-900)">${esc(q.q)}</div><div class="tip">漢字を思い浮かべてからタップ</div>`
+                   : `<div class="q">${qText(q)}</div><div class="tip">答えを言ってからタップ</div>`;
+  const back = `<div class="a ${kj ? 'kanji' : ''}">${esc(q.c[0])}</div>${q.h ? `<div class="h">💡 ${esc(q.h)}</div>` : ''}`;
+  $('main').innerHTML = `
+    <div class="card flash ${flipped ? 'back' : ''}" onclick="flipped=!flipped;drawCard()">
+      <div class="meta">${esc(secOf(q.sec).name)}　${ci + 1} / ${cards.length}</div>${flipped ? back : front}</div>
+    <div class="nav"><button onclick="moveCard(-1)">← 前へ</button><button class="primary" onclick="moveCard(1)">次へ →</button></div>`;
+}
+function moveCard(d) { ci = (ci + d + cards.length) % cards.length; flipped = false; drawCard(); }
+
+$('hTitle').textContent = D.title; $('hSub').textContent = D.sub;
+drawSecs(); render();
+</script>
+</body>
+</html>
