@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地理総合 2学期中間対策</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=BIZ+UDPMincho:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #0F766E; --main-light: #E6F4F2;
+  --green: #16A34A; --green-light: #F0FDF4; --red: #DC2626; --red-light: #FEF2F2;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF; --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #F5F6F8; color: var(--gray-900); min-height: 100vh; }
+button { font-family: inherit; }
+header { background: var(--main); color: white; padding: 14px 16px 12px; position: sticky; top: 0; z-index: 50; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+header .ttl { font-size: 18px; font-weight: 700; }
+header .sub { font-size: 12px; opacity: .9; margin-top: 2px; }
+.tabs { display: flex; gap: 4px; margin-top: 10px; }
+.tab { flex: 1; min-width: 0; padding: 9px 2px; border: none; border-radius: 8px; background: rgba(255,255,255,.18); color: white; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tab.active { background: white; color: var(--main); }
+.container { max-width: 680px; margin: 0 auto; padding: 12px 12px 60px; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.secs { padding: 10px 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { padding: 6px 11px; border: 2px solid var(--gray-200); border-radius: 20px; background: white; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.chip.active { background: var(--main); border-color: var(--main); color: white; }
+.chip small { font-weight: 400; opacity: .8; }
+.start { padding: 22px 18px; text-align: center; }
+.start .big { font-size: 40px; }
+.start h2 { font-size: 18px; margin-top: 4px; }
+.start p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin: 8px 0 12px; }
+.small { font-size: 12px; color: var(--gray-400); }
+.progress { padding: 10px 14px; margin-bottom: 12px; }
+.pinfo { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 6px; }
+.pbar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+.pfill { height: 8px; background: var(--main); transition: width .3s; }
+.qcard { padding: 18px; margin-bottom: 12px; }
+.qtag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+.qtext { font-size: 17px; line-height: 1.8; }
+.qtext .blank { display: inline-block; min-width: 72px; border-bottom: 3px solid var(--main); margin: 0 2px; }
+.qtext.kana { font-size: 24px; font-weight: 700; text-align: center; color: var(--main); padding: 8px 0; }
+.choices { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+.choice { display: flex; gap: 10px; align-items: center; text-align: left; padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-size: 16px; color: var(--gray-800); cursor: pointer; line-height: 1.5; }
+.choice.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 24px; justify-content: flex-start; }
+.choice:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice .lb { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--gray-600); font-family: 'BIZ UDPGothic', sans-serif; }
+.choice.correct { border-color: var(--green); background: var(--green-light); }
+.choice.correct .lb { background: var(--green); color: white; }
+.choice.wrong { border-color: var(--red); background: var(--red-light); }
+.choice.wrong .lb { background: var(--red); color: white; }
+.choice:disabled { cursor: default; }
+.expl { display: none; margin-top: 12px; padding: 12px 14px; border-left: 4px solid var(--main); background: var(--gray-50); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.expl.show { display: block; }
+.expl .res { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.expl .res.ng { color: var(--red); }
+.expl .txt { font-size: 14px; color: var(--gray-600); line-height: 1.8; }
+.next { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: none; }
+.next.show { display: block; }
+.big-btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm); background: var(--main); color: white; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+.big-btn.red { background: var(--red); }
+.big-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.result { padding: 24px 18px; text-align: center; margin-bottom: 12px; }
+.result .score { font-size: 52px; font-weight: 700; color: var(--main); line-height: 1.1; }
+.result .score small { font-size: 22px; color: var(--gray-400); font-weight: 400; }
+.result .msg { font-size: 16px; font-weight: 700; margin-top: 8px; }
+.miss { padding: 16px; margin-bottom: 12px; }
+.miss h3 { font-size: 14px; color: var(--red); margin-bottom: 8px; }
+.miss .item { padding: 8px 0; border-bottom: 1px solid var(--gray-100); font-size: 14px; line-height: 1.6; }
+.miss .item:last-child { border-bottom: none; }
+.miss .ans { color: var(--green); font-weight: 700; }
+.flash { padding: 24px 18px; min-height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; border: 2px solid var(--main-light); margin-bottom: 12px; }
+.flash.back { background: var(--main-light); border-color: var(--main); }
+.flash .meta { font-size: 12px; color: var(--gray-400); margin-bottom: 12px; }
+.flash .q { font-size: 17px; line-height: 1.8; }
+.flash .a { font-size: 26px; font-weight: 700; color: var(--main); }
+.flash .a.long { font-size: 17px; line-height: 1.8; text-align: left; }
+.flash .a.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 32px; }
+.flash .h { font-size: 13px; color: var(--gray-600); margin-top: 12px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.flash .tip { font-size: 12px; color: var(--gray-400); margin-top: 14px; }
+.nav { display: flex; gap: 8px; }
+.nav button { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: 2px solid var(--gray-200); background: white; font-size: 15px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.nav button.primary { background: var(--main); border-color: var(--main); color: white; }
+.oral-q { font-size: 18px; line-height: 1.8; }
+.oral-q.kana { font-size: 26px; font-weight: 700; text-align: center; color: var(--main); }
+.oral-step { font-size: 13px; color: var(--gray-600); background: var(--gray-50); border-radius: var(--radius-sm); padding: 8px 12px; margin: 12px 0; line-height: 1.7; }
+.oral-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.obtn { flex: 1; min-width: 120px; padding: 12px; border: 2px solid var(--main); background: white; color: var(--main); border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; }
+.obtn.fill { background: var(--main); color: white; }
+.reveal { display: none; margin-top: 14px; padding: 16px; background: var(--main-light); border-radius: var(--radius-sm); text-align: center; }
+.reveal.show { display: block; }
+.reveal .ans { font-size: 26px; font-weight: 700; color: var(--main); }
+.reveal .ans.long { font-size: 17px; line-height: 1.8; text-align: left; }
+.reveal .ans.kanji { font-family: 'BIZ UDPMincho', serif; font-size: 40px; letter-spacing: .05em; }
+.reveal .hint { font-size: 14px; color: var(--gray-600); margin-top: 10px; line-height: 1.7; text-align: left; background: white; padding: 10px 12px; border-radius: var(--radius-sm); }
+.judge { display: flex; gap: 8px; margin-top: 12px; }
+.judge button { flex: 1; padding: 14px; border: none; border-radius: var(--radius-sm); font-size: 17px; font-weight: 700; cursor: pointer; color: white; }
+.judge .ok { background: var(--green); } .judge .ng { background: var(--red); }
+.opt { font-size: 13px; color: var(--gray-600); display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="ttl" id="hTitle"></div>
+  <div class="sub" id="hSub"></div>
+  <div class="tabs">
+    <button class="tab active" data-v="quiz" onclick="go('quiz')">✏️ 4択</button>
+    <button class="tab" data-v="oral" onclick="go('oral')">🎤 口頭</button>
+    <button class="tab" data-v="card" onclick="go('card')">🃏 カード</button>
+    <button class="tab" data-v="wrong" onclick="go('wrong')">🎯 苦手</button>
+  </div>
+</header>
+<div class="container">
+  <div class="card secs" id="secs"></div>
+  <div id="main"></div>
+</div>
+<script>
+const D = {"key": "chiri_2gakki_chukan", "title": "🌏 地理総合 2学期中間対策", "sub": "時差・標準時・サマータイム・地形図（プリントNO.9〜14・自習課題）", "secs": [{"id": "a", "name": "時差のきほん", "desc": "標準時子午線・経度15度で1時間・日付変更線（自習課題）"}, {"id": "b", "name": "時差の計算ドリル", "desc": "現地時刻・時差・飛行機の所要時間。答えのあとに計算の手順が出ます。"}, {"id": "c", "name": "鉄道・アメリカ", "desc": "NO.9 シベリア鉄道、NO.10 航空時刻表とアメリカの時差"}, {"id": "d", "name": "サマータイム・標準時", "desc": "NO.11 サマータイム、NO.12 標準時2時間前倒しの記事"}, {"id": "e", "name": "地形図", "desc": "NO.14 等高線・尾根と谷・縮尺と面積"}, {"id": "f", "name": "📝 説明してみよう", "desc": "記述対策。「🎤 口頭」で先に声に出して説明 → 模範解答とキーワードを確認しよう。4択では「いちばん正しい説明」を選ぶ練習になります。"}], "qs": [{"sec": "a", "q": "その国の時刻の基準となる経線を ___ という。", "c": ["標準時子午線", "本初子午線", "日付変更線", "赤道"], "h": "自習課題①：標準時子午線の真南に太陽が来たときを正午とする。"}, {"sec": "a", "q": "経度0度の、イギリスのロンドンを通る経線を ___ という。", "c": ["本初子午線", "標準時子午線", "日付変更線", "回帰線"], "h": "本初子午線（旧グリニッジ天文台を通る）。"}, {"sec": "a", "q": "日本の標準時子午線は東経 ___ 度。", "c": ["135", "120", "140", "150"], "h": "自習課題②：東経135度。"}, {"sec": "a", "q": "日本の標準時子午線（東経135度）が通る明石市があるのは ___ 県。", "c": ["兵庫", "和歌山", "岡山", "京都"], "h": "自習課題③：兵庫県明石市。"}, {"sec": "a", "q": "国によって標準時子午線の経度が違うために生まれる時刻のずれを ___ という。", "c": ["時差", "経度差", "日較差", "緯度差"], "h": "自習課題④：時差。"}, {"sec": "a", "q": "地球は24時間で360度回転するので、経度 ___ 度につき1時間の時差が生まれる。", "c": ["15", "24", "30", "10"], "h": "自習課題⑤：360 ÷ 24 ＝ 15。"}, {"sec": "a", "q": "アメリカやロシアのように東西に長い国では、標準時を ___ 。", "c": ["複数定めている", "1つにしている", "定めていない", "毎年変えている"], "h": "自習課題：アメリカ本土は4つ、ロシアは11の標準時がある。"}, {"sec": "a", "q": "経度180度付近に引かれた、日付を調整する線を ___ という。", "c": ["日付変更線", "本初子午線", "標準時子午線", "赤道"], "h": "日付変更線を西から東へこえるときは日付を1日戻し、東から西へこえるときは1日進める。"}, {"sec": "a", "q": "世界で1日が最も早く始まるのは、日付変更線のすぐ ___ 側の地域。", "c": ["西", "東", "北", "南"], "h": "日付変更線の西側（日本やオセアニア側）が「1日のスタート」、東側が「1日のゴール」。"}, {"sec": "a", "q": "自習課題の地図の5都市のうち、東京と時差がほとんどない都市は ___ 。", "c": ["シドニー", "ニューヨーク", "ロンドン", "バグダッド"], "h": "自習課題⑥：シドニー（東経150度付近）。"}, {"sec": "a", "q": "自習課題の地図の5都市のうち、1日のスタートが最も遅い都市は ___ 。", "c": ["ニューヨーク", "シドニー", "東京", "ロンドン"], "h": "自習課題⑦：日付変更線の東側に近いほど1日のスタートが遅い → ニューヨーク（西経75度）。"}, {"sec": "a", "q": "日本（東経135度）とロンドン（経度0度）の時差は ___ 。", "c": ["9時間", "8時間", "10時間", "15時間"], "h": "自習課題(2)：135 ÷ 15 ＝ 9時間。"}, {"sec": "a", "q": "東京が3月30日午後1時のとき、バグダッド（東経45度）は ___ 。", "c": ["3月30日 午前7時", "3月30日 午後7時", "3月29日 午後11時", "3月30日 午前8時"], "h": "自習課題⑧：経度差90度 → 6時間遅い。13時 − 6時間 ＝ 午前7時。"}, {"sec": "a", "q": "東京が3月30日午後1時のとき、ニューヨーク（西経75度）は ___ 。", "c": ["3月29日 午後11時", "3月30日 午後11時", "3月31日 午前3時", "3月29日 午前11時"], "h": "自習課題⑨：経度差 135＋75 ＝ 210度 → 14時間遅い。13時 − 14時間 ＝ 前日の23時。"}, {"sec": "a", "q": "東経と西経の都市の経度差を求めるときは、2つの経度を ___ 。", "c": ["足す", "引く", "かける", "比べない"], "h": "例：東京（東経135度）とニューヨーク（西経75度）→ 135 ＋ 75 ＝ 210度。"}, {"sec": "a", "q": "東にある都市ほど、時刻は ___ 。", "c": ["進んでいる", "遅れている", "同じ", "ばらばら"], "h": "太陽は東から昇るので、東の都市ほど先に朝が来る（時刻が進んでいる）。"}, {"sec": "b", "q": "東京（東経135度）が 12月30日 午後11時 のとき、ロンドン（経度0度）は ___ 。", "c": ["12月30日 午後2時", "12月31日 午前8時", "12月31日 午後2時", "12月30日 午後3時"], "h": "東京（東経135度）とロンドン（経度0度）の時差：経度差÷15 ＝ 9時間。ロンドンは西にあるので9時間遅れている。12月30日 午後11時 − 9時間 ＝ 12月30日 午後2時"}, {"sec": "b", "q": "シドニー（東経150度）が 12月1日 午後8時 のとき、カイロ（東経30度）は ___ 。", "c": ["12月1日 午後0時", "12月2日 午前4時", "12月2日 午後0時", "12月1日 午後1時"], "h": "シドニー（東経150度）とカイロ（東経30度）の時差：経度差÷15 ＝ 8時間。カイロは西にあるので8時間遅れている。12月1日 午後8時 − 8時間 ＝ 12月1日 午後0時"}, {"sec": "b", "q": "東京（東経135度）が 1月1日 午前5時 のとき、バグダッド（東経45度）は ___ 。", "c": ["12月31日 午後11時", "1月1日 午前11時", "1月1日 午後11時", "1月1日 午前0時"], "h": "東京（東経135度）とバグダッド（東経45度）の時差：経度差÷15 ＝ 6時間。バグダッドは西にあるので6時間遅れている。1月1日 午前5時 − 6時間 ＝ 12月31日 午後11時"}, {"sec": "b", "q": "東京（東経135度）が 10月30日 午前5時 のとき、シンガポール（東経120度）は ___ 。", "c": ["10月30日 午前4時", "10月30日 午前6時", "10月31日 午前4時", "10月30日 午前5時"], "h": "東京（東経135度）とシンガポール（東経120度）の時差：経度差÷15 ＝ 1時間。シンガポールは西にあるので1時間遅れている。10月30日 午前5時 − 1時間 ＝ 10月30日 午前4時"}, {"sec": "b", "q": "東京（東経135度）が 3月1日 午後11時 のとき、ドバイ（東経60度）は ___ 。", "c": ["3月1日 午後6時", "3月2日 午前4時", "3月2日 午後6時", "3月1日 午後7時"], "h": "東京（東経135度）とドバイ（東経60度）の時差：経度差÷15 ＝ 5時間。ドバイは西にあるので5時間遅れている。3月1日 午後11時 − 5時間 ＝ 3月1日 午後6時"}, {"sec": "b", "q": "東京（東経135度）が 7月15日 午後5時 のとき、ニューヨーク（西経75度）は ___ 。", "c": ["7月15日 午前3時", "7月16日 午前7時", "7月16日 午前3時", "7月15日 午前4時"], "h": "東京（東経135度）とニューヨーク（西経75度）の時差：経度差÷15 ＝ 14時間。ニューヨークは西にあるので14時間遅れている。7月15日 午後5時 − 14時間 ＝ 7月15日 午前3時"}, {"sec": "b", "q": "ロンドン（経度0度）が 12月1日 午後1時 のとき、ニューヨーク（西経75度）は ___ 。", "c": ["12月1日 午前8時", "12月1日 午後6時", "12月2日 午前8時", "12月1日 午前9時"], "h": "ロンドン（経度0度）とニューヨーク（西経75度）の時差：経度差÷15 ＝ 5時間。ニューヨークは西にあるので5時間遅れている。12月1日 午後1時 − 5時間 ＝ 12月1日 午前8時"}, {"sec": "b", "q": "東京（東経135度）が 7月15日 午前5時 のとき、カイロ（東経30度）は ___ 。", "c": ["7月14日 午後10時", "7月15日 午後0時", "7月15日 午後10時", "7月14日 午後11時"], "h": "東京（東経135度）とカイロ（東経30度）の時差：経度差÷15 ＝ 7時間。カイロは西にあるので7時間遅れている。7月15日 午前5時 − 7時間 ＝ 7月14日 午後10時"}, {"sec": "b", "q": "シンガポール（東経120度）が 10月1日 午前5時 のとき、バグダッド（東経45度）は ___ 。", "c": ["10月1日 午前0時", "10月1日 午前10時", "10月2日 午前0時", "10月1日 午前1時"], "h": "シンガポール（東経120度）とバグダッド（東経45度）の時差：経度差÷15 ＝ 5時間。バグダッドは西にあるので5時間遅れている。10月1日 午前5時 − 5時間 ＝ 10月1日 午前0時"}, {"sec": "b", "q": "ロンドン（経度0度）が 1月1日 午後8時 のとき、ホノルル（西経150度）は ___ 。", "c": ["1月1日 午前10時", "1月2日 午前6時", "1月2日 午前10時", "1月1日 午前11時"], "h": "ロンドン（経度0度）とホノルル（西経150度）の時差：経度差÷15 ＝ 10時間。ホノルルは西にあるので10時間遅れている。1月1日 午後8時 − 10時間 ＝ 1月1日 午前10時"}, {"sec": "b", "q": "シドニー（東経150度）が 10月30日 午後5時 のとき、ロンドン（経度0度）は ___ 。", "c": ["10月30日 午前7時", "10月31日 午前3時", "10月31日 午前7時", "10月30日 午前8時"], "h": "シドニー（東経150度）とロンドン（経度0度）の時差：経度差÷15 ＝ 10時間。ロンドンは西にあるので10時間遅れている。10月30日 午後5時 − 10時間 ＝ 10月30日 午前7時"}, {"sec": "b", "q": "パリ（東経15度）が 12月1日 午前0時 のとき、シンガポール（東経120度）は ___ 。", "c": ["12月1日 午前7時", "11月30日 午後5時", "11月30日 午前7時", "12月1日 午前8時"], "h": "パリ（東経15度）とシンガポール（東経120度）の時差：経度差÷15 ＝ 7時間。シンガポールは東にあるので7時間進んでいる。12月1日 午前0時 ＋ 7時間 ＝ 12月1日 午前7時"}, {"sec": "b", "q": "東京（東経135度）が 1月30日 午後8時 のとき、パリ（東経15度）は ___ 。", "c": ["1月30日 午後0時", "1月31日 午前4時", "1月31日 午後0時", "1月30日 午後1時"], "h": "東京（東経135度）とパリ（東経15度）の時差：経度差÷15 ＝ 8時間。パリは西にあるので8時間遅れている。1月30日 午後8時 − 8時間 ＝ 1月30日 午後0時"}, {"sec": "b", "q": "東京（東経135度）が 10月1日 午後8時 のとき、ホノルル（西経150度）は ___ 。", "c": ["10月1日 午前1時", "10月2日 午後3時", "10月2日 午前1時", "10月1日 午前2時"], "h": "東京（東経135度）とホノルル（西経150度）の時差：経度差÷15 ＝ 19時間。ホノルルは西にあるので19時間遅れている。10月1日 午後8時 − 19時間 ＝ 10月1日 午前1時"}, {"sec": "b", "q": "ホノルル（西経150度）とドバイ（東経60度）の時差は ___ 。", "c": ["14時間", "15時間", "13時間", "10時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 14時間。"}, {"sec": "b", "q": "バグダッド（東経45度）とパリ（東経15度）の時差は ___ 。", "c": ["2時間", "3時間", "1時間", "22時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 2時間。"}, {"sec": "b", "q": "シンガポール（東経120度）とロンドン（経度0度）の時差は ___ 。", "c": ["8時間", "9時間", "7時間", "16時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 8時間。"}, {"sec": "b", "q": "東京（東経135度）とシドニー（東経150度）の時差は ___ 。", "c": ["1時間", "2時間", "3時間", "23時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 1時間。"}, {"sec": "b", "q": "ホノルル（西経150度）とロサンゼルス（西経120度）の時差は ___ 。", "c": ["2時間", "3時間", "1時間", "22時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 2時間。"}, {"sec": "b", "q": "ニューヨーク（西経75度）とカイロ（東経30度）の時差は ___ 。", "c": ["7時間", "8時間", "6時間", "17時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 7時間。"}, {"sec": "b", "q": "パリ（東経15度）とシドニー（東経150度）の時差は ___ 。", "c": ["9時間", "10時間", "8時間", "15時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 9時間。"}, {"sec": "b", "q": "カイロ（東経30度）とシンガポール（東経120度）の時差は ___ 。", "c": ["6時間", "7時間", "5時間", "18時間"], "h": "経度差 ÷ 15 ＝ 時差。東経と西経の組み合わせは、経度を「足して」から15で割る。答え 6時間。"}, {"sec": "b", "q": "羽田（東経135度）0:00発 → ロンドン（経度0度）4:00着（どちらも現地時間）。所要時間は ___ 。", "c": ["13時間", "15時間", "14時間", "12時間"], "h": "出発時刻をロンドンの時間に直す：0:00 − 9時間 ＝ 前日の15:00。到着 4:00 との差 ＝ 13時間。"}, {"sec": "b", "q": "羽田（東経135度）23:35発 → ドバイ（東経60度）0:45着（どちらも現地時間）。所要時間は ___ 。", "c": ["6時間10分", "16時間10分", "7時間10分", "5時間10分"], "h": "出発時刻をドバイの時間に直す：23:35 − 5時間 ＝ 18:35。到着 0:45 との差 ＝ 6時間10分。"}, {"sec": "b", "q": "羽田（東経135度）17:35発 → ホノルル（西経150度）8:20着（どちらも現地時間）。所要時間は ___ 。", "c": ["9時間45分", "11時間45分", "10時間45分", "8時間45分"], "h": "出発時刻をホノルルの時間に直す：17:35 − 19時間 ＝ 前日の22:35。到着 8:20 との差 ＝ 9時間45分。"}, {"sec": "b", "q": "羽田（東経135度）23:40発 → シンガポール（東経120度）5:55着（どちらも現地時間）。所要時間は ___ 。", "c": ["7時間15分", "9時間15分", "8時間15分", "6時間15分"], "h": "出発時刻をシンガポールの時間に直す：23:40 − 1時間 ＝ 22:40。到着 5:55 との差 ＝ 7時間15分。"}, {"sec": "b", "q": "羽田（東経135度）17:35発 → パリ（東経15度）23:20着（どちらも現地時間）。所要時間は ___ 。", "c": ["13時間45分", "15時間45分", "14時間45分", "12時間45分"], "h": "出発時刻をパリの時間に直す：17:35 − 8時間 ＝ 9:35。到着 23:20 との差 ＝ 13時間45分。"}, {"sec": "b", "q": "羽田（東経135度）23:35発 → バグダッド（東経45度）7:10着（どちらも現地時間）。所要時間は ___ 。", "c": ["13時間35分", "15時間35分", "14時間35分", "12時間35分"], "h": "出発時刻をバグダッドの時間に直す：23:35 − 6時間 ＝ 17:35。到着 7:10 との差 ＝ 13時間35分。"}, {"sec": "b", "q": "羽田（東経135度）6:40発 → カイロ（東経30度）11:25着（どちらも現地時間）。所要時間は ___ 。", "c": ["11時間45分", "13時間45分", "12時間45分", "10時間45分"], "h": "出発時刻をカイロの時間に直す：6:40 − 7時間 ＝ 前日の23:40。到着 11:25 との差 ＝ 11時間45分。"}, {"sec": "b", "q": "羽田（東経135度）0:35発 → シドニー（東経150度）11:35着（どちらも現地時間）。所要時間は ___ 。", "c": ["10時間", "8時間", "11時間", "9時間"], "h": "出発時刻をシドニーの時間に直す：0:35 ＋ 1時間 ＝ 1:35。到着 11:35 との差 ＝ 10時間。"}, {"sec": "b", "q": "羽田（東経135度）6:35発 → シンガポール（東経120度）12:20着。所要時間は ___ 。", "c": ["6時間45分", "4時間45分", "5時間45分", "7時間45分"], "h": "自習課題の表：出発をシンガポール時間に直す 6:35 − 1時間 ＝ 5:35。12:20 − 5:35 ＝ 6時間45分。"}, {"sec": "b", "q": "羽田（東経135度）6:55発 → ニューヨーク（西経75度）6:30着。所要時間は ___ 。", "c": ["13時間35分", "23時間35分", "9時間35分", "14時間35分"], "h": "自習課題の表：6:55 − 14時間 ＝ 前日16:55。6:30 までは13時間35分。"}, {"sec": "c", "q": "シベリア鉄道の時刻表は、どこの時間で書かれている？ ___ 。", "c": ["モスクワ時間", "現地時間", "日本時間", "世界標準時"], "h": "NO.9：時刻表はすべてモスクワ時間。現地時間に直すには「モスクワとの時差」を足す。"}, {"sec": "c", "q": "シベリア鉄道の駅の現地時間は「モスクワ時間 ＋ ___ 」で求める。", "c": ["モスクワとの時差", "日本との時差", "24時間", "経度÷15"], "h": "NO.9：例 ウラジオストク 14:52 ＋ 7 ＝ 21:52。"}, {"sec": "c", "q": "ウラジオストク：モスクワ時間 0日14:52、モスクワとの時差7時間。現地時間は ___ 。", "c": ["21:52", "7:52", "14:52", "22:52"], "h": "NO.9：14:52 ＋ 7時間 ＝ 21:52。"}, {"sec": "c", "q": "チタ：モスクワ時間 2日20:02、モスクワとの時差6時間。現地時間は ___ 。", "c": ["2:02（翌日）", "14:02", "20:02", "1:02（翌日）"], "h": "NO.9：20:02 ＋ 6時間 ＝ 26:02 → 翌日の2:02。"}, {"sec": "c", "q": "ノボシビルスク：モスクワ時間 4日19:54、モスクワとの時差4時間。現地時間は ___ 。", "c": ["23:54", "15:54", "0:54（翌日）", "22:54"], "h": "NO.9：19:54 ＋ 4時間 ＝ 23:54。"}, {"sec": "c", "q": "シベリア鉄道で、ウラジオストク（0日14:52）からモスクワ（6日17:58）までにかかる時間は ___ 。", "c": ["6日と3時間6分", "6日と17時間58分", "5日と3時間6分", "7日と3時間6分"], "h": "NO.9：どちらもモスクワ時間なので、そのまま引き算 → 6日3時間6分。"}, {"sec": "c", "q": "シベリア鉄道で東（ウラジオストク）から西（モスクワ）へ進むと、モスクワとの時差は ___ 。", "c": ["だんだん小さくなる", "だんだん大きくなる", "変わらない", "一度だけ変わる"], "h": "NO.9：7 → 6 → 5 → 4 → 3 → 2 → 0。"}, {"sec": "c", "q": "東京（東経135度・＋9）とロサンゼルス（西経120度・−8）の時差（標準時）は ___ 。", "c": ["17時間", "16時間", "15時間", "1時間"], "h": "NO.10：9 ＋ 8 ＝ 17時間。"}, {"sec": "c", "q": "NO.10の時刻表の所要時間は、時差16時間で計算するとぴったり合う。その理由は ___ 。", "c": ["ロサンゼルスがサマータイム中で、時計が1時間進んでいるから", "日本がサマータイム中だから", "飛行機が日付変更線をこえるから", "羽田とロサンゼルスの経度差が240度だから"], "h": "サマータイム中のロサンゼルスは −7。9 ＋ 7 ＝ 16時間。例：羽田17:00発 ＝ ロサンゼルス1:00 → 11:15着で10時間15分。"}, {"sec": "c", "q": "東京とニューヨークの時差は ___ 。", "c": ["14時間", "9時間", "17時間", "12時間"], "h": "NO.10の読み物：東京が朝9時のとき、ニューヨークは前日の夜7時。"}, {"sec": "c", "q": "東京が朝9時のとき、ニューヨークは ___ 。", "c": ["前日の夜7時", "同じ日の夜11時", "翌日の朝7時", "前日の朝7時"], "h": "NO.10：9時 − 14時間 ＝ 前日の19時。"}, {"sec": "c", "q": "日本の新聞を、ニューヨークでは日本で配達されるより前に読める。その理由は ___ 。", "c": ["ニューヨークは日本より14時間遅れているから", "ニューヨークは日本より14時間進んでいるから", "飛行機で運ぶから", "ニューヨークに日付変更線があるから"], "h": "NO.10：東京で午前2時に送信 ＝ ニューヨークは前日の正午。"}, {"sec": "c", "q": "アメリカ本土の標準時の数は ___ 。", "c": ["4つ", "2つ", "3つ", "6つ"], "h": "NO.10：Eastern・Central・Mountain・Pacific の4つ。"}, {"sec": "c", "q": "ニューヨークとサンフランシスコの時差は ___ 。", "c": ["3時間", "4時間", "2時間", "5時間"], "h": "NO.10：約4,000kmはなれていて、時差は3時間。"}, {"sec": "c", "q": "ニューヨークから朝9時にサンフランシスコへ着きたい（飛行約5時間）。ニューヨークを ___ に出ればよい。", "c": ["朝7時", "朝4時", "午前1時", "朝6時"], "h": "NO.10：西へ行くと時計を3時間戻す。9時 ＋ 3時間 − 5時間 ＝ 7時。"}, {"sec": "c", "q": "サンフランシスコから朝9時にニューヨークへ着きたい（飛行約5時間）。サンフランシスコを ___ に出なければならない。", "c": ["午前1時", "朝7時", "朝4時", "朝6時"], "h": "NO.10：東へ行くと時計が3時間進む。9時 − 3時間 − 5時間 ＝ 午前1時。"}, {"sec": "c", "q": "ロサンゼルスの夜10時に日本から電話したら、ニューヨークは ___ だった（NO.10のエピソード）。", "c": ["午前1時ごろ", "午後7時ごろ", "夜10時", "朝9時ごろ"], "h": "ロサンゼルス（−8）とニューヨーク（−5）の時差は3時間。夜10時 ＋ 3時間 ＝ 午前1時。"}, {"sec": "d", "q": "サマータイム制度とは、日の出の時刻が早まる時期に、時計を ___ 制度。", "c": ["1時間進める", "1時間遅らせる", "2時間進める", "30分進める"], "h": "NO.11：1年のうち半年ほど実施する国が多い。"}, {"sec": "d", "q": "サマータイムを導入している国は、世界で ___ ほど。", "c": ["70か国", "20か国", "150か国", "5か国"], "h": "NO.11：世界70か国ほど。"}, {"sec": "d", "q": "サマータイムを導入している国が多いのは ___ 。", "c": ["ヨーロッパや北アメリカなどの高緯度の地域", "赤道付近の地域", "アジアの低緯度の地域", "アフリカの内陸部"], "h": "NO.11 Q1：高緯度ほど夏の昼が長く、日の出が早いので、時計を進めると明るい時間を有効に使える。"}, {"sec": "d", "q": "オーストラリアのサマータイムが10月〜4月なのは ___ から。", "c": ["南半球で季節が北半球と逆だ", "赤道に近い", "日付変更線に近い", "経度が大きい"], "h": "NO.11：イギリス 3月最終日曜〜10月最終日曜、アメリカ 3月第2日曜〜11月第1日曜、オーストラリア 10月第1日曜〜4月第1日曜。"}, {"sec": "d", "q": "アメリカのサマータイムの期間は ___ 。", "c": ["3月第2日曜〜11月第1日曜", "3月最終日曜〜10月最終日曜", "10月第1日曜〜4月第1日曜", "6月〜8月"], "h": "NO.11の地図。"}, {"sec": "d", "q": "19時まで練習する野球部で、照明が必要な月の数（未実施で10〜11か月）は、サマータイムを実施すると ___ 。", "c": ["7か月", "10か月", "4か月", "12か月"], "h": "NO.11 Q2（俊太くんの答え 7か月）：時計が1時間進むので、時計の上では日没が遅くなる → 照明が必要な月が減る。"}, {"sec": "d", "q": "日本の標準時が東経135度に決められたのは ___ 年。", "c": ["1886（明治19）", "1868（明治元）", "1948（昭和23）", "2013（平成25）"], "h": "NO.12：1886年に決めてから変更していない。"}, {"sec": "d", "q": "2013年に東京都知事が提案した「標準時を2時間早める」ねらいは ___ 。", "c": ["東京の金融市場を世界で最も早く始まるマーケットにすること", "日付変更線を動かすこと", "サマータイムを廃止すること", "時差をなくすこと"], "h": "NO.12：国際金融機関のアジア拠点を東京に呼び戻すねらい。ほかに日照時間の有効活用・節電効果・余暇活動。"}, {"sec": "d", "q": "日本の標準時を2時間早めた場合の問題点として記事にあるのは ___ 。", "c": ["冬は朝が暗い時間帯から通勤ラッシュになる", "夏の日没が早くなる", "時差が大きくなって旅行できない", "時計が使えなくなる"], "h": "NO.12：冬至は日の出が午前8時46分になり、暗い時間帯から通勤ラッシュに。"}, {"sec": "d", "q": "標準時を2時間早めると、東京市場が開く午前9時は、香港やシンガポールでは ___ になる。", "c": ["午前6時", "午前11時", "午前9時", "午後1時"], "h": "NO.12：午前の東京市場の値動きを見た売買が難しくなる。"}, {"sec": "d", "q": "日本でも1948年にGHQの指示でサマータイムが導入されたが、 ___ で廃止された。", "c": ["4年", "1年", "10年", "30年"], "h": "NO.12：明るい時間が多くなり、労働時間が増えたという批判が出た。"}, {"sec": "d", "q": "日本のサマータイムが廃止された理由は ___ 。", "c": ["労働時間が増えたという批判が出たから", "電気代が上がったから", "時計が足りなかったから", "GHQが反対したから"], "h": "NO.12。"}, {"sec": "e", "q": "2万5千分の1地形図の主曲線（細い等高線）の間隔は ___ 。", "c": ["10m", "20m", "50m", "100m"], "h": "2万5千分の1：主曲線10m・計曲線50m。5万分の1：主曲線20m・計曲線100m。"}, {"sec": "e", "q": "2万5千分の1地形図の計曲線（太い等高線）の間隔は ___ 。", "c": ["50m", "10m", "100m", "25m"], "h": "計曲線は主曲線5本ごと。"}, {"sec": "e", "q": "5万分の1地形図の主曲線の間隔は ___ 。", "c": ["20m", "10m", "50m", "100m"], "h": "5万分の1：主曲線20m・計曲線100m。"}, {"sec": "e", "q": "等高線の間隔がせまいところは、土地の傾きが ___ 。", "c": ["急", "ゆるやか", "平ら", "関係ない"], "h": "間隔がせまい ＝ 急、広い ＝ ゆるやか。"}, {"sec": "e", "q": "等高線が、低いほうへ張り出しているところは ___ 。", "c": ["尾根", "谷", "湖", "平野"], "h": "NO.14 問2：尾根 ＝ 低いほうへ張り出す、谷 ＝ 高いほうへ食い込む。"}, {"sec": "e", "q": "等高線が、高いほうへ食い込んでいるところは ___ 。", "c": ["谷", "尾根", "山頂", "台地"], "h": "谷には川が流れやすい。"}, {"sec": "e", "q": "等高線にトゲ（短い線）がついている記号が表すのは ___ 。", "c": ["凹地（くぼ地）", "山頂", "尾根", "崖"], "h": "NO.14 問1❸：凹地は周りより低い → 内側ほど低くなる。"}, {"sec": "e", "q": "NO.14 問1❶：550mの計曲線から内側へ主曲線（10mおき）を4本上った山頂の等高線は ___ 。", "c": ["590m", "600m", "560m", "540m"], "h": "俊太くんの答え 590m。"}, {"sec": "e", "q": "2万5千分の1地形図で、地図上の4mmは実際には ___ 。", "c": ["100m", "25m", "1km", "400m"], "h": "4mm × 25,000 ＝ 100,000mm ＝ 100m。"}, {"sec": "e", "q": "2万5千分の1地形図で、4mm × 4mm の方眼1つの実際の面積は ___ 。", "c": ["0.01km²（100m × 100m）", "0.1km²", "1km²", "0.0016km²"], "h": "NO.14 問3：100m × 100m ＝ 10,000m² ＝ 0.01km²。湖にかかる方眼の数を数えてかける。"}, {"sec": "e", "q": "2万5千分の1地形図で、地図上の1cmは実際には ___ 。", "c": ["250m", "25m", "2.5km", "500m"], "h": "1cm × 25,000 ＝ 25,000cm ＝ 250m。"}, {"sec": "f", "q": "地球上で、経度15度ごとに1時間の時差が生まれるのはなぜか。説明しよう。___", "c": ["地球は24時間で360度自転するので、1時間あたり15度回転するから。", "地球は1年で太陽のまわりを360度回るから。", "日本の標準時子午線が東経135度で、135÷9＝15だから。", "経線が15度おきに引かれていると国際的に決められているから。"], "h": "🔑 キーワード：24時間・360度・自転・360÷24＝15"}, {"sec": "f", "q": "東にある都市ほど時刻が進んでいるのはなぜか。説明しよう。___", "c": ["地球は西から東へ自転していて、東の地域ほど先に太陽が昇る（正午がくる）から。", "地球は東から西へ自転しているから。", "東の地域ほど標準時子午線の数が多いから。", "日付変更線が西側にあるから。"], "h": "🔑 キーワード：西から東へ自転・太陽が先に昇る"}, {"sec": "f", "q": "アメリカやロシアが、複数の標準時を定めているのはなぜか。説明しよう。___", "c": ["国土が東西に長く、1つの標準時だと地域によって太陽の動きと時刻が大きくずれるから。", "国土が南北に長く、季節が地域によってちがうから。", "人口が多く、時計が足りないから。", "日付変更線が国の中を通っているから。"], "h": "🔑 キーワード：東西に長い・経度差が大きい・太陽の動きと時刻のずれ"}, {"sec": "f", "q": "サマータイム制度を導入している国が、ヨーロッパや北アメリカなどの高緯度の地域に多いのはなぜか。説明しよう。___", "c": ["高緯度の地域は夏の日の出が早く昼が長いので、時計を進めると明るい時間を有効に使えるから。", "高緯度の地域は一年中昼の長さが変わらないから。", "高緯度の地域は赤道に近く、暑い時間をさけたいから。", "高緯度の地域は日付変更線に近いから。"], "h": "🔑 キーワード：高緯度・夏の昼が長い・日の出が早い・明るい時間の有効活用"}, {"sec": "f", "q": "オーストラリアのサマータイムが10月〜4月になっているのはなぜか。説明しよう。___", "c": ["南半球にあり、北半球と季節が逆で、10月〜4月が夏にあたるから。", "赤道の上にあり、一年中夏だから。", "日付変更線のすぐ東にあるから。", "イギリスと同じ時期にすると時差がなくなるから。"], "h": "🔑 キーワード：南半球・季節が逆・10月〜4月が夏"}, {"sec": "f", "q": "サマータイムの利点と欠点を説明しよう。___", "c": ["利点：明るい時間を有効に使え、照明の節電や余暇活動の充実が期待できる。欠点：時計の切り替えで生活リズムが乱れたり、労働時間が増えたりする。", "利点：時差がなくなる。欠点：日付変更線がずれる。", "利点：冬の朝が明るくなる。欠点：夏の夜が暗くなる。", "利点：世界中の時刻がそろう。欠点：時計が使えなくなる。"], "h": "🔑 キーワード：利点＝明るい時間の有効活用・節電・余暇／欠点＝生活リズム・労働時間の増加（日本では1948年に導入→4年で廃止）"}, {"sec": "f", "q": "NO.10の羽田〜ロサンゼルスの時刻表は、時差17時間ではなく16時間で計算すると所要時間が合う。なぜか。説明しよう。___", "c": ["ロサンゼルスがサマータイム中で時計を1時間進めているため、日本との時差が1時間小さい16時間になっているから。", "日本がサマータイム中で、時計を1時間進めているから。", "飛行機が日付変更線をこえると1時間ずれるから。", "羽田の経度が東経140度だから。"], "h": "🔑 キーワード：ロサンゼルス・サマータイム・1時間進める・時差16時間（−8 → −7）"}, {"sec": "f", "q": "アメリカ国内の出張で、東から西へ行くか西から東へ行くかでスケジュールの立て方が変わるのはなぜか。説明しよう。___", "c": ["東西で時差が3時間あり、西へ行くと時計を戻し、東へ行くと時計が進むため、出発時刻の決め方が変わるから。", "東と西で飛行機の速さがちがうから。", "東と西で日付がちがうから。", "西海岸だけサマータイムがあるから。"], "h": "🔑 キーワード：時差3時間・西へ→時計を戻す・東へ→時計が進む（NY→SF 朝7時発、SF→NY 午前1時発）"}, {"sec": "f", "q": "ニューヨークでは、日本で配達されるより前に日本の新聞の朝刊を読むことができる。なぜか。説明しよう。___", "c": ["ニューヨークは日本より14時間遅れていて、日本で作った紙面を送るとニューヨークはまだ前日の昼だから。", "ニューヨークは日本より14時間進んでいるから。", "飛行機で新聞を運ぶと日付変更線で1日もどるから。", "ニューヨークの新聞社が日本より早く記事を書くから。"], "h": "🔑 キーワード：時差14時間・ニューヨークが遅れている・送信時（東京午前2時）＝ニューヨーク前日の正午"}, {"sec": "f", "q": "日本の標準時を2時間早める提案の、ねらいと問題点を説明しよう。___", "c": ["ねらい：東京の金融市場を世界で最も早く始まる市場にし、日照時間も有効に使う。問題点：冬は暗い時間から通勤ラッシュになり、アジアの市場との時間のずれも大きくなる。", "ねらい：日付変更線を動かす。問題点：時差がなくなる。", "ねらい：夏の日没を早くする。問題点：夏の夜が暗くなる。", "ねらい：サマータイムを廃止する。問題点：時計が足りなくなる。"], "h": "🔑 キーワード：ねらい＝世界一早いマーケット・金融機関を呼び戻す・日照時間の活用・節電／問題点＝冬の朝が暗い・香港やシンガポールで午前6時"}, {"sec": "f", "q": "地形図で、等高線の間隔がせまいところと広いところのちがいを説明しよう。___", "c": ["間隔がせまいところは傾斜が急で、広いところは傾斜がゆるやかである。", "間隔がせまいところは標高が低く、広いところは標高が高い。", "間隔がせまいところは谷で、広いところは尾根である。", "間隔がせまいところは川で、広いところは湖である。"], "h": "🔑 キーワード：せまい＝急・広い＝ゆるやか"}, {"sec": "f", "q": "地形図で、尾根と谷を等高線から見分ける方法を説明しよう。___", "c": ["等高線が低いほうへ張り出しているところが尾根、高いほうへ食い込んでいるところが谷である。", "等高線が高いほうへ張り出しているところが尾根、低いほうへ食い込んでいるところが谷である。", "等高線が太いところが尾根、細いところが谷である。", "等高線の数字が大きいところが尾根、小さいところが谷である。"], "h": "🔑 キーワード：尾根＝低いほうへ張り出す・谷＝高いほうへ食い込む（谷には川が流れやすい）"}], "read": {"本初子午線": "ほんしょしごせん", "標準時子午線": "ひょうじゅんじしごせん", "子午線": "しごせん", "明石市": "あかしし", "凹地": "おうち", "主曲線": "しゅきょくせん", "計曲線": "けいきょくせん", "尾根": "おね", "日較差": "にちかくさ", "km²": "平方キロメートル", "m²": "平方メートル", "GHQ": "ジーエイチキュー"}};
+const $ = id => document.getElementById(id);
+const STORE = D.key + '_wrong_v1';
+let view = 'quiz', sec = 'all';
+function shuffle(a) { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+const secOf = id => D.secs.find(s => s.id === id);
+const inSec = q => sec === 'all' ? !secOf(q.sec).extra : q.sec === sec;
+const qText = q => esc(q.q.replace(/。___$/, '。')).replace('___', '<span class="blank"></span>');
+const isKanji = q => !!secOf(q.sec).kanji;
+function loadBank() { try { return JSON.parse(localStorage.getItem(STORE) || '[]'); } catch (e) { return []; } }
+function saveBank(b) { try { localStorage.setItem(STORE, JSON.stringify(b)); } catch (e) {} }
+const ALL = D.qs.map((q, i) => Object.assign({ id: i }, q));
+const byId = id => ALL.find(q => q.id === id);
+function addBank(q) { const b = loadBank(); if (!b.includes(q.id)) { b.push(q.id); saveBank(b); } }
+function rmBank(q) { saveBank(loadBank().filter(x => x !== q.id)); }
+const bankList = () => loadBank().map(byId).filter(q => q && (sec === 'all' || q.sec === sec));
+
+function drawSecs() {
+  const n = id => ALL.filter(q => id === 'all' ? !secOf(q.sec).extra : q.sec === id).length;
+  $('secs').innerHTML = [{ id: 'all', name: '全部' }].concat(D.secs).map(s =>
+    `<button class="chip ${sec === s.id ? 'active' : ''}" onclick="setSec('${s.id}')">${esc(s.name)} <small>${n(s.id)}</small></button>`).join('');
+}
+function setSec(s) { sec = s; drawSecs(); render(); }
+function go(v) {
+  view = v;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.v === v));
+  render(); window.scrollTo({ top: 0 });
+}
+function render() { if (hasTTS) speechSynthesis.cancel(); view === 'card' ? startCard() : view === 'oral' ? oralStart() : quizStart(); }
+
+/* ===== 4択 ===== */
+let qs = [], cur = 0, score = 0, answered = false, missed = [], order = [];
+function quizStart() {
+  const list = view === 'wrong' ? bankList() : ALL.filter(inSec);
+  const s = sec === 'all' ? null : secOf(sec);
+  const [icon, title, desc] = view === 'wrong'
+    ? ['🎯', '苦手問題だけ復習', '間違えた問題がたまります。正解すると消えるので、0問になればクリア！']
+    : ['✏️', s ? s.name : '全部まとめて', s && s.desc ? s.desc : 'プリントの空欄を中心にした4択です。選択肢の並びは毎回変わります。'];
+  $('main').innerHTML = `<div class="card start"><div class="big">${icon}</div><h2>${esc(title)}</h2><p>${esc(desc)}</p>
+    <div class="small">${list.length}問${sec === 'all' && view !== 'wrong' && D.secs.some(x => x.extra) ? '（「漢字テスト」などの別枠は、上のボタンから選んでね）' : ''}</div>
+    <button class="big-btn" ${list.length ? '' : 'disabled'} onclick="quizBegin()">スタート</button></div>`;
+}
+function quizBegin() {
+  qs = shuffle(view === 'wrong' ? bankList() : ALL.filter(inSec));
+  cur = 0; score = 0; missed = []; drawQ();
+}
+function drawQ() {
+  const q = qs[cur], L = 'ABCD', kj = isKanji(q);
+  answered = false; order = shuffle(q.c.map((_, i) => i));
+  $('main').innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${cur + 1} / ${qs.length}</span><span>${score}点</span></div>
+      <div class="pbar"><div class="pfill" style="width:${cur / qs.length * 100}%"></div></div></div>
+    <div class="card qcard">
+      <span class="qtag">${esc(secOf(q.sec).name)}</span>
+      ${kj ? `<div class="small" style="text-align:center">正しい漢字はどれ？</div><div class="qtext kana">${esc(q.q)}</div>` : `<div class="qtext">${qText(q)}</div>`}
+      <div class="choices">${order.map((o, i) => `<button class="choice ${kj ? 'kanji' : ''}" onclick="answer(${i})"><span class="lb">${L[i]}</span><span>${esc(q.c[o])}</span></button>`).join('')}</div>
+      <div class="expl" id="expl"><div class="res" id="res"></div><div class="txt">${esc(q.h || '')}</div></div>
+    </div>
+    <button class="next" id="nextBtn" onclick="nextQ()">${cur + 1 < qs.length ? '次の問題 →' : '結果を見る'}</button>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="quizStart()">← やめる</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function answer(i) {
+  if (answered) return; answered = true;
+  const q = qs[cur], btns = document.querySelectorAll('.choice'), ci = order.indexOf(0), ok = i === ci;
+  btns.forEach(b => b.disabled = true);
+  btns[ci].classList.add('correct'); if (!ok) btns[i].classList.add('wrong');
+  const r = $('res');
+  r.textContent = ok ? '⭕ 正解！' : '❌ 正解は「' + q.c[0] + '」';
+  if (!ok) r.classList.add('ng');
+  if (ok) { score++; if (view === 'wrong') rmBank(q); } else { missed.push(q); addBank(q); }
+  $('expl').classList.add('show'); $('nextBtn').classList.add('show');
+}
+function nextQ() { cur++; cur >= qs.length ? showResult() : drawQ(); }
+function showResult() {
+  const n = qs.length, pct = Math.round(score / n * 100);
+  const msg = pct === 100 ? '🏆 全問正解！完璧！' : pct >= 80 ? '🌟 すごい！あと少し！' : pct >= 60 ? '⭐ よくできました！' : pct >= 40 ? '💪 苦手問題でもう1回！' : '📖 暗記カードで確認してから再挑戦！';
+  const b = bankList().length;
+  $('main').innerHTML = `
+    <div class="card result"><div class="score">${score}<small> / ${n}</small></div><div class="small">${pct}%</div><div class="msg">${msg}</div></div>
+    ${missed.length ? `<div class="card miss"><h3>❌ 間違えた問題（${missed.length}問）→ 苦手に保存しました</h3>
+      ${missed.map(q => `<div class="item"><span class="small">${esc(secOf(q.sec).name)}</span><br>${esc(q.q.replace('___', '（　）'))}<br><span class="ans">正解：${esc(q.c[0])}</span></div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="quizBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手問題だけ復習（${b}問） 🎯</button>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== 暗記カード ===== */
+let cards = [], ci = 0, flipped = false;
+function startCard() { cards = shuffle(ALL.filter(inSec)); ci = 0; flipped = false; drawCard(); }
+function drawCard() {
+  if (!cards.length) { $('main').innerHTML = '<div class="card start"><p>カードがありません</p></div>'; return; }
+  const q = cards[ci], kj = isKanji(q);
+  const front = kj ? `<div class="a" style="color:var(--gray-900)">${esc(q.q)}</div><div class="tip">漢字を思い浮かべてからタップ</div>`
+                   : `<div class="q">${qText(q)}</div><div class="tip">答えを言ってからタップ</div>`;
+  const back = `<div class="a ${kj ? 'kanji' : (q.c[0].length > 24 ? 'long' : '')}">${esc(q.c[0])}</div>${q.h ? `<div class="h">💡 ${esc(q.h)}</div>` : ''}`;
+  $('main').innerHTML = `
+    <div class="card flash ${flipped ? 'back' : ''}" onclick="flipped=!flipped;drawCard()">
+      <div class="meta">${esc(secOf(q.sec).name)}　${ci + 1} / ${cards.length}</div>${flipped ? back : front}</div>
+    <div class="nav"><button onclick="moveCard(-1)">← 前へ</button><button class="primary" onclick="moveCard(1)">次へ →</button></div>`;
+}
+function moveCard(d) { ci = (ci + d + cards.length) % cards.length; flipped = false; drawCard(); }
+
+/* ===== 読み上げ（日本語） ===== */
+const hasTTS = 'speechSynthesis' in window;
+let oralRate = '0.9', autoRead = true;
+const READ_KEYS = Object.keys(D.read || {}).sort((a, b) => b.length - a.length);
+function toSpeech(s) {
+  s = s.replace(/。___$/, '。').replace(/___/g, '、なに、').replace(/[『』「」〔〕]/g, '').replace(/（\s*）/g, '、なに、');
+  for (const k of READ_KEYS) s = s.split(k).join(D.read[k]);
+  return s.replace(/（/g, '、').replace(/）/g, '、').replace(/→/g, '、つぎに、').replace(/〜/g, 'から');
+}
+let jaVoice = null;
+function pickJa() { if (hasTTS) jaVoice = speechSynthesis.getVoices().find(v => /^ja[-_]/i.test(v.lang)) || null; }
+if (hasTTS) { pickJa(); speechSynthesis.onvoiceschanged = pickJa; }
+function sayJa(text) {
+  if (!hasTTS) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(toSpeech(text));
+  u.lang = 'ja-JP'; if (jaVoice) u.voice = jaVoice;
+  u.rate = parseFloat(oralRate);
+  speechSynthesis.speak(u);
+}
+
+/* ===== 口頭・書くモード ===== */
+let oq = [], oc = 0, oscore = 0, omissed = [];
+function oralStart() {
+  const list = ALL.filter(inSec);
+  const kanji = sec !== 'all' && secOf(sec).kanji;
+  $('main').innerHTML = `<div class="card start"><div class="big">${kanji ? '✍️' : '🎤'}</div>
+    <h2>${kanji ? '漢字を紙に書いて確認' : '口頭で一問一答'}</h2>
+    <p>${kanji ? '読みを見て（聞いて）、紙に漢字を書く → 「答えを見る」で正しい字と見分け方を確認 → 書けたかどうか自分で ⭕ ❌。'
+               : '問題を聞く → 声に出して答える → 「答えを見る」で確認 → 言えたかどうか自分で ⭕ ❌。❌は苦手に保存されます。'}</p>
+    <div class="small">${esc(sec === 'all' ? '全部' : secOf(sec).name)}：${list.length}問${!kanji && D.secs.some(x => x.kanji) ? '（漢字15語を紙に書く練習は、上の「漢字テスト」を選んでね）' : ''}</div>
+    <div class="opt">読み上げ速度 <select id="oralRate"><option value="0.8">ゆっくり</option><option value="0.9" selected>ふつう</option><option value="1.1">はやめ</option></select>
+      <label style="display:flex;align-items:center;gap:4px"><input type="checkbox" id="autoRead" checked>問題を自動で読む</label></div>
+    <button class="big-btn" ${list.length ? '' : 'disabled'} onclick="oralBegin()">スタート</button></div>`;
+}
+function oralBegin() {
+  oralRate = $('oralRate').value; autoRead = $('autoRead').checked;
+  oq = shuffle(ALL.filter(inSec)); oc = 0; oscore = 0; omissed = []; drawOral();
+}
+function oralQText(q) { return isKanji(q) ? q.q.replace(/（.*）/, '') + '。漢字で書いてみよう。' : q.q; }
+function drawOral() {
+  const q = oq[oc], kj = isKanji(q);
+  $('main').innerHTML = `
+    <div class="card progress"><div class="pinfo"><span>${oc + 1} / ${oq.length}</span><span>⭕ ${oscore}</span></div>
+      <div class="pbar"><div class="pfill" style="width:${oc / oq.length * 100}%"></div></div></div>
+    <div class="card qcard">
+      <span class="qtag">${esc(secOf(q.sec).name)}</span>
+      ${kj ? `<div class="oral-q kana">${esc(q.q)}</div>` : `<div class="oral-q">${qText(q)}</div>`}
+      <div class="oral-step">${kj ? '✍️ 紙に漢字を書いてから「答えを見る」' : q.q.includes('説明しよう') ? '📝 声に出して説明してから「答えを見る」→ キーワードが入っていたら ⭕' : '🎤 声に出して答えてから「答えを見る」'}</div>
+      <div class="oral-btns">
+        <button class="obtn" onclick="sayJa(oralQText(oq[oc]))">🔊 問題を聞く</button>
+        <button class="obtn fill" id="showBtn" onclick="reveal()">答えを見る</button>
+      </div>
+      <div class="reveal" id="rev">
+        <div class="ans ${kj ? 'kanji' : (q.c[0].length > 24 ? 'long' : '')}">${esc(q.c[0])}</div>
+        ${q.h ? `<div class="hint">💡 ${esc(q.h)}</div>` : ''}
+        ${kj ? '' : `<button class="obtn" style="margin-top:10px;width:100%" onclick="sayJa(oq[oc].c[0])">🔊 答えを聞く</button>`}
+        <div class="judge"><button class="ok" onclick="judge(true)">⭕ ${kj ? '書けた' : '言えた'}</button><button class="ng" onclick="judge(false)">❌ ${kj ? 'まちがえた' : '言えなかった'}</button></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:12px"><a class="small" style="cursor:pointer;text-decoration:underline" onclick="oralStart()">← やめる</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (autoRead) sayJa(oralQText(q));
+}
+function reveal() {
+  const q = oq[oc];
+  $('rev').classList.add('show'); $('showBtn').style.display = 'none';
+  if (!isKanji(q)) sayJa(q.c[0]); else if (hasTTS) speechSynthesis.cancel();
+}
+function judge(ok) {
+  const q = oq[oc];
+  if (ok) { oscore++; rmBank(q); } else { omissed.push(q); addBank(q); }
+  oc++;
+  if (oc < oq.length) return drawOral();
+  if (hasTTS) speechSynthesis.cancel();
+  const n = oq.length, b = bankList().length;
+  $('main').innerHTML = `
+    <div class="card result"><div class="score">${oscore}<small> / ${n}</small></div><div class="small">⭕ の数</div>
+      <div class="msg">${oscore === n ? '🏆 全部できた！' : '❌ の問題は「苦手」に入りました'}</div></div>
+    ${omissed.length ? `<div class="card miss"><h3>❌ もう一度覚えよう（${omissed.length}問）</h3>
+      ${omissed.map(q => `<div class="item">${esc(isKanji(q) ? q.q : q.q.replace('___', '（　）'))}<br><span class="ans">${esc(q.c[0])}</span></div>`).join('')}</div>` : ''}
+    <button class="big-btn" onclick="oralBegin()">もう一度 🔄</button>
+    <button class="big-btn red" ${b ? '' : 'disabled'} onclick="go('wrong');quizBegin()">苦手を4択で復習（${b}問） 🎯</button>`;
+}
+
+$('hTitle').textContent = D.title; $('hSub').textContent = D.sub;
+drawSecs(); render();
+</script>
+</body>
+</html>
