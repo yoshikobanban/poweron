@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本史路線図 律令ライン</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root { --line: #C2410C; --line-light: #FFF1E8; --ink: #1F2937; --sub: #4B5563; --muted: #9CA3AF; --bg: #F5F6F8; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: var(--bg); color: var(--ink); padding: 16px; }
+.wrap { max-width: 760px; margin: 0 auto; }
+header { background: var(--line); color: white; border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+.logo { width: 52px; height: 52px; border-radius: 50%; background: white; color: var(--line); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; flex-shrink: 0; }
+header h1 { font-size: 22px; }
+header p { font-size: 12px; opacity: .92; margin-top: 2px; }
+
+.intro { display: grid; grid-template-columns: 1fr 230px; gap: 12px; margin-bottom: 14px; }
+.card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 14px 16px; }
+.story { font-size: 14px; line-height: 1.9; }
+.story b { color: var(--line); }
+.map svg { width: 100%; height: auto; display: block; }
+.map .cap { font-size: 11px; color: var(--muted); margin-top: 4px; text-align: center; }
+
+/* 路線 */
+.route { position: relative; padding-left: 56px; }
+.route::before { content: ''; position: absolute; left: 24px; top: 30px; bottom: 30px; width: 10px; background: var(--line); border-radius: 5px; }
+.stop { position: relative; margin-bottom: 14px; break-inside: avoid; }
+.dot { position: absolute; left: -45px; top: 22px; width: 32px; height: 32px; border-radius: 50%; background: white; border: 6px solid var(--line); }
+.stop.term .dot { background: var(--line); }
+
+/* 駅名標 */
+.sign { background: white; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.1); overflow: hidden; }
+.sign-top { display: flex; align-items: center; gap: 12px; padding: 12px 16px 8px; }
+.num { flex-shrink: 0; width: 46px; height: 46px; border: 3px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; color: var(--line); font-weight: 700; }
+.num small { font-size: 10px; }
+.num span { font-size: 18px; }
+.names { flex: 1; min-width: 0; }
+.kana { font-size: 12px; color: var(--sub); letter-spacing: .08em; }
+.name { font-size: 26px; font-weight: 700; letter-spacing: .04em; }
+.year { font-size: 12px; color: white; background: var(--line); border-radius: 12px; padding: 3px 10px; white-space: nowrap; }
+.bar { background: var(--line); color: white; font-size: 12px; display: flex; justify-content: space-between; padding: 4px 14px; }
+.body { padding: 10px 16px 14px; }
+.tenno { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.tenno span { display: inline-block; font-size: 11px; color: var(--line); border: 1.5px solid var(--line); border-radius: 4px; padding: 0 5px; margin-right: 6px; vertical-align: 1px; }
+.ev { list-style: none; font-size: 14px; line-height: 1.75; }
+.ev li { padding-left: 52px; position: relative; }
+.ev li b { position: absolute; left: 0; color: var(--line); font-variant-numeric: tabular-nums; }
+.ev li em { font-style: normal; font-weight: 700; }
+.annc { margin-top: 8px; font-size: 13px; color: var(--sub); background: var(--line-light); border-radius: 8px; padding: 7px 10px; line-height: 1.7; }
+.annc::before { content: '🔊 車内アナウンス：'; font-weight: 700; color: var(--line); }
+
+/* 支線 */
+.branch { margin: -4px 0 14px 18px; border-left: 4px dashed #2563EB; padding: 6px 0 6px 16px; break-inside: avoid; }
+.branch .sign { border: 2px solid #2563EB; }
+.branch .num { border-color: #2563EB; color: #2563EB; }
+.branch .bar { background: #2563EB; }
+.branch .ev li b { color: #2563EB; }
+
+.goro { margin-top: 6px; }
+.goro h2 { font-size: 16px; color: var(--line); margin-bottom: 8px; }
+.goro table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.goro td { padding: 6px 4px; border-bottom: 1px solid #EEE; vertical-align: top; }
+.goro td:first-child { width: 58px; font-weight: 700; color: var(--line); }
+.goro td:nth-child(2) { width: 120px; font-weight: 700; }
+.foot { font-size: 11px; color: var(--muted); text-align: center; margin-top: 12px; }
+
+@media (max-width: 600px) {
+  .intro { grid-template-columns: 1fr; }
+  .name { font-size: 22px; }
+  .route { padding-left: 44px; }
+  .route::before { left: 16px; }
+  .dot { left: -40px; }
+}
+@media print {
+  body { background: white; padding: 0; }
+  .card, .sign { box-shadow: none; border: 1px solid #DDD; }
+  header, .bar, .year, .route::before, .stop.term .dot { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: A4 portrait; margin: 10mm; }
+}
+
+.play { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 14px; }
+.pbtn { padding: 10px 14px; border: 2px solid var(--line); background: white; color: var(--line); border-radius: 22px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.pbtn.fill { background: var(--line); color: white; }
+.sbtn { margin-top: 8px; padding: 6px 12px; border: 2px solid var(--line); background: white; color: var(--line); border-radius: 18px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.stop.now .sign { outline: 3px solid var(--line); outline-offset: 2px; }
+.play select { padding: 8px; border-radius: 8px; border: 2px solid #E5E7EB; font-family: inherit; }
+@media print { .play, .sbtn { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">律</div>
+    <div>
+      <h1>日本史路線図　律令ライン</h1>
+      <p>飛鳥 ⇄ 難波 ⇄ 近江大津 ⇄ 藤原京　ー　都の移動で覚える飛鳥〜律令国家（プリントNO.7・NO.8）</p>
+    </div>
+  </header>
+
+  <div class="intro">
+    <div class="card story">
+      <b>あらすじ（これだけ先に言えるようにしよう）</b><br>
+      蘇我氏が物部氏を倒して権力をにぎる → 聖徳太子と天皇中心の国づくり → 蘇我氏が強くなりすぎる → 中大兄皇子と中臣鎌足が蘇我入鹿を倒す（乙巳の変）→ 大化の改新 → 白村江で負けて守りを固める → 跡継ぎ争い（壬申の乱）→ 天武・持統天皇が律令国家を仕上げて藤原京へ。
+    </div>
+    <div class="card map">
+      <svg viewBox="0 0 220 200" role="img" aria-label="都の位置と移動のようす">
+        <rect x="0" y="0" width="220" height="200" rx="10" fill="#F0F7FF"/>
+        <path d="M150 6 C170 40 175 60 165 80 L160 92 L140 92 C135 70 132 40 150 6Z" fill="#BFDBFE"/>
+        <text x="171" y="40" font-size="9" fill="#2563EB">琵琶湖</text>
+        <path d="M0 110 C30 100 45 120 52 140 C55 160 40 180 20 200 L0 200Z" fill="#BFDBFE"/>
+        <text x="6" y="150" font-size="9" fill="#2563EB">大阪湾</text>
+        <g fill="none" stroke="#C2410C" stroke-width="3" stroke-linecap="round" marker-end="url(#ar)">
+          <path d="M118 168 C100 150 85 132 66 122"/>
+          <path d="M70 128 C90 140 104 152 114 162"/>
+          <path d="M126 160 C135 130 142 110 148 94"/>
+          <path d="M150 98 C146 120 138 140 128 158"/>
+          <path d="M124 166 L118 156"/>
+        </g>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#C2410C"/></marker></defs>
+        <g font-size="10" font-weight="700" fill="#1F2937">
+          <circle cx="62" cy="120" r="6" fill="white" stroke="#C2410C" stroke-width="3"/><text x="34" y="108">難波</text>
+          <circle cx="150" cy="90" r="6" fill="white" stroke="#C2410C" stroke-width="3"/><text x="158" y="104">近江大津</text>
+          <circle cx="122" cy="170" r="6" fill="white" stroke="#C2410C" stroke-width="3"/><text x="132" y="186">飛鳥</text>
+          <circle cx="116" cy="152" r="6" fill="#C2410C"/><text x="74" y="156">藤原京</text>
+        </g>
+      </svg>
+      <div class="cap">都は飛鳥を中心に、難波・近江大津へ行って戻ってくる（位置はだいたい）</div>
+    </div>
+  </div>
+
+  <div class="play">
+    <button class="pbtn fill" onclick="playAll()">▶ 全線を聞く（始発から終点まで）</button>
+    <button class="pbtn" onclick="playGoro()">🎵 語呂あわせを聞く</button>
+    <button class="pbtn" onclick="stopAll()">⏹ 停止</button>
+    <select id="rate" aria-label="読み上げ速度"><option value="0.85">ゆっくり</option><option value="1" selected>ふつう</option><option value="1.15">はやめ</option></select>
+  </div>
+  <div class="route">
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>01</span></div>
+          <div class="names"><div class="kana">あすか</div><div class="name">飛鳥</div></div><div class="year">6世紀末〜</div></div>
+        <div class="bar"><span>始発</span><span>つぎは あすかいたぶきのみや →</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>推古天皇（日本初の女帝）　<span>摂政</span>聖徳太子　<span>大臣</span>蘇我馬子</div>
+          <ul class="ev">
+            <li><b>527</b><em>磐井の乱</em>（筑紫国造の磐井が新羅と結ぶ → 物部麁鹿火が鎮圧）</li>
+            <li><b>587</b>蘇我馬子が<em>物部守屋</em>を倒す</li>
+            <li><b>592</b>馬子が崇峻天皇を暗殺 → <em>推古天皇</em>が即位</li>
+            <li><b>603</b><em>冠位十二階</em>（才能で位を与える。徳・仁・礼・信・義・智）</li>
+            <li><b>604</b><em>憲法十七条</em>（和を以て貴しと為し…）</li>
+            <li><b>607</b><em>遣隋使</em>・小野妹子（日出づる処の天子…）→ 608 裴世清が来日</li>
+            <li><b>文化</b><em>飛鳥文化</em>：飛鳥寺（蘇我馬子）・法隆寺（聖徳太子）・釈迦三尊像（鞍作鳥）</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">まもなく飛鳥です。冠位十二階・憲法十七条へお越しのお客様は、聖徳太子の改札をご利用ください。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>02</span></div>
+          <div class="names"><div class="kana">あすかいたぶきのみや</div><div class="name">飛鳥板蓋宮</div></div><div class="year">643〜645</div></div>
+        <div class="bar"><span>← あすか</span><span>なにわながらのとよさきのみや →</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>皇極天皇　<span>実権</span>蘇我蝦夷・入鹿（父子）</div>
+          <ul class="ev">
+            <li><b>643</b>蘇我入鹿が<em>山背大兄王</em>（聖徳太子の子）を自殺させる</li>
+            <li><b>645</b><em>乙巳の変</em>：<em>中大兄皇子</em>と<em>中臣鎌足</em>が蘇我入鹿を暗殺、蝦夷は自殺</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">この駅で蘇我氏はお降りください。中大兄皇子・中臣鎌足は、そのまま改新号にお乗り換えです。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>03</span></div>
+          <div class="names"><div class="kana">なにわながらのとよさきのみや</div><div class="name">難波長柄豊碕宮</div></div><div class="year">645〜</div></div>
+        <div class="bar"><span>← あすかいたぶきのみや</span><span>あすか（斉明）→</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>孝徳天皇　<span>皇太子</span>中大兄皇子　<span>内臣</span>中臣鎌足</div>
+          <ul class="ev">
+            <li><b>645</b>初の年号<em>「大化」</em>。国博士は旻・高向玄理</li>
+            <li><b>646</b><em>改新の詔</em>：<em>公地公民</em>（田荘・部曲を廃止 → 食封）、戸籍・計帳・<em>班田収授法</em></li>
+            <li><b>まとめ</b>一連の改革 ＝ <em>大化の改新</em></li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">難波です。「公地公民」行きは2番線から発車します。豪族の私有地・私有民はお持ち込みいただけません。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>04</span></div>
+          <div class="names"><div class="kana">あすか（さいめい）</div><div class="name">飛鳥（斉明）</div></div><div class="year">655〜661</div></div>
+        <div class="bar"><span>← なにわ</span><span>おうみおおつのみや →</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>斉明天皇（皇極天皇がもう一度即位 ＝ <em>重祚</em>）</div>
+          <ul class="ev">
+            <li><b>660</b><em>百済</em>が唐・新羅に滅ぼされ、日本に救援を求める</li>
+            <li><b>661</b>斉明天皇が九州の朝倉宮で死去 → 中大兄皇子が即位せずに政治（称制）</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">ここで支線「白村江」が分かれます。お乗り換えのお客様はお急ぎください。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="branch">
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>支線</small><span>B</span></div>
+          <div class="names"><div class="kana">はくすきのえ</div><div class="name">白村江</div></div><div class="year" style="background:#2563EB">663</div></div>
+        <div class="bar"><span>朝鮮半島ゆき（片道）</span><span>守りを固めて本線へもどる</span></div>
+        <div class="body">
+          <ul class="ev">
+            <li><b>663</b><em>白村江の戦い</em>：唐・新羅の連合軍に大敗 → 朝鮮半島から手を引く</li>
+            <li><b>守り</b>大宰府に<em>水城</em>・大野城、九州に<em>防人</em>と烽（のろし）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>05</span></div>
+          <div class="names"><div class="kana">おうみおおつのみや</div><div class="name">近江大津宮</div></div><div class="year">667〜672</div></div>
+        <div class="bar"><span>← あすか</span><span>あすかきよみはらのみや →</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>天智天皇（＝中大兄皇子）</div>
+          <ul class="ev">
+            <li><b>667</b>近江大津宮へ遷都</li>
+            <li><b>668</b>即位。<em>近江令</em>（最初の令とされる）</li>
+            <li><b>670</b><em>庚午年籍</em>（最初の全国的な戸籍）</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">近江大津です。天智天皇がお亡くなりになったため、この先、跡継ぎ争いで大きくゆれます。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>06</span></div>
+          <div class="names"><div class="kana">あすかきよみはらのみや</div><div class="name">飛鳥浄御原宮</div></div><div class="year">672〜694</div></div>
+        <div class="bar"><span>← おうみおおつのみや</span><span>ふじわらきょう →</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>天武天皇（＝大海人皇子、天智天皇の弟）</div>
+          <ul class="ev">
+            <li><b>672</b><em>壬申の乱</em>：大海人皇子（吉野で挙兵）が<em>大友皇子</em>（天智天皇の子）に勝つ</li>
+            <li><b>681</b><em>飛鳥浄御原令</em>の制定を始める</li>
+            <li><b>684</b><em>八色の姓</em>（豪族を天皇中心に並べ直す）</li>
+            <li><b>その他</b>「大王」から<em>「天皇」</em>の称号へ。<em>富本銭</em>をつくる</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">飛鳥浄御原です。壬申の乱による遅れのため、大海人皇子は天武天皇としてご乗車いただきます。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop term">
+      <div class="dot"></div>
+      <div class="sign">
+        <div class="sign-top"><div class="num"><small>RR</small><span>07</span></div>
+          <div class="names"><div class="kana">ふじわらきょう</div><div class="name">藤原京</div></div><div class="year">694〜</div></div>
+        <div class="bar"><span>← あすかきよみはらのみや</span><span>終点</span></div>
+        <div class="body">
+          <div class="tenno"><span>天皇</span>持統天皇（天武天皇の皇后、天智天皇の娘）</div>
+          <ul class="ev">
+            <li><b>689</b>飛鳥浄御原令を施行</li>
+            <li><b>690</b><em>庚寅年籍</em>（6年ごとの戸籍・班田のもと）</li>
+            <li><b>694</b><em>藤原京</em>へ遷都：条坊制による初の都城（大和三山に囲まれる）</li>
+          </ul>
+          <button class="sbtn" onclick="playStop(this)">🔊 この駅を聞く</button>
+          <div class="annc">終点、藤原京です。律令国家の完成まで、あと少し。お忘れ物のないようご注意ください。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card goro">
+    <h2>🎵 年号の語呂あわせ（ここだけは声に出して3回）</h2>
+    <table>
+      <tr><td>592</td><td>推古天皇 即位</td><td>ご苦に（592）負けず女帝が即位</td></tr>
+      <tr><td>604</td><td>憲法十七条</td><td>群れよ（604）、和を以て貴しと為せ</td></tr>
+      <tr><td>607</td><td>遣隋使</td><td>花の都へ無礼な（607）国書</td></tr>
+      <tr><td>645</td><td>乙巳の変</td><td>蒸し殺し（645）、蘇我入鹿を倒す</td></tr>
+      <tr><td>663</td><td>白村江の戦い</td><td>ろくろくさん（663）ざん負けた白村江</td></tr>
+      <tr><td>672</td><td>壬申の乱</td><td>ろくな兄（672）を持たぬ大友皇子</td></tr>
+      <tr><td>694</td><td>藤原京</td><td>むくよ（694）、藤原京へお引っ越し</td></tr>
+    </table>
+  </div>
+  <div class="foot">日本史 2学期中間対策｜アプリ（nihonshi_2gakki_chukan.html）の4択・口頭モードとセットで使おう</div>
+</div>
+
+<script>
+const READ = {"磐井の乱": "いわいのらん", "磐井": "いわい", "筑紫国造": "つくしのくにのみやつこ", "国造": "くにのみやつこ", "新羅": "しらぎ", "百済": "くだら", "高句麗": "こうくり", "岩戸山古墳": "いわとやまこふん", "八女市": "やめし", "大仙陵古墳": "だいせんりょうこふん", "稲荷山古墳": "いなりやまこふん", "高松塚古墳": "たかまつづかこふん", "物部麁鹿火": "もののべのあらかい", "物部尾輿": "もののべのおこし", "物部守屋": "もののべのもりや", "大伴金村": "おおとものかなむら", "蘇我稲目": "そがのいなめ", "蘇我馬子": "そがのうまこ", "蘇我入鹿": "そがのいるか", "蘇我蝦夷": "そがのえみし", "蝦夷": "えみし", "入鹿": "いるか", "稲目": "いなめ", "継体天皇": "けいたいてんのう", "任那四県": "みまなよんけん", "大連": "おおむらじ", "左大臣": "さだいじん", "右大臣": "うだいじん", "大臣": "おおおみ", "三蔵": "さんぞう", "崇仏派": "すうぶつは", "排仏派": "はいぶつは", "崇峻天皇": "すしゅんてんのう", "推古天皇": "すいこてんのう", "欽明天皇": "きんめいてんのう", "孝徳天皇": "こうとくてんのう", "皇極天皇": "こうぎょくてんのう", "持統天皇": "じとうてんのう", "斉明天皇": "さいめいてんのう", "天智天皇": "てんじてんのう", "天武天皇": "てんむてんのう", "文武天皇": "もんむてんのう", "聖徳太子": "しょうとくたいし", "厩戸王": "うまやとおう", "摂政": "せっしょう", "冠位十二階": "かんいじゅうにかい", "大徳": "だいとく", "大仁": "だいにん", "大礼": "だいらい", "大智": "だいち", "憲法十七条": "けんぽうじゅうななじょう", "天皇記": "てんのうき", "国記": "こっき", "古事記": "こじき", "日本書紀": "にほんしょき", "風土記": "ふどき", "遣隋使": "けんずいし", "遣唐使": "けんとうし", "朝貢使": "ちょうこうし", "小野妹子": "おののいもこ", "裴世清": "はいせいせい", "高向玄理": "たかむこのくろまろ", "中臣鎌足": "なかとみのかまたり", "隋書": "ずいしょ", "倭国伝": "わこくでん", "魏志": "ぎし", "倭人伝": "わじんでん", "宋書": "そうじょ", "漢書": "かんじょ", "地理志": "ちりし", "魏徴": "ぎちょう", "煬帝": "ようだい", "文帝": "ぶんてい", "太宗": "たいそう", "光武帝": "こうぶてい", "曇徴": "どんちょう", "観勒": "かんろく", "恵慈": "えじ", "南淵請安": "みなぶちのしょうあん", "旻": "みん", "飛鳥寺式": "あすかでらしき", "飛鳥寺": "あすかでら", "法興寺": "ほうこうじ", "法隆寺": "ほうりゅうじ", "四天王寺": "してんのうじ", "広隆寺": "こうりゅうじ", "中宮寺": "ちゅうぐうじ", "薬師寺": "やくしじ", "東大寺": "とうだいじ", "若草伽藍跡": "わかくさがらんあと", "伽藍配置": "がらんはいち", "伽藍": "がらん", "飛鳥池遺跡": "あすかいけいせき", "秦河勝": "はたのかわかつ", "北魏": "ほくぎ", "杏仁形": "きょうにんけい", "仰月形": "ぎょうげつけい", "金銅像": "こんどうぞう", "釈迦三尊像": "しゃかさんぞんぞう", "鞍作鳥": "くらつくりのとり", "止利仏師": "とりぶっし", "夢殿": "ゆめどの", "救世観音像": "くせかんのんぞう", "百済観音像": "くだらかんのんぞう", "釈迦如来像": "しゃかにょらいぞう", "半跏思惟像": "はんかしゆいぞう", "弥勒菩薩": "みろくぼさつ", "古拙": "こせつ", "忍冬唐草文様": "にんどうからくさもんよう", "須弥座": "しゅみざ", "玉虫厨子": "たまむしのずし", "橘大郎女": "たちばなのおおいらつめ", "天寿国繡帳": "てんじゅこくしゅうちょう", "刺繡": "ししゅう", "法華経": "ほけきょう", "維摩経": "ゆいまぎょう", "勝鬘経": "しょうまんぎょう", "三経義疏": "さんぎょうぎしょ", "白鳳": "はくほう", "天平": "てんぴょう", "山背大兄王": "やましろのおおえのおう", "乙巳の変": "いっしのへん", "中大兄皇子": "なかのおおえのおうじ", "飛鳥板蓋宮": "あすかのいたぶきのみや", "軽皇子": "かるのみこ", "内臣": "うちつおみ", "阿倍内麻呂": "あべのうちまろ", "蘇我倉山田石川麻呂": "そがのくらやまだのいしかわまろ", "国博士": "くにのはかせ", "大化": "たいか", "大宝律令": "たいほうりつりょう", "大宝": "たいほう", "養老律令": "ようろうりつりょう", "難波長柄豊碕宮": "なにわのながらのとよさきのみや", "改新の詔": "かいしんのみことのり", "詔": "みことのり", "公地公民": "こうちこうみん", "田荘": "たどころ", "屯倉": "みやけ", "子代": "こしろ", "部曲": "かきべ", "食封": "じきふ", "大夫": "たいふ", "戸籍": "こせき", "計帳": "けいちょう", "班田収授法": "はんでんしゅうじゅほう", "班田収授": "はんでんしゅうじゅ", "墾田永年私財法": "こんでんえいねんしざいほう", "重祚": "ちょうそ", "称制": "しょうせい", "譲位": "じょうい", "朝倉宮": "あさくらのみや", "白村江": "はくすきのえ", "水城": "みずき", "大野城": "おおのじょう", "基肄城": "きいじょう", "大宰府": "だざいふ", "防人": "さきもり", "烽": "とぶひ", "近江大津宮": "おうみおおつのみや", "近江朝廷": "おうみちょうてい", "近江令": "おうみりょう", "飛鳥浄御原令": "あすかきよみはらりょう", "飛鳥浄御原宮": "あすかきよみはらのみや", "庚午年籍": "こうごねんじゃく", "庚寅年籍": "こういんねんじゃく", "壬申の乱": "じんしんのらん", "大友皇子": "おおとものおうじ", "大海人皇子": "おおあまのおうじ", "草壁皇子": "くさかべのおうじ", "八色の姓": "やくさのかばね", "富本銭": "ふほんせん", "和同開珎": "わどうかいちん", "永楽通宝": "えいらくつうほう", "寛永通宝": "かんえいつうほう", "藤原京": "ふじわらきょう", "平城京": "へいじょうきょう", "平安京": "へいあんきょう", "条坊制": "じょうぼうせい", "都城": "とじょう", "三宝": "さんぽう", "仏・法・僧": "ぶつ、ほう、そう", "篤く": "あつく", "承りては": "うけたまわりては", "謹め": "つつしめ", "和を以て貴しと為し": "わをもってとうとしとなし", "忤ふること無きを宗と為す": "さからうことなきをむねとなす", "日出づる処の天子、書を日没する処の天子に致す": "ひいづるところのてんし、しょをひぼっするところのてんしにいたす", "倭の国書": "わのこくしょ", "大業三年": "たいぎょうさんねん", "昔在の": "むかしの", "罷めよ": "やめよ", "初めて造れ": "はじめてつくれ", "親魏倭王": "しんぎわおう", "姪": "めい", "斉明": "さいめい", "馬子": "うまこ", "立てたまへる": "たてたまえる", "処々": "しょしょ", "其の": "その", "加耶": "かや", "渤海": "ぼっかい", "隋": "ずい", "唐": "とう", "魏": "ぎ", "宋": "そう", "倭": "わ", "郡評論争": "ぐんぴょうろんそう", "評": "こおり", "郡": "ぐん", "飛鳥（斉明）": "あすか、さいめい", "律令": "りつりょう", "皇后": "こうごう", "大和三山": "やまとさんざん", "実権": "じっけん", "RR": "", "6世紀末〜": "ろくせいきまつから", "改札": "かいさつ", "終点": "しゅうてん", "始発": "しはつ", "乗車": "じょうしゃ", "乗り換え": "のりかえ", "和を以て": "わをもって", "日出づる処の天子": "ひいづるところのてんし", "蘇我氏": "そがし", "改新号": "かいしんごう", "女帝": "じょてい", "父子": "ふし"};
+const KEYS = Object.keys(READ).sort((a, b) => b.length - a.length);
+const has = 'speechSynthesis' in window;
+let ja = null, token = 0;
+function pick() { if (has) ja = speechSynthesis.getVoices().find(v => /^ja[-_]/i.test(v.lang)) || null; }
+if (has) { pick(); speechSynthesis.onvoiceschanged = pick; }
+function toSpeech(t) {
+  t = t.replace(/🔊 車内アナウンス：|🔊 この駅を聞く/g, '');
+  for (const k of KEYS) t = t.split(k).join(READ[k]);
+  return t.replace(/→/g, '、そして、').replace(/〜/g, 'から').replace(/[（）「」『』]/g, '、').replace(/＝/g, 'は、').replace(/・/g, '、').replace(/\s+/g, ' ');
+}
+function stopAll() { token++; if (has) speechSynthesis.cancel(); document.querySelectorAll('.stop.now').forEach(e => e.classList.remove('now')); }
+function queue(items) {
+  if (!has) { alert('この端末は読み上げに対応していません'); return; }
+  stopAll(); const my = token; let i = 0;
+  const next = () => {
+    if (my !== token) return;
+    document.querySelectorAll('.stop.now').forEach(e => e.classList.remove('now'));
+    if (i >= items.length) return;
+    const [text, el] = items[i++];
+    if (el) { el.classList.add('now'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    const u = new SpeechSynthesisUtterance(toSpeech(text));
+    u.lang = 'ja-JP'; if (ja) u.voice = ja; u.rate = parseFloat(document.getElementById('rate').value);
+    u.onend = next; u.onerror = next; speechSynthesis.speak(u);
+  };
+  next();
+}
+function stopText(st) {
+  const sign = st.querySelector('.sign');
+  const name = sign.querySelector('.name').textContent;
+  const num = sign.querySelector('.num span').textContent;
+  const isBranch = st.classList.contains('branch');
+  const parts = [isBranch ? '支線、' + name + '。' : '駅ナンバー' + parseInt(num) + '、' + name + '。'];
+  const t = sign.querySelector('.tenno'); if (t) { const c = t.cloneNode(true); c.querySelectorAll('span').forEach(sp => sp.textContent = '。' + sp.textContent + 'は、'); parts.push(c.textContent.replace(/^。/, '') + '。'); }
+  sign.querySelectorAll('.ev li').forEach(li => { const b = li.querySelector('b').textContent; parts.push((/^\d+$/.test(b) ? b + '年、' : b + '、') + li.textContent.slice(b.length) + '。'); });
+  const a = sign.querySelector('.annc'); if (a) parts.push('車内アナウンス。' + a.textContent);
+  return parts.join(' ');
+}
+function playStop(btn) { const st = btn.closest('.stop, .branch'); queue([[stopText(st), st]]); }
+function playAll() {
+  const items = [[document.querySelector('.story').textContent, null]];
+  document.querySelectorAll('.route .stop, .route .branch').forEach(st => items.push([stopText(st), st]));
+  queue(items);
+}
+function playGoro() {
+  queue([...document.querySelectorAll('.goro tr')].map(tr => { const td = tr.querySelectorAll('td'); return [td[0].textContent + '年、' + td[1].textContent + '。' + td[2].textContent.replace(/（\d+）/, '') + '。', null]; }));
+}
+</script>
+</body>
+</html>
