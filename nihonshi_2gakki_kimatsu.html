@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日本史 2学期期末 書いて覚えるPRO</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #9A3412; --main-light: #FFF7ED; --main-mid: #FED7AA;
+  --green: #16A34A; --green-light: #F0FDF4;
+  --red: #DC2626; --red-light: #FEF2F2;
+  --orange: #EA580C; --orange-light: #FFF7ED;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF;
+  --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #FBF4EE; min-height: 100vh; padding: 16px; color: var(--gray-900); }
+.container { max-width: 640px; margin: 0 auto; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.header { padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 17px; font-weight: 700; color: var(--main); }
+.header-sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.score-badge { background: var(--main); color: white; font-size: 15px; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; display: none; }
+.sec-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
+.sec-tab { min-width: 0; padding: 8px 2px; border: 2px solid var(--main-mid); background: white; color: var(--main); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sec-tab small { display: block; font-size: 10px; font-weight: 400; color: var(--gray-400); margin-top: 2px; }
+.sec-tab.active { background: var(--main); color: white; border-color: var(--main); }
+.sec-tab.active small { color: #FFEDD5; }
+.tts-bar { padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: var(--gray-600); display: flex; flex-direction: column; gap: 8px; }
+.tts-row { display: flex; align-items: center; gap: 10px; }
+.tts-bar select { flex: 1; min-width: 0; padding: 6px 8px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; background: white; }
+.tts-bar input[type=range] { flex: 1; }
+.tts-bar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
+.mode-screen { display: none; } .mode-screen.show { display: block; }
+.mode-card { padding: 16px 18px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; display: flex; gap: 14px; align-items: flex-start; }
+.mode-card:hover { border-color: var(--main); transform: translateY(-2px); }
+.mode-card.main-mode { border-color: var(--orange); }
+.mode-icon { font-size: 28px; line-height: 1; }
+.mode-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.mode-count { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+.mode-count.orange { background: var(--orange-light); color: var(--orange); }
+.mode-count.empty { background: var(--gray-100); color: var(--gray-400); }
+.reco { display: inline-block; background: var(--orange); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.star { display: inline-block; background: var(--red); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.quiz-area { display: none; }
+.progress-wrap { padding: 12px 18px; margin-bottom: 12px; }
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+.progress-bar { background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden; }
+.progress-fill { background: var(--main); height: 8px; border-radius: 4px; transition: width 0.4s ease; }
+.question-card { padding: 20px; margin-bottom: 12px; }
+.q-tag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.q-tag.star-tag { background: var(--red-light); color: var(--red); margin-left: 4px; }
+.q-ja { font-size: 15px; color: var(--gray-800); padding: 10px 12px; background: var(--gray-50); border-radius: var(--radius-sm); line-height: 1.7; }
+.q-big { font-size: 20px; font-weight: 700; line-height: 1.6; padding: 6px 0 2px; }
+.q-note { font-size: 13px; color: var(--main); margin-top: 8px; line-height: 1.6; }
+.mushi { font-size: 18px; line-height: 2.4; margin-top: 14px; }
+.mushi input { font-family: 'Courier New', monospace; font-size: 17px; padding: 3px 6px; border: none; border-bottom: 3px solid var(--main); background: var(--main-light); border-radius: 4px 4px 0 0; outline: none; color: var(--gray-900); }
+.mushi input:focus { background: #CCFBF1; }
+.mushi input.ok { border-bottom-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700; }
+.mushi input.ng { border-bottom-color: var(--red); background: var(--red-light); color: var(--red); text-decoration: line-through; }
+.fix { color: var(--green); font-weight: 700; font-size: 15px; margin: 0 2px; }
+.hint-len { font-size: 11px; color: var(--gray-400); vertical-align: super; margin-left: 1px; }
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.choice-btn { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 16px; color: var(--gray-800); cursor: pointer; text-align: left; width: 100%; }
+.choice-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice-btn:disabled { cursor: default; }
+.choice-label { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--gray-100); font-weight: 700; font-size: 13px; color: var(--gray-600); flex-shrink: 0; }
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.write-in { width: 100%; margin-top: 14px; padding: 12px; font-family: 'Courier New', monospace; font-size: 17px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); outline: none; line-height: 1.6; resize: vertical; }
+.write-in:focus { border-color: var(--main); }
+textarea.write-in { min-height: 96px; }
+.rearrange-target { display: flex; flex-wrap: wrap; gap: 8px; min-height: 58px; padding: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200); border-radius: var(--radius-sm); margin-top: 14px; align-items: flex-start; }
+.rearrange-target.filled { border-style: solid; background: var(--orange-light); border-color: var(--orange); }
+.rearrange-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.word-chip { padding: 9px 13px; background: white; border: 2px solid var(--gray-200); border-radius: 20px; font-size: 16px; font-family: inherit; cursor: pointer; color: var(--gray-800); }
+.word-chip:hover:not(:disabled) { border-color: var(--orange); }
+.word-chip.in-target { background: var(--orange); color: white; border-color: var(--orange); }
+.word-chip.ok { background: var(--green); border-color: var(--green); color: white; }
+.word-chip.ng { background: var(--red); border-color: var(--red); color: white; }
+.word-chip:disabled { cursor: default; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn { flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.check-btn { width: 100%; margin-top: 12px; padding: 13px; background: var(--orange); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.check-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.explanation { display: none; margin-top: 14px; padding: 14px; background: #FFFAF5; border-left: 4px solid var(--main); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.explanation.show { display: block; }
+.ex-correct { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+.ex-correct.wrong-flag { color: var(--red); }
+.ex-text { font-size: 15px; color: var(--gray-800); line-height: 1.8; }
+.ex-label { font-size: 12px; color: var(--gray-400); margin-top: 8px; }
+.diff-line { font-family: 'Courier New', monospace; font-size: 15px; line-height: 1.9; margin-top: 4px; word-break: break-word; }
+.d-ok { color: var(--gray-800); }
+.d-bad { color: var(--red); text-decoration: line-through; font-weight: 700; }
+.d-miss { color: white; background: var(--orange); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+.d-good { color: var(--green); font-weight: 700; }
+.speak-btn { border: 2px solid var(--main-mid); background: white; color: var(--main); border-radius: 20px; padding: 4px 12px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.next-btn { display: none; width: 100%; margin-top: 12px; padding: 14px; background: var(--main); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.next-btn.show { display: block; }
+.back-link { text-align: center; margin-top: 14px; }
+.back-link a { color: var(--gray-400); font-size: 13px; cursor: pointer; text-decoration: underline; }
+.result { display: none; padding: 26px 20px; text-align: center; }
+.result-score { font-size: 44px; font-weight: 700; color: var(--main); }
+.result-msg { font-size: 15px; color: var(--gray-600); margin: 10px 0 18px; line-height: 1.7; }
+.note-card { padding: 12px 16px; margin-top: 4px; font-size: 12px; color: var(--gray-600); line-height: 1.7; }
+.diff-line.jp { font-family: inherit; font-size: 20px; letter-spacing: 2px; }
+.write-in { font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="card header">
+    <div style="flex:1">
+      <div class="header-title">日本史 2学期期末 書いて覚えるPRO</div>
+      <div class="header-sub">プリント NO.8 律令国家への道 〜 NO.10 律令制度</div>
+    </div>
+    <div class="score-badge" id="scoreBadge">0点</div>
+  </div>
+
+  <div class="sec-tabs" id="secTabs"></div>
+
+  <div class="mode-screen show" id="modeScreen">
+    <div class="card mode-card" onclick="startMode('mc')">
+      <div class="mode-icon">📝</div>
+      <div>
+        <div class="mode-title">4択</div>
+        <div class="mode-desc">問題文を読んで用語を選びます。まずはここで全部選べるように。</div>
+        <span class="mode-count" id="cnt-mc"></span>
+      </div>
+    </div>
+    <div class="card mode-card main-mode" onclick="startMode('kw')">
+      <div class="mode-icon">✍️</div>
+      <div>
+        <div class="mode-title">漢字で書く<span class="reco">いちばん大事</span></div>
+        <div class="mode-desc">選択肢なしで、用語を漢字で入力します。1字でも違えば×（高松「家」古墳はアウト）。困ったら「よみがなヒント」。</div>
+        <span class="mode-count orange" id="cnt-kw"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('order')">
+      <div class="mode-icon">📅</div>
+      <div>
+        <div class="mode-title">年代並べ替え</div>
+        <div class="mode-desc">4つの出来事を古い順にタップ。天皇と出来事の取り違えを防ぎます。</div>
+        <span class="mode-count" id="cnt-order"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('wrong')">
+      <div class="mode-icon">🔁</div>
+      <div>
+        <div class="mode-title">苦手復習</div>
+        <div class="mode-desc">これまでに間違えた問題だけ。正解すると苦手リストから消えます。</div>
+        <span class="mode-count" id="cnt-wrong"></span>
+      </div>
+    </div>
+    <div class="card note-card">★ は先生がプリントで「大切」と印をつけたところ。八色の姓の「真人・朝臣…」は先生が「書く問題は出ない」と言っていたので、4択だけに入れています。</div>
+  </div>
+
+  <div class="quiz-area" id="quizArea">
+    <div class="card progress-wrap">
+      <div class="progress-info"><span id="progText"></span><span id="progScore"></span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+    </div>
+    <div class="card question-card" id="qCard"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">次へ →</button>
+    <div class="card result" id="result"></div>
+    <div class="back-link"><a onclick="backToMenu()">← メニューに戻る</a></div>
+  </div>
+</div>
+
+<script>
+// [プリント, 種類, 問題, 答え, よみがな, 別解(配列), オプション]
+// 種類は4択の選択肢をそろえるため。opt: 'mconly'=4択だけ, 'star'=先生の重要マーク
+const RAW = [
+ // ===== NO.8 律令国家への道 =====
+ [8,'天皇','皇極天皇が重祚（もう一度即位）した天皇','斉明天皇','さいめいてんのう',['斉明']],
+ [8,'場所','斉明天皇が難波から遷都した場所','飛鳥','あすか'],
+ [8,'国','660年に滅亡し、日本に救援を依頼した朝鮮半島の国','百済','くだら'],
+ [8,'天皇','百済救援に向かい、661年に九州の朝倉宮で死去した天皇','斉明天皇','さいめいてんのう',['斉明']],
+ [8,'人物','天智天皇が即位する前の名前（661〜667年は称制）','中大兄皇子','なかのおおえのおうじ'],
+ [8,'天皇','中大兄皇子が668年に即位して何天皇になったか','天智天皇','てんじてんのう',['天智']],
+ [8,'出来事','663年、唐・新羅の連合軍に敗れ、以後朝鮮経営を断念した戦い','白村江の戦い','はくすきのえのたたかい',['白村江']],
+ [8,'国','白村江の戦いで日本が戦った2国（唐と、もう1つ）','新羅','しらぎ'],
+ [8,'施設','白村江の敗戦後、大宰府を守るために築いた堤','水城','みずき'],
+ [8,'役職','白村江の敗戦後、九州においた兵士','防人','さきもり'],
+ [8,'都','667年に天智天皇が遷都した宮','近江大津宮','おうみおおつのみや'],
+ [8,'法','668年に制定された最初の令（律は現存せず、完成を疑う説あり）','近江令','おうみりょう'],
+ [8,'戸籍','670年に作成された最初の全国的戸籍（永久保存）','庚午年籍','こうごねんじゃく'],
+ [8,'出来事','672年、天智天皇死後の皇位継承をめぐる「古代史最大の内乱」','壬申の乱','じんしんのらん'],
+ [8,'人物','壬申の乱で近江朝廷方についた天智天皇の子（＝弘文天皇）','大友皇子','おおとものおうじ'],
+ [8,'人物','壬申の乱で吉野で挙兵した天智天皇の弟','大海人皇子','おおあまのおうじ'],
+ [8,'都','壬申の乱に勝った大海人皇子が即位した宮','飛鳥浄御原宮','あすかきよみはらのみや'],
+ [8,'天皇','大海人皇子が即位して何天皇になったか','天武天皇','てんむてんのう',['天武']],
+ [8,'称号','天武天皇のころから「大王」に代わって使われた称号','天皇','てんのう'],
+ [8,'法','681年に天武天皇が制定に着手し、689年に持統天皇が施行した令','飛鳥浄御原令','あすかきよみはらりょう'],
+ [8,'制度','684年、天皇中心に豪族を再編成した制度','八色の姓','やくさのかばね'],
+ [8,'制度','八色の姓でいちばん上の姓（真人・朝臣・宿禰…）','真人','まひと',null,'mconly'],
+ [8,'銭','天武天皇のころ鋳造され、1999年に奈良県の飛鳥池遺跡から出土した銭','富本銭','ふほんせん'],
+ [8,'天皇','天智天皇の娘で天武天皇の皇后。草壁皇子の死後に即位した天皇','持統天皇','じとうてんのう',['持統']],
+ [8,'戸籍','690年に作成された戸籍（以後6年ごとに作成、班田収授）','庚寅年籍','こういんねんじゃく'],
+ [8,'都','694年に遷都した、都城制による初の都（大和三山に囲まれた地）','藤原京','ふじわらきょう'],
+ [8,'場所','藤原京が模倣した唐の都','長安','ちょうあん'],
+ [8,'理由','天武天皇が国史の編纂を始めた理由','武力で即位したため、支配の正統性を示す必要があったから','',null,'mconly'],
+ // ===== NO.9 白鳳文化 =====
+ [9,'天皇','白鳳文化はとくに天武天皇と何天皇の時代の文化か','持統天皇','じとうてんのう',['持統']],
+ [9,'文化','白鳳文化が影響を受けた中国の文化','初唐文化','しょとうぶんか'],
+ [9,'寺','国家が管理する官立の寺院を何というか','官大寺','かんだいじ'],
+ [9,'寺','天武天皇が皇后（のちの持統天皇）の病気平癒を願って建てた寺','薬師寺','やくしじ'],
+ [9,'経典','白鳳期に重視された護国の経典','金光明経','こんこうみょうきょう'],
+ [9,'作品','各階に裳階をもつ三重塔。フェノロサが「凍れる音楽」と呼んだ','薬師寺東塔','やくしじとうとう'],
+ [9,'人物','薬師寺東塔を「凍れる音楽」と呼んだ人','フェノロサ','ふぇのろさ',null,'mconly'],
+ [9,'作品','薬師寺金堂にある金銅像','薬師三尊像','やくしさんぞんぞう'],
+ [9,'作品','旧山田寺薬師三尊の本尊の頭部（金銅像）','興福寺仏頭','こうふくじぶっとう'],
+ [9,'人物','山田寺を建てた人物（興福寺仏頭のもとの寺）','蘇我倉山田石川麻呂','そがのくらのやまだのいしかわまろ',null,'mconly'],
+ [9,'作品','悪い夢を見たとき祈れば良い夢に変えてくれるという金銅像','法隆寺夢違観音像','ほうりゅうじゆめちがいかんのんぞう'],
+ [9,'作品','1949年に大部分焼失。アジャンター・敦煌の壁画に似ている絵画','法隆寺金堂壁画','ほうりゅうじこんどうへきが'],
+ [9,'作品','1972年発見。初唐・高句麗の影響を受けた人物・四神の図','高松塚古墳壁画','たかまつづかこふんへきが'],
+ [9,'人物','白鳳期の代表的な歌人（宮廷歌人）','柿本人麻呂','かきのもとのひとまろ'],
+ [9,'人物','「熟田津に船乗りせむと月待てば…」の歌をよんだ女性歌人','額田王','ぬかたのおおきみ'],
+ [9,'書物','白鳳期の和歌がのちに集録された和歌集','万葉集','まんようしゅう'],
+ [9,'人物','漢詩をよんだ皇子で、謀反の罪で死んだ天武天皇の子','大津皇子','おおつのみこ',['大津皇子']],
+ [9,'書物','白鳳期の漢詩がのちに集録された漢詩集','懐風藻','かいふうそう'],
+ // ===== NO.10 律令制度と官僚制 =====
+ [10,'法','701年に文武天皇のもとで制定された律令','大宝律令','たいほうりつりょう'],
+ [10,'人物','大宝律令の編纂の中心となった皇族','刑部親王','おさかべしんのう'],
+ [10,'人物','大宝律令・養老律令の編纂にかかわった中臣鎌足の子','藤原不比等','ふじわらのふひと'],
+ [10,'法','718年に編纂され、757年に施行された律令','養老律令','ようろうりつりょう'],
+ [10,'官庁','神祇官と並ぶ中央の最高機関（政治を担当）','太政官','だいじょうかん'],
+ [10,'官庁','八省のうち、詔書の作成などを担当','中務省','なかつかさしょう',null,'mconly'],
+ [10,'官庁','八省のうち、文官の人事などを担当','式部省','しきぶしょう',null,'mconly'],
+ [10,'官庁','八省のうち、戸籍の作成・税務などを担当','民部省','みんぶしょう',null,'mconly'],
+ [10,'官庁','八省のうち、軍事・武官の人事などを担当','兵部省','ひょうぶしょう',null,'mconly'],
+ [10,'官庁','八省のうち、財政・貨幣などを担当','大蔵省','おおくらしょう',null,'mconly'],
+ [10,'官庁','風俗の取り締まり・官吏の監察をする機関','弾正台','だんじょうだい'],
+ [10,'官庁','宮城の警備をする機関（衛門府など）','五衛府','ごえふ'],
+ [10,'制度','太政大臣のように、適任者がいないときには置かない官','則闕の官','そっけつのかん',null,'mconly'],
+ [10,'官庁','都の左京・右京の一般民政をおこなう役所','京職','きょうしき'],
+ [10,'官庁','摂津国の一般民政・難波津の管理をおこなう役所','摂津職','せっつしき'],
+ [10,'官庁','九州の民政・軍事・外交を担当。「遠の朝廷」','大宰府','だざいふ'],
+ [10,'役職','国を治め、中央貴族が任命された役人（任期6年→のち4年）','国司','こくし'],
+ [10,'役職','郡を治め、旧国造ら在地豪族が任命された役人（終身）','郡司','ぐんじ'],
+ [10,'役職','里を治め、有力農民が任命された役人（1里＝50戸）','里長','りちょう'],
+ [10,'制度','715年ごろ、里を何と改称したか','郷','ごう'],
+ [10,'制度','長官・次官・判官・主典の4つの等級からなる官職の制度','四等官制','しとうかんせい'],
+ [10,'制度','貴族が位階に応じた官職に任命される制度','官位相当の制','かんいそうとうのせい'],
+ [10,'制度','三位以上の子と孫、五位以上の子が21歳で父や祖父の位階に応じた位階を与えられる制度','蔭位の制','おんいのせい',null,'star'],
+ [10,'制度','笞・杖・徒・流・死の5つの刑罰','五刑','ごけい'],
+ [10,'制度','天皇や尊属・国家に対する8つの重い罪','八虐','はちぎゃく'],
+ [10,'台帳','班田のための台帳。6年ごとに作成','戸籍','こせき'],
+ [10,'台帳','調・庸を徴収するための台帳。毎年作成','計帳','けいちょう'],
+ [10,'制度','6歳以上の男女に口分田を班給し、死後に収公する法','班田収授法','はんでんしゅうじゅほう',['班田収授']],
+ [10,'数字','口分田は何歳以上の男女に班給されたか','6歳','',['6','六歳','六']],
+ [10,'制度','土地の班給のため、田地を整然と区画した制度','条里制','じょうりせい'],
+ [10,'数字','良民男子に班給された口分田の広さ','2段','',['二段','2反','二反'],'mconly'],
+ [10,'数字','良民女子に班給された口分田の広さ（男子の3分の2）','1段120歩','',['一段百二十歩'],'mconly'],
+ [10,'税','21〜60歳の男子を何というか','正丁','せいてい'],
+ [10,'税','61〜65歳の男子を何というか','老丁','ろうてい',['次丁']],
+ [10,'税','17〜20歳の男子を何というか','中男','ちゅうなん',['少丁']],
+ [10,'数字','租：田1段につき納める稲の量','2束2把','',['二束二把'],'mconly'],
+ [10,'数字','租は収穫の約何%','3%','',['3','約3%','三']],
+ [10,'税','調・庸を農民が都まで運ぶこと','運脚','うんきゃく'],
+ [10,'数字','雑徭は年間何日が限度','60日','',['60','六十日']],
+ [10,'税','凶作に備えて粟を納めさせた制度（備荒貯蓄）','義倉','ぎそう'],
+ [10,'税','国家が稲を貸し付け、利息をとる制度','出挙','すいこ'],
+ [10,'役職','諸国で兵士を訓練する組織','軍団','ぐんだん'],
+ [10,'役職','宮城や京内を警備する兵士（1年間）','衛士','えじ'],
+ [10,'役職','九州北岸を警備する兵士（3年間）','防人','さきもり'],
+ [10,'制度','陵戸・官戸・公奴婢・家人・私奴婢の5種類の賤民','五色の賤','ごしきのせん'],
+ [10,'制度','天皇の陵墓を守る、官有の賤民','陵戸','りょうこ'],
+ [10,'制度','口分田の班給や租税負担の単位となった、数戸の房戸からなる家族','郷戸','ごうこ']
+];
+// 年代並べ替え用
+const EVENTS = [
+ [660,'百済が滅亡する',8],[663,'白村江の戦い',8],[667,'近江大津宮に遷都',8],[668,'近江令の制定',8],
+ [670,'庚午年籍の作成',8],[672,'壬申の乱',8],[681,'飛鳥浄御原令の制定に着手',8],[684,'八色の姓の制定',8],
+ [689,'飛鳥浄御原令の施行',8],[690,'庚寅年籍の作成',8],[694,'藤原京に遷都',8],[701,'大宝律令の制定',10],
+ [718,'養老律令の編纂',10],[757,'養老律令の施行',10],[715,'里を郷と改称',10]
+];
+
+const ITEMS = [];
+RAW.forEach((r,i) => {
+  const [no,cat,q,a,yomi,alts,opt] = r;
+  const base = {no, cat, q, a, yomi, alts: alts||[], star: opt==='star'};
+  ITEMS.push(Object.assign({type:'mc', id:'mc'+i}, base));
+  if (opt!=='mconly') ITEMS.push(Object.assign({type:'kw', id:'kw'+i}, base));
+});
+const ORDER_SETS = [];
+[8,10,'all'].forEach(no => {
+  const pool = EVENTS.filter(e => no==='all' || e[2]===no);
+  const n = no==='all' ? 10 : 6;
+  for (let k=0;k<n;k++) ORDER_SETS.push({type:'order', id:'od'+no+'-'+k, no: no==='all'?0:no, pool});
+});
+const byId = Object.fromEntries(ITEMS.concat(ORDER_SETS).map(x=>[x.id,x]));
+
+let sec='all', mode=null, queue=[], qi=0, score=0, answered=false, cur=null, mcTally=[0,0,0,0];
+const STORE='nihonshi_kimatsu_wrong';
+function loadWrong(){ try { return JSON.parse(localStorage.getItem(STORE))||[]; } catch(e){ return []; } }
+function saveWrong(a){ try { localStorage.setItem(STORE, JSON.stringify(a)); } catch(e){} }
+function addWrong(id){ const a=loadWrong(); if(!a.includes(id)){ a.push(id); saveWrong(a); } }
+function removeWrong(id){ saveWrong(loadWrong().filter(x=>x!==id)); }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function inSec(it){ if (sec==='all') return it.type!=='order' || it.no===0; return it.no===+sec; }
+
+const TABS=[{id:'all',name:'全範囲',sub:'NO.8〜10'},{id:'8',name:'NO.8',sub:'律令国家への道'},{id:'9',name:'NO.9',sub:'白鳳文化'},{id:'10',name:'NO.10',sub:'律令制度'}];
+function renderTabs(){ document.getElementById('secTabs').innerHTML = TABS.map(t=>`<button class="sec-tab ${t.id===sec?'active':''}" onclick="setSec('${t.id}')">${t.name}<small>${t.sub}</small></button>`).join(''); }
+function setSec(s){ sec=s; renderTabs(); updateCounts(); }
+function listFor(m){ return m==='order' ? ORDER_SETS.filter(inSec) : ITEMS.filter(it=>it.type===m && inSec(it)); }
+function updateCounts(){
+  ['mc','kw','order'].forEach(m=>{ const n=listFor(m).length; const el=document.getElementById('cnt-'+m); el.textContent = n? n+'問' : 'この範囲にはありません'; el.className='mode-count '+(m==='kw'?'orange':'')+(n?'':' empty'); });
+  const w = loadWrong().filter(id=>byId[id] && (sec==='all' || byId[id].no===+sec)).length;
+  const el=document.getElementById('cnt-wrong'); el.textContent = w? w+'問' : 'まだありません'; el.className='mode-count '+(w?'orange':'empty');
+}
+function startMode(m){
+  const list = m==='wrong' ? loadWrong().map(id=>byId[id]).filter(it=>it && (sec==='all'||it.no===+sec)) : listFor(m);
+  if (!list.length) return;
+  mode=m; queue=shuffle(list); qi=0; score=0; mcTally=[0,0,0,0];
+  document.getElementById('modeScreen').classList.remove('show');
+  document.getElementById('quizArea').style.display='block';
+  document.getElementById('result').style.display='none';
+  document.getElementById('qCard').style.display='block';
+  showQ();
+}
+function backToMenu(){ document.getElementById('quizArea').style.display='none'; document.getElementById('modeScreen').classList.add('show'); document.getElementById('scoreBadge').style.display='none'; updateCounts(); }
+function updateProgress(){
+  document.getElementById('progText').textContent=`${qi+1} / ${queue.length}問`;
+  document.getElementById('progScore').textContent=`正解 ${score}`;
+  document.getElementById('progFill').style.width=(qi/queue.length*100)+'%';
+  const b=document.getElementById('scoreBadge'); b.style.display='block'; b.textContent=score+'点';
+}
+const TAGNAME={mc:'📝 4択', kw:'✍️ 漢字で書く', order:'📅 年代並べ替え'};
+function tagHtml(it){ return `<span class="q-tag">${it.no?'NO.'+it.no:'全範囲'}　${TAGNAME[it.type]}</span>${it.star?'<span class="q-tag star-tag">★先生が「大切」</span>':''}`; }
+function showQ(){ answered=false; cur=queue[qi]; document.getElementById('nextBtn').classList.remove('show'); updateProgress(); ({mc:showMC, kw:showKW, order:showOrder})[cur.type](); }
+function finishAnswer(ok){
+  answered=true;
+  if (ok){ score++; if(mode==='wrong') removeWrong(cur.id); } else addWrong(cur.id);
+  updateProgress(); document.getElementById('progFill').style.width=((qi+1)/queue.length*100)+'%';
+  const nb=document.getElementById('nextBtn'); nb.classList.add('show'); nb.textContent = qi+1<queue.length ? '次へ →' : '結果を見る';
+}
+function nextQ(){ qi++; if (qi>=queue.length) return showResult(); showQ(); window.scrollTo({top:0,behavior:'smooth'}); }
+function showResult(){
+  document.getElementById('qCard').style.display='none'; document.getElementById('nextBtn').classList.remove('show');
+  const pct=Math.round(score/queue.length*100);
+  const msg = pct===100 ? '全問正解！' : pct>=80 ? 'あと少し。間違えた問題は「苦手復習」に入っています。' : '間違えた問題は「苦手復習」に入りました。もう一周してみましょう。';
+  const r=document.getElementById('result');
+  r.innerHTML=`<div class="result-score">${score} / ${queue.length}</div><div class="result-msg">${msg}</div>
+   <button class="check-btn" style="background:var(--main)" onclick="startMode('${mode}')">もう一度</button>
+   <button class="check-btn" onclick="backToMenu();startMode('wrong')">苦手復習へ</button>`;
+  r.style.display='block';
+}
+function readingLine(it){ return it.yomi ? `<div class="ex-label">よみ：${esc(it.yomi)}</div>` : ''; }
+
+// 4択（正解の位置が偏らないように）
+function showMC(){
+  const same = shuffle(ITEMS.filter(it=>it.type==='mc' && it.cat===cur.cat && it.a!==cur.a)).map(it=>it.a);
+  const other = shuffle(ITEMS.filter(it=>it.type==='mc' && it.no===cur.no && it.a!==cur.a && it.cat!=='理由')).map(it=>it.a);
+  const wrongs = [...new Set(same.concat(other))].filter(a=>a!==cur.a).slice(0,3);
+  const min=Math.min(...mcTally); const c=[0,1,2,3].filter(p=>mcTally[p]===min); const pos=c[Math.floor(Math.random()*c.length)]; mcTally[pos]++;
+  const opts=shuffle(wrongs); opts.splice(pos,0,cur.a);
+  document.getElementById('qCard').innerHTML=`${tagHtml(cur)}<div class="q-big">${esc(cur.q)}</div>
+   <div class="choices">${opts.map((o,k)=>`<button class="choice-btn" data-ok="${o===cur.a}" onclick="pickMC(this)"><span class="choice-label">${'ABCD'[k]}</span>${esc(o)}</button>`).join('')}</div>
+   <div class="explanation" id="ex"></div>`;
+}
+function pickMC(btn){
+  if (answered) return; const ok=btn.dataset.ok==='true';
+  document.querySelectorAll('.choice-btn').forEach(b=>{ b.disabled=true; if(b.dataset.ok==='true') b.classList.add('correct'); });
+  if (!ok) btn.classList.add('wrong');
+  const ex=document.getElementById('ex');
+  ex.innerHTML=`<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 正解は「'+esc(cur.a)+'」'}</div>${readingLine(cur)}`;
+  ex.classList.add('show'); finishAnswer(ok);
+}
+
+// 漢字で書く
+const normJ = t => t.replace(/[\s　「」『』]/g,'').replace(/[％]/g,'%').replace(/[０-９]/g, d=>String.fromCharCode(d.charCodeAt(0)-0xFEE0));
+function showKW(){
+  document.getElementById('qCard').innerHTML=`${tagHtml(cur)}<div class="q-big">${esc(cur.q)}</div>
+   <div class="q-note">${cur.a.length}文字${cur.yomi?`　<button class="speak-btn" style="margin-top:0" onclick="this.outerHTML='<b>よみ：${esc(cur.yomi)}</b>'">よみがなヒント</button>`:''}</div>
+   <input class="write-in" id="ans" autocomplete="off" placeholder="漢字で書く">
+   <button class="check-btn" id="chk" onclick="checkKW()">答え合わせ</button>
+   <div class="explanation" id="ex"></div>`;
+  const a=document.getElementById('ans');
+  a.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.isComposing){ e.preventDefault(); answered ? nextQ() : checkKW(); } });
+  a.focus();
+}
+function charDiff(user, correct){
+  // 1文字ずつ比べて、違う字を赤で示す
+  let out='';
+  for (let i=0;i<Math.max(user.length, correct.length);i++){
+    const u=user[i]||'', c=correct[i]||'';
+    out += u===c ? `<span class="d-ok">${esc(u)}</span>` : (u ? `<span class="d-bad">${esc(u)}</span>` : `<span class="d-miss">${esc(c)}</span>`);
+  }
+  return out;
+}
+function checkKW(){
+  if (answered) return;
+  const v=normJ(document.getElementById('ans').value);
+  const ok = [cur.a].concat(cur.alts).some(x=>normJ(x)===v);
+  document.getElementById('ans').disabled=true; document.getElementById('chk').style.display='none';
+  const ex=document.getElementById('ex');
+  ex.innerHTML=`<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 赤い字が違います'}</div>
+   ${ok?'':`<div class="ex-label">あなたの答え</div><div class="diff-line jp">${v?charDiff(v, cur.a):'（空欄）'}</div><div class="ex-label">正しい答え</div>`}
+   <div class="diff-line jp d-good">${esc(cur.a)}</div>${readingLine(cur)}`;
+  ex.classList.add('show'); finishAnswer(ok);
+}
+
+// 年代並べ替え
+let ordSet=[], ordPicked=[];
+function showOrder(){
+  let pick; do { pick = shuffle(cur.pool).slice(0,4); } while (new Set(pick.map(e=>e[0])).size<4);
+  ordSet = pick.slice().sort((a,b)=>a[0]-b[0]); ordPicked=[];
+  let sh; do { sh = shuffle(pick); } while (sh.every((e,k)=>e===ordSet[k]));
+  document.getElementById('qCard').innerHTML=`${tagHtml(cur)}<div class="q-big">古い順にタップしよう</div>
+   <div class="rearrange-target" id="tgt" style="flex-direction:column"></div>
+   <div class="rearrange-pool" id="pool" style="flex-direction:column">${sh.map(e=>`<button class="word-chip" style="text-align:left" data-y="${e[0]}" onclick="pickOrd(this)">${esc(e[1])}</button>`).join('')}</div>
+   <div class="actions"><button class="action-btn" onclick="resetOrd()">やり直し</button></div>
+   <button class="check-btn" id="chk" onclick="checkOrd()" disabled>答え合わせ</button>
+   <div class="explanation" id="ex"></div>`;
+}
+function pickOrd(b){ if(answered) return; ordPicked.push(+b.dataset.y); b.classList.add('in-target'); b.onclick=null; document.getElementById('tgt').appendChild(b); const full=ordPicked.length===4; document.getElementById('chk').disabled=!full; document.getElementById('tgt').classList.toggle('filled',full); }
+function resetOrd(){ if(answered) return; const pool=document.getElementById('pool'); [...document.getElementById('tgt').children].forEach(b=>{ b.classList.remove('in-target'); b.onclick=()=>pickOrd(b); pool.appendChild(b); }); ordPicked=[]; document.getElementById('chk').disabled=true; document.getElementById('tgt').classList.remove('filled'); }
+function checkOrd(){
+  if (answered) return;
+  const ok = ordPicked.every((y,k)=>y===ordSet[k][0]);
+  [...document.getElementById('tgt').children].forEach((b,k)=>{ b.disabled=true; b.classList.remove('in-target'); b.classList.add(+b.dataset.y===ordSet[k][0]?'ok':'ng'); b.textContent = b.textContent+'（'+b.dataset.y+'年）'; });
+  document.getElementById('chk').style.display='none';
+  const ex=document.getElementById('ex');
+  ex.innerHTML=`<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 正しい順番'}</div><div class="ex-text">${ordSet.map(e=>`${e[0]}年　${esc(e[1])}`).join('<br>')}</div>`;
+  ex.classList.add('show'); finishAnswer(ok);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Enter' && answered && document.activeElement.tagName!=='INPUT') nextQ(); });
+renderTabs(); updateCounts();
+</script>
+</body>
+</html>
