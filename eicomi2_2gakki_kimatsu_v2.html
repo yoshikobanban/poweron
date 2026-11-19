@@ -768,7 +768,13 @@ function stepDone(ok, msg, extra){
 let readToken = 0; let READ_Q = [];
 function stopRead(){ readToken++; READ_Q = []; if (window.speechSynthesis) speechSynthesis.cancel(); document.querySelectorAll('.read-item').forEach(el=>el.style.outline=''); }
 function readPart(pid){
+  const wasSpeaking = window.speechSynthesis && (speechSynthesis.speaking || speechSynthesis.pending);
   stopRead(); const my = readToken;
+  if (wasSpeaking) return setTimeout(() => { if (my===readToken) queuePart(pid, my); }, 150);
+  queuePart(pid, my);
+}
+function queuePart(pid, my){
+  speechSynthesis.resume();
   const p = PARTS.find(x=>x.id===pid);
   // 全部の文を一度に予約する（Chrome・iPhoneで途中で止まりにくい）
   p.sents.forEach((s, i) => {
@@ -806,9 +812,18 @@ function makeUtter(text){
 }
 function speak(text){
   if (!('speechSynthesis' in window) || !text) return;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(makeUtter(text));
+  const ss = speechSynthesis, u = makeUtter(text);
+  // Safariは cancel() の直後に speak() すると声が出ないので、少し待ってから読む
+  if (ss.speaking || ss.pending) { ss.cancel(); setTimeout(() => { ss.resume(); ss.speak(u); }, 150); }
+  else { ss.resume(); ss.speak(u); }
 }
+// iPhone・iPad・Safari用：最初のタップで読み上げを使えるようにしておく
+let speechUnlocked = false;
+document.addEventListener('click', () => {
+  if (speechUnlocked || !('speechSynthesis' in window)) return;
+  speechUnlocked = true;
+  const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u);
+}, true);
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 else document.getElementById('voiceSel').innerHTML = '<option>この端末は読み上げ非対応</option>';
 
