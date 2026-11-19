@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>英コミュII 2学期期末 書いて覚えるPRO（パターン2）</title>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --main: #0D9488; --main-light: #F0FDFA; --main-mid: #99F6E4;
+  --green: #16A34A; --green-light: #F0FDF4;
+  --red: #DC2626; --red-light: #FEF2F2;
+  --orange: #EA580C; --orange-light: #FFF7ED;
+  --gray-50: #F9FAFB; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-400: #9CA3AF;
+  --gray-600: #4B5563; --gray-800: #1F2937; --gray-900: #111827;
+  --radius: 12px; --radius-sm: 8px;
+  --cs-s: #1D4ED8; --cs-v: #DC2626; --cs-g-bg: #FED7AA; --cs-g: #9A3412; --cs-m: #15803D;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'BIZ UDPGothic', 'Hiragino Sans', sans-serif; background: #ECFDF8; min-height: 100vh; padding: 16px; color: var(--gray-900); }
+.container { max-width: 640px; margin: 0 auto; }
+.card { background: white; border-radius: var(--radius); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.header { padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+.header-title { font-size: 17px; font-weight: 700; color: var(--main); }
+.header-sub { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.score-badge { background: var(--main); color: white; font-size: 15px; font-weight: 700; padding: 6px 14px; border-radius: 20px; white-space: nowrap; display: none; }
+.sec-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.sec-tab { min-width: 0; padding: 8px 2px; border: 2px solid var(--main-mid); background: white; color: var(--main); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.sec-tab small { display: block; font-size: 10px; font-weight: 400; color: var(--gray-400); margin-top: 2px; }
+.sec-tab.active { background: var(--main); color: white; border-color: var(--main); }
+.sec-tab.active small { color: #CCFBF1; }
+
+/* 設定バー */
+.settings { padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: var(--gray-600); display: flex; flex-direction: column; gap: 9px; }
+.set-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.set-label { white-space: nowrap; min-width: 52px; }
+.settings select { flex: 1; min-width: 0; padding: 6px 8px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; background: white; }
+.seg { display: inline-flex; border: 2px solid var(--main-mid); border-radius: 20px; overflow: hidden; }
+.seg button { border: none; background: white; color: var(--main); font-family: inherit; font-size: 12px; font-weight: 700; padding: 5px 10px; cursor: pointer; }
+.seg button.on { background: var(--main); color: white; }
+.legend { font-size: 11px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.mode-screen { display: none; } .mode-screen.show { display: block; }
+.mode-card { padding: 16px 18px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; display: flex; gap: 14px; align-items: flex-start; }
+.mode-card:hover { border-color: var(--main); transform: translateY(-2px); }
+.mode-card.main-mode { border-color: var(--orange); }
+.mode-icon { font-size: 28px; line-height: 1; }
+.mode-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.mode-desc { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+.mode-count { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+.mode-count.orange { background: var(--orange-light); color: var(--orange); }
+.mode-count.empty { background: var(--gray-100); color: var(--gray-400); }
+.reco { display: inline-block; background: var(--orange); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.star { display: inline-block; background: var(--red); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin: 0 4px; vertical-align: middle; }
+.quiz-area { display: none; }
+.progress-wrap { padding: 12px 18px; margin-bottom: 12px; }
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; }
+.progress-bar { background: var(--gray-200); border-radius: 4px; height: 8px; overflow: hidden; }
+.progress-fill { background: var(--main); height: 8px; border-radius: 4px; transition: width 0.4s ease; }
+.question-card { padding: 20px; margin-bottom: 12px; }
+.q-tag { display: inline-block; background: var(--main-light); color: var(--main); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+.q-tag.star-tag { background: var(--red-light); color: var(--red); margin-left: 4px; }
+.q-ja { font-size: 15px; color: var(--gray-800); padding: 10px 12px; background: var(--gray-50); border-radius: var(--radius-sm); line-height: 1.9; }
+.q-big { font-size: 20px; font-weight: 700; line-height: 1.8; padding: 6px 0 2px; }
+.q-en { font-size: 18px; line-height: 1.8; margin-top: 12px; }
+.q-note { font-size: 13px; color: var(--main); margin-top: 8px; line-height: 1.7; }
+ruby rt { font-size: 0.55em; color: var(--gray-600); font-weight: 400; }
+.mushi { font-size: 18px; line-height: 2.4; margin-top: 14px; }
+.mushi input { font-family: 'Courier New', monospace; font-size: 17px; padding: 3px 6px; border: none; border-bottom: 3px solid var(--main); background: var(--main-light); border-radius: 4px 4px 0 0; outline: none; color: var(--gray-900); }
+.mushi input:focus { background: #CCFBF1; }
+.mushi input.ok { border-bottom-color: var(--green); background: var(--green-light); color: var(--green); font-weight: 700; }
+.mushi input.ng { border-bottom-color: var(--red); background: var(--red-light); color: var(--red); text-decoration: line-through; }
+.fix { color: var(--green); font-weight: 700; font-size: 15px; margin: 0 2px; }
+.hint-len { font-size: 11px; color: var(--gray-400); vertical-align: super; margin-left: 1px; }
+.blank-box { display: inline-block; min-width: 70px; border-bottom: 3px solid var(--orange); color: var(--orange); font-weight: 700; text-align: center; }
+.choices { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.choice-btn { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 16px; color: var(--gray-800); cursor: pointer; text-align: left; width: 100%; }
+.choice-btn:hover:not(:disabled) { border-color: var(--main); background: var(--main-light); }
+.choice-btn:disabled { cursor: default; }
+.choice-label { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--gray-100); font-weight: 700; font-size: 13px; color: var(--gray-600); flex-shrink: 0; }
+.choice-btn.correct { border-color: var(--green); background: var(--green-light); }
+.choice-btn.correct .choice-label { background: var(--green); color: white; }
+.choice-btn.wrong { border-color: var(--red); background: var(--red-light); }
+.choice-btn.wrong .choice-label { background: var(--red); color: white; }
+.write-in { width: 100%; margin-top: 14px; padding: 12px; font-family: 'Courier New', monospace; font-size: 17px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); outline: none; line-height: 1.6; resize: vertical; }
+.write-in:focus { border-color: var(--main); }
+textarea.write-in { min-height: 96px; }
+.rearrange-target { display: flex; flex-wrap: wrap; gap: 8px; min-height: 58px; padding: 12px; background: var(--gray-50); border: 2px dashed var(--gray-200); border-radius: var(--radius-sm); margin-top: 14px; align-items: flex-start; }
+.rearrange-target.filled { border-style: solid; background: var(--orange-light); border-color: var(--orange); }
+.rearrange-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.word-chip { padding: 9px 13px; background: white; border: 2px solid var(--gray-200); border-radius: 20px; font-size: 16px; font-family: inherit; cursor: pointer; color: var(--gray-800); }
+.word-chip:hover:not(:disabled) { border-color: var(--orange); }
+.word-chip.in-target { background: var(--orange); color: white; border-color: var(--orange); }
+.word-chip.ok { background: var(--green); border-color: var(--green); color: white; }
+.word-chip.ng { background: var(--red); border-color: var(--red); color: white; }
+.word-chip:disabled { cursor: default; }
+.actions { display: flex; gap: 8px; margin-top: 12px; }
+.action-btn { flex: 1; padding: 10px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); background: white; font-family: inherit; font-size: 13px; font-weight: 700; color: var(--gray-600); cursor: pointer; }
+.check-btn { width: 100%; margin-top: 12px; padding: 13px; background: var(--orange); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.check-btn:disabled { background: var(--gray-200); color: var(--gray-400); cursor: default; }
+.explanation { display: none; margin-top: 14px; padding: 14px; background: #F3FBFA; border-left: 4px solid var(--main); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.explanation.show { display: block; }
+.ex-correct { font-size: 15px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+.ex-correct.wrong-flag { color: var(--red); }
+.ex-text { font-size: 16px; color: var(--gray-800); line-height: 1.9; }
+.ex-label { font-size: 12px; color: var(--gray-400); margin-top: 8px; }
+.diff-line { font-family: 'Courier New', monospace; font-size: 15px; line-height: 1.9; margin-top: 4px; word-break: break-word; }
+.d-ok { color: var(--gray-800); }
+.d-bad { color: var(--red); text-decoration: line-through; font-weight: 700; }
+.d-miss { color: white; background: var(--orange); padding: 1px 5px; border-radius: 4px; font-weight: 700; }
+.d-good { color: var(--green); font-weight: 700; }
+.speak-btn { border: 2px solid var(--main-mid); background: white; color: var(--main); border-radius: 20px; padding: 4px 12px; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+.next-btn { display: none; width: 100%; margin-top: 12px; padding: 14px; background: var(--main); color: white; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.next-btn.show { display: block; }
+.back-link { text-align: center; margin-top: 14px; }
+.back-link a { color: var(--gray-400); font-size: 13px; cursor: pointer; text-decoration: underline; }
+.result { display: none; padding: 26px 20px; text-align: center; }
+.result-score { font-size: 44px; font-weight: 700; color: var(--main); }
+.result-msg { font-size: 15px; color: var(--gray-600); margin: 10px 0 18px; line-height: 1.7; }
+.note-card { padding: 12px 16px; margin-top: 4px; font-size: 12px; color: var(--gray-600); line-height: 1.7; }
+
+/* 文構造の色分け */
+.cs-on .cs-S { color: var(--cs-s); border-bottom: 2px solid var(--cs-s); font-weight: 700; }
+.cs-on .cs-V { color: var(--cs-v); border-bottom: 2px solid var(--cs-v); font-weight: 700; }
+.cs-on .cs-G { background: var(--cs-g-bg); color: var(--cs-g); font-weight: 700; border-radius: 3px; padding: 0 2px; }
+.cs-on .cs-M { color: var(--cs-m); }
+.lg { padding: 1px 6px; border-radius: 4px; }
+.lg-S { color: var(--cs-s); border: 1.5px solid var(--cs-s); }
+.lg-V { color: var(--cs-v); border: 1.5px solid var(--cs-v); }
+.lg-G { background: var(--cs-g-bg); color: var(--cs-g); }
+.lg-M { color: var(--cs-m); border: 1.5px solid var(--cs-m); }
+
+/* ステップアップ */
+.steps { display: flex; gap: 4px; margin-bottom: 14px; }
+.step { flex: 1; text-align: center; font-size: 12px; font-weight: 700; padding: 6px 2px; border-radius: 6px; background: var(--gray-100); color: var(--gray-400); }
+.step.now { background: var(--orange); color: white; }
+.step.done-ok { background: var(--green-light); color: var(--green); }
+.step.done-ng { background: var(--red-light); color: var(--red); }
+
+/* 本文を読む */
+.read-item { padding: 14px 16px; margin-bottom: 10px; }
+.read-en { font-size: 17px; line-height: 1.9; }
+.read-ja { font-size: 14px; color: var(--gray-600); line-height: 1.9; margin-top: 6px; }
+.read-ja.hide { display: none; }
+</style>
+</head>
+<body>
+<div class="container" id="root">
+
+  <div class="card header">
+    <div style="flex:1">
+      <div class="header-title">英コミュII 2学期期末 書いて覚えるPRO <span style="font-size:12px;background:var(--orange);color:white;padding:2px 8px;border-radius:4px;vertical-align:middle">パターン2</span></div>
+      <div class="header-sub">Lesson 6 Part 2 〜 Lesson 7 Part 2</div>
+    </div>
+    <div class="score-badge" id="scoreBadge">0点</div>
+  </div>
+
+  <div class="sec-tabs" id="secTabs"></div>
+
+  <div class="card settings">
+    <div class="set-row">
+      <span class="set-label">🔊 声</span>
+      <select id="voiceSel" onchange="setVoice(this.value)"><option>読み込み中…</option></select>
+    </div>
+    <div class="set-row">
+      <span class="set-label">速さ</span>
+      <span class="seg" id="segRate"></span>
+      <label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="autoSpeak" checked onchange="saveSettings()">自動で読む</label>
+    </div>
+    <div class="set-row">
+      <span class="set-label">色分け</span>
+      <span class="seg" id="segCs"></span>
+      <span class="legend"><span class="lg lg-S">S 主語</span><span class="lg lg-V">V 動詞</span><span class="lg lg-G">文法</span><span class="lg lg-M">修飾語</span></span>
+    </div>
+    <div class="set-row">
+      <span class="set-label">ふりがな</span>
+      <span class="seg" id="segFuri"></span>
+    </div>
+    <div class="set-row">
+      <span class="set-label">出題順</span>
+      <span class="seg" id="segOrder"></span>
+    </div>
+  </div>
+
+  <div class="mode-screen show" id="modeScreen">
+    <div class="card mode-card main-mode" onclick="startMode('step')">
+      <div class="mode-icon">🪜</div>
+      <div>
+        <div class="mode-title">3段階ステップアップ<span class="reco">文法の文はここ</span></div>
+        <div class="mode-desc">文法ポイントの文を、①4択 → ②並べ替え → ③全文タイピング の順に1文ずつ。「選べるけど書けない」をなくすモードです。</div>
+        <span class="mode-count orange" id="cnt-step"></span>
+      </div>
+    </div>
+    <div class="card mode-card main-mode" onclick="startMode('mushi')">
+      <div class="mode-icon">🐛</div>
+      <div>
+        <div class="mode-title">虫食いつづり<span class="reco">いちばん大事</span></div>
+        <div class="mode-desc">先生の「虫食い音読」と同じ形。頭文字と文字数をヒントに、本文の単語を<b>つづりまで</b>書きます。1文字でも違えば×。</div>
+        <span class="mode-count orange" id="cnt-mushi"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startRead()">
+      <div class="mode-icon">📖</div>
+      <div>
+        <div class="mode-title">本文を色分けで読む</div>
+        <div class="mode-desc">教科書の本文を、主語・動詞・文法・修飾語に色をつけて表示。1文ずつ🔊で聞けます。問題の前の予習に。</div>
+        <span class="mode-count" id="cnt-read"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('mc')">
+      <div class="mode-icon">📝</div>
+      <div>
+        <div class="mode-title">単語・熟語 4択</div>
+        <div class="mode-desc">日本語を見て英語を選ぶウォーミングアップ。選べるようになったら「書く」へ。</div>
+        <span class="mode-count" id="cnt-mc"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('vw')">
+      <div class="mode-icon">✏️</div>
+      <div>
+        <div class="mode-title">単語・熟語 書く</div>
+        <div class="mode-desc">4択と同じ問題を、選択肢なしで英語を入力して答えます。</div>
+        <span class="mode-count" id="cnt-vw"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('re')">
+      <div class="mode-icon">🔀</div>
+      <div>
+        <div class="mode-title">本文の並べ替え</div>
+        <div class="mode-desc">本文の文を語句のカードで組み立てます。<span class="star">テストに絶対出す</span>の文も入っています。</div>
+        <span class="mode-count" id="cnt-re"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('full')">
+      <div class="mode-icon">🖊️</div>
+      <div>
+        <div class="mode-title">大事な文を全部書く</div>
+        <div class="mode-desc">「テストに絶対出す」文と文法ポイントの文を、日本語を見て英文まるごと入力。抜けた語はオレンジで表示します。</div>
+        <span class="mode-count" id="cnt-full"></span>
+      </div>
+    </div>
+    <div class="card mode-card" onclick="startMode('wrong')">
+      <div class="mode-icon">🔁</div>
+      <div>
+        <div class="mode-title">要復習</div>
+        <div class="mode-desc">間違えた問題が自動でここに入ります。正解すると消えます。</div>
+        <span class="mode-count" id="cnt-wrong"></span>
+      </div>
+    </div>
+    <div class="card note-card">Lesson 7は先生の冊子がまだ配られていないので、虫食いの単語は教科書の新出語で作っています。冊子が配られたら入れ替えます。</div>
+  </div>
+
+  <div class="quiz-area" id="quizArea">
+    <div class="card progress-wrap" id="progWrap">
+      <div class="progress-info"><span id="progText"></span><span id="progScore"></span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+    </div>
+    <div id="qCard" class="card question-card"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQ()">次へ →</button>
+    <div class="card result" id="result"></div>
+    <div class="back-link"><a onclick="backToMenu()">← メニューに戻る</a></div>
+  </div>
+
+</div>
+
+<script>
+// ===== データ（教科書本文） =====
+// [語]＝虫食い（つづり）  {S:…}主語 {V:…}動詞 {G:…}文法ポイント {M:…}修飾語
+// key: 'star'=先生の「テストに絶対出す」, 'g'=文法ポイント
+// q4: [3段階の①4択で空欄にする語句, [まちがいの選択肢3つ]]
+const PARTS = [
+ { id:'6-2', name:'L6-2', sub:'北里柴三郎', sents:[
+  {en:'{S:Three [historical] figures} {V:have been selected} {M:for the new designs}.', ja:'新しいデザインには3人の歴史的人物が選ばれました。'},
+  {en:'{S:All of them} {V:spent} time {M:abroad}, {V:learned} about foreign cultures, and {V:gained} the latest knowledge {M:at that time}.', ja:'彼らのすべてが海外で時を過ごし、外国文化について学び、そして当時の最新の知識を得ました。'},
+  {en:'{S:They} {V:became} pioneers {M:in their fields in Japan} and {V:used} their experiences {M:to help create a modern [nation]}.', ja:'彼らは日本の彼らの分野における先駆者となり、近代国家を創り出す手助けをするために、彼らの経験を利用しました。'},
+  {en:'{S:Kitasato Shibasaburo} {V:is known as} the father of modern medicine {M:in Japan}.', ja:'北里柴三郎は日本の近代医学の創始者として知られています。'},
+  {en:'{S:He} {V:saw} many people {G:die} {M:from [infectious] [diseases]}.', ja:'彼は多くの人が感染症で死ぬのを見ました。', key:'g', note:'see＋人＋動詞の原形「人が～するのを見る」', q4:['die',['died','to die','dying']]},
+  {en:'{S:He} {V:thought} {G:it} possible {G:that doctors could prevent such diseases}.', ja:'彼は医師がこのような病気を防ぐことは可能だと思いました。', key:'g', note:'形式目的語 it ＝ that 以下', q4:['it',['that','this','what']]},
+  {en:'{S:He} {V:studied} {M:in Germany} and {V:developed} a way {M:to save patients from [tetanus] and [diphtheria]}.', ja:'彼はドイツで研究し、患者を破傷風やジフテリアから救う方法を発展させました。'},
+  {en:'{S:[Prestigious] universities abroad} {V:offered} him a [position], but {S:he} {V:returned} {M:to Japan} {M:to [devote] his life to the country}.', ja:'海外の名門大学が彼に地位を提供しましたが、彼は日本に戻り、生涯を自国に捧げました。'}
+ ], vocab:[
+  ['歴史的な','historical'],['国、国家','nation'],['感染性の','infectious'],['病気','disease'],['破傷風','tetanus'],['ジフテリア','diphtheria'],
+  ['名声のある、有名な','prestigious'],['地位','position'],['～を（…に）捧げる','devote'],['当時は','at that time'],['～として知られている','be known as'],['～の創始者、～の父','the father of'],['外国で、海外で','abroad']
+ ]},
+ { id:'6-3', name:'L6-3', sub:'津田梅子・渋沢栄一', sents:[
+  {en:'{S:Tsuda Umeko} {V:is known as} a pioneer of [female] education {M:in Japan}.', ja:'津田梅子は日本の女子教育の先駆者として知られています。'},
+  {en:'{M:At the age of six}, {S:she} {V:was selected} {M:to study in the United States}.', ja:'6歳のとき、彼女はアメリカ合衆国で勉強するよう選ばれました。'},
+  {en:'{M:Eleven years later}, {S:she} {V:returned} {M:to Japan}.', ja:'11年後、彼女は日本に戻りました。'},
+  {en:'{M:Soon}, {S:she} {V:found} Japanese women had few [opportunities] {M:in education or jobs}.', ja:'じきに、彼女は日本人女性には教育や職業の機会がほとんどないことに気づきました。', key:'star', q4:['few',['a few','little','many']]},
+  {en:'{S:She} {V:felt} {G:it} necessary {G:to improve their [social] [status]}.', ja:'彼女は彼女たちの社会的地位を向上させることが必要だと感じました。', key:'star', note:'形式目的語 it ＝ to 以下', q4:['to improve',['improving','improve','improved']]},
+  {en:'{M:In 1900}, {S:she} {V:founded} a school {M:that later became one of the first universities for women in Japan}.', ja:'1900年、彼女は学校を設立し、それはのちに日本で最初の女子大学のひとつとなりました。'},
+  {en:'{S:Shibusawa Eiichi} {V:is [regarded] as} the father of Japanese [capitalism].', ja:'渋沢栄一は日本の資本主義の創始者と見なされています。'},
+  {en:'{S:He} {V:went} {M:to [Paris]} {M:for the 1867 [World] [Exhibition]} and {V:visited} several [European] countries.', ja:'彼は1867年の万国博覧会のためにパリへ行き、ヨーロッパのいくつかの国を訪れました。'},
+  {en:'{S:He} {V:learned} about [Western] social and economic systems {M:there}.', ja:'彼はそこで西洋の社会と経済体系について学びました。'},
+  {en:'{M:After returning to Japan}, {S:he} {V:helped create} the first bank and hundreds of leading companies.', ja:'日本に戻った後、彼は最初の銀行と何百というトップ企業を作る手助けをしました。'},
+  {en:'{S:He} {M:also} {V:supported} education, international relationships, and public [welfare].', ja:'彼はまた、教育と国際関係と公共の福祉も支援しました。'}
+ ], vocab:[
+  ['女性の','female'],['機会','opportunity'],['社会的な','social'],['地位','status'],['～を（…と）みなす','regard'],['資本主義','capitalism'],
+  ['万国博覧会','World Exhibition'],['ヨーロッパの','European'],['西洋の','Western'],['福祉','welfare'],['～歳のときに','at the age of'],
+  ['～とみなされている','be regarded as'],['何百もの～','hundreds of'],['～を設立する','found'],['～の先駆者','a pioneer of']
+ ]},
+ { id:'6-4', name:'L6-4', sub:'キャッシュレス', sents:[
+  {en:'[Pushing] a [Cashless] Society Forward', ja:'（タイトル）キャッシュレス社会を推し進める', title:true},
+  {en:'{S:[Redesigning] banknotes} {V:may encourage} Japan {M:to go cashless faster}.', ja:'紙幣のデザインを変えることは、日本にキャッシュレス化を早めるよう促すかもしれません。'},
+  {en:'{G:It} {V:costs} companies a lot of money {G:to [adjust] equipment to use new banknotes}.', ja:'新紙幣を使用するための機器を調整するのに、企業には多くのお金がかかります。', key:'g', note:'It costs 人＋お金＋to ～「～するのに（人に）お金がかかる」', q4:['to adjust',['adjusting','adjust','adjusted']]},
+  {en:'{M:Moreover}, {S:the [working] population} {V:is decreasing} {M:because of the low [birthrate] in Japan}.', ja:'そのうえ、日本では出生率の低下のために労働人口が減少してきています。'},
+  {en:'{S:A cashless system} {V:saves} a lot of work {M:by making [transactions] easier}.', ja:'キャッシュレスシステムは取引を簡単にすることで、多くの仕事を省きます。'},
+  {en:'{S:It} {M:also} {V:makes} {G:it} convenient {G:for foreign tourists to visit Japan}, {M:since they don\'t need to exchange [currencies]}.', ja:'それはまた、外国人旅行者が日本を訪れるのを便利にします。彼らは通貨を両替する必要がないからです。', key:'g', note:'形式目的語 it ＝ to 以下（make it ～ for 人 to …）', q4:['it',['that','them','its']]},
+  {en:'{S:Some countries} {V:stopped} issuing their largest banknotes {M:to go cashless}.', ja:'キャッシュレス化するために、最大額の紙幣を発行するのをやめた国もあります。'},
+  {en:'{M:Maybe} {S:Japan} {G:should have [abolished]} the ¥10,000 banknote.', ja:'おそらく日本は1万円札を廃止するべきだったでしょう。', key:'g', note:'should have＋過去分詞「～すべきだったのに」', q4:['should have abolished',['should abolish','should have abolish','must abolish']]},
+  {en:'{G:If there were no ¥10,000 banknotes}, {S:it} {G:would be} much easier {M:to carry one card or one smartphone instead of many small banknotes}.', ja:'1万円札がなければ、たくさんの少額紙幣の代わりに、カード1枚やスマートフォン1台を持ち歩くほうがずっと簡単でしょう。', key:'g', note:'仮定法過去：If＋過去形, would＋動詞の原形', q4:['would be',['will be','would have been','is']]}
+ ], vocab:[
+  ['～を押す、推し進める','push'],['キャッシュレスの','cashless'],['～を再設計する','redesign'],['～を調整する','adjust'],['労働の、働いている','working'],['出生率','birthrate'],
+  ['取引','transaction'],['通貨','currency'],['～を廃止する','abolish'],['さらに、そのうえ','moreover'],['～の代わりに','instead of'],['～のために、～が原因で','because of'],['紙幣','banknote']
+ ]},
+ { id:'7-1', name:'L7-1', sub:'警告標識の色', sents:[
+  {en:'{V:Have} {S:you} {M:ever} {V:noticed} that red and yellow are often used {M:for [warning] signs}?', ja:'赤と黄色が警告標識によく使われていることに気づいたことがありますか。'},
+  {en:'{S:[Vivid] and warm colors} {V:are chosen} {M:because they catch people\'s attention}.', ja:'鮮やかで暖かい色は、人々の注意を引くので選ばれます。'},
+  {en:'{S:They} {V:help} people {G:notice} signs {G:whose} messages should be understood [immediately].', ja:'それらは、メッセージがすぐに理解されるべき標識に人々が気づくのを助けます。', key:'g', note:'関係代名詞 whose（signs の messages）／help＋人＋動詞の原形', q4:['whose',['which','who','that']]},
+  {en:'{M:Besides the choice of colors}, {S:the contrast of colors} {V:plays} an important role {M:in [conveying] messages clearly and quickly}.', ja:'色の選択に加えて、色のコントラストは、メッセージをはっきりとすばやく伝えるのに重要な役割を果たします。'},
+  {en:'{M:For example}, {S:emergency exit signs} {V:show} a picture of a green figure {M:on a white [background]}.', ja:'例えば、非常口の標識は白い背景に緑色の人の絵を示しています。'},
+  {en:'{S:The contrast between green and white parts} {V:helps} us {G:[distinguish]} the figure clearly {G:from} its background {M:even in [smoke] or fire}.', ja:'緑と白の部分のコントラストは、煙や火の中でも、私たちがその人の姿を背景とはっきり区別するのを助けます。', key:'g', note:'distinguish A from B「AをBと区別する」／help＋人＋動詞の原形', q4:['distinguish',['distinguishing','distinguished','distinguishes']]}
+ ], vocab:[
+  ['警告','warning'],['鮮やかな','vivid'],['すぐに、ただちに','immediately'],['～を伝える','convey'],['背景','background'],['～を区別する','distinguish'],['煙','smoke'],
+  ['人の注意を引く','catch people\'s attention'],['～において役割を果たす','play a role in'],['AをBと区別する','distinguish A from B'],['～に加えて','besides'],['例えば','for example']
+ ]},
+ { id:'7-2', name:'L7-2', sub:'色の効果', sents:[
+  {en:'{S:Colors} {V:have} various [effects] {M:on us}.', ja:'色は私たちにさまざまな効果を及ぼします。'},
+  {en:'{V:Let\'s look at} the effects of white.', ja:'白の効果を見てみましょう。'},
+  {en:'{S:The two go [stones] in the photo} {V:seem to be} the same size, but {M:actually} {S:they} {V:are} not.', ja:'写真の2つの碁石は同じ大きさに見えますが、実際はそうではありません。'},
+  {en:'{S:The white stone} {V:is made} [slightly] smaller {M:because of} {G:the fact that} white [objects] look larger than they really are.', ja:'白い物は実際よりも大きく見えるという事実のため、白い石はわずかに小さく作られています。', key:'g', note:'同格の that：the fact that ～「～という事実」', q4:['that',['which','what','whose']]},
+  {en:'{S:The effects of colors} {V:are} {M:also} important {M:when grocery stores sell fresh fruit or vegetables}.', ja:'色の効果は、食料品店が新鮮な果物や野菜を売るときにも重要です。'},
+  {en:'{M:For example}, {S:oranges} {V:are sold} {M:in bright red [mesh] bags} because red {G:makes} the color of the fruit {G:look} more vivid.', ja:'例えば、赤は果物の色をより鮮やかに見せるので、オレンジは明るい赤色のネット袋に入れて売られています。', key:'g', note:'make＋O＋動詞の原形「Oを～させる」', q4:['look',['to look','looking','looked']]},
+  {en:'{M:For the same reason}, {S:[okra]} {V:is sold} {M:in green mesh bags}.', ja:'同じ理由で、オクラは緑色のネット袋に入れて売られています。'},
+  {en:'{M:In this way}, {S:fruit and vegetables} {V:look} fresher and more delicious.', ja:'このようにして、果物や野菜はより新鮮でおいしそうに見えます。'},
+  {en:'{S:This} {V:[stimulates]} consumers {G:to buy} them.', ja:'これが消費者にそれらを買う気にさせます。', note:'stimulate 人 to ～「人を～する気にさせる」', q4:['to buy',['buying','buy','bought']]}
+ ], vocab:[
+  ['効果','effect'],['石','stone'],['わずかに、少し','slightly'],['物体、物','object'],['網目、メッシュ','mesh'],['オクラ','okra'],['～を刺激する','stimulate'],
+  ['～に効果を及ぼす','have an effect on'],['このように','in this way'],['同じ理由で','for the same reason'],['～のように見える','seem to be'],['～という事実','the fact that'],['実際は','actually']
+ ]}
+];
+const FURI = {"新しいデザインには3人の歴史的人物が選ばれました。": "<ruby>新<rt>あたら</rt></ruby>しいデザインには3<ruby>人<rt>にん</rt></ruby>の<ruby>歴史的<rt>れきしてき</rt></ruby><ruby>人物<rt>じんぶつ</rt></ruby>が<ruby>選<rt>えら</rt></ruby>ばれました。", "彼らのすべてが海外で時を過ごし、外国文化について学び、そして当時の最新の知識を得ました。": "<ruby>彼<rt>かれ</rt></ruby>らのすべてが<ruby>海外<rt>かいがい</rt></ruby>で<ruby>時<rt>とき</rt></ruby>を<ruby>過<rt>す</rt></ruby>ごし、<ruby>外国<rt>がいこく</rt></ruby><ruby>文化<rt>ぶんか</rt></ruby>について<ruby>学<rt>まな</rt></ruby>び、そして<ruby>当時<rt>とうじ</rt></ruby>の<ruby>最新<rt>さいしん</rt></ruby>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>得<rt>え</rt></ruby>ました。", "彼らは日本の彼らの分野における先駆者となり、近代国家を創り出す手助けをするために、彼らの経験を利用しました。": "<ruby>彼<rt>かれ</rt></ruby>らは<ruby>日本<rt>にほん</rt></ruby>の<ruby>彼<rt>かれ</rt></ruby>らの<ruby>分野<rt>ぶんや</rt></ruby>における<ruby>先駆者<rt>せんくしゃ</rt></ruby>となり、<ruby>近代国家<rt>きんだいこっか</rt></ruby>を<ruby>創<rt>つく</rt></ruby>り<ruby>出<rt>だ</rt></ruby>す<ruby>手助<rt>てだす</rt></ruby>けをするために、<ruby>彼<rt>かれ</rt></ruby>らの<ruby>経験<rt>けいけん</rt></ruby>を<ruby>利用<rt>りよう</rt></ruby>しました。", "北里柴三郎は日本の近代医学の創始者として知られています。": "<ruby>北里<rt>きたさと</rt></ruby><ruby>柴三郎<rt>しばさぶろう</rt></ruby>は<ruby>日本<rt>にほん</rt></ruby>の<ruby>近代<rt>きんだい</rt></ruby><ruby>医学<rt>いがく</rt></ruby>の<ruby>創始者<rt>そうししゃ</rt></ruby>として<ruby>知<rt>し</rt></ruby>られています。", "彼は多くの人が感染症で死ぬのを見ました。": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>多<rt>おお</rt></ruby>くの<ruby>人<rt>ひと</rt></ruby>が<ruby>感染症<rt>かんせんしょう</rt></ruby>で<ruby>死<rt>し</rt></ruby>ぬのを<ruby>見<rt>み</rt></ruby>ました。", "彼は医師がこのような病気を防ぐことは可能だと思いました。": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>医師<rt>いし</rt></ruby>がこのような<ruby>病気<rt>びょうき</rt></ruby>を<ruby>防<rt>ふせ</rt></ruby>ぐことは<ruby>可能<rt>かのう</rt></ruby>だと<ruby>思<rt>おも</rt></ruby>いました。", "彼はドイツで研究し、患者を破傷風やジフテリアから救う方法を発展させました。": "<ruby>彼<rt>かれ</rt></ruby>はドイツで<ruby>研究<rt>けんきゅう</rt></ruby>し、<ruby>患者<rt>かんじゃ</rt></ruby>を<ruby>破傷風<rt>はしょうふう</rt></ruby>やジフテリアから<ruby>救<rt>すく</rt></ruby>う<ruby>方法<rt>ほうほう</rt></ruby>を<ruby>発展<rt>はってん</rt></ruby>させました。", "海外の名門大学が彼に地位を提供しましたが、彼は日本に戻り、生涯を自国に捧げました。": "<ruby>海外<rt>かいがい</rt></ruby>の<ruby>名門<rt>めいもん</rt></ruby><ruby>大学<rt>だいがく</rt></ruby>が<ruby>彼<rt>かれ</rt></ruby>に<ruby>地位<rt>ちい</rt></ruby>を<ruby>提供<rt>ていきょう</rt></ruby>しましたが、<ruby>彼<rt>かれ</rt></ruby>は<ruby>日本<rt>にほん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>り、<ruby>生涯<rt>しょうがい</rt></ruby>を<ruby>自国<rt>じこく</rt></ruby>に<ruby>捧<rt>ささ</rt></ruby>げました。", "歴史的な": "<ruby>歴史的<rt>れきしてき</rt></ruby>な", "国、国家": "<ruby>国<rt>くに</rt></ruby>、<ruby>国家<rt>こっか</rt></ruby>", "感染性の": "<ruby>感染性<rt>かんせんせい</rt></ruby>の", "病気": "<ruby>病気<rt>びょうき</rt></ruby>", "破傷風": "<ruby>破傷風<rt>はしょうふう</rt></ruby>", "ジフテリア": "ジフテリア", "名声のある、有名な": "<ruby>名声<rt>めいせい</rt></ruby>のある、<ruby>有名<rt>ゆうめい</rt></ruby>な", "地位": "<ruby>地位<rt>ちい</rt></ruby>", "～を（…に）捧げる": "～を（…に）<ruby>捧<rt>ささ</rt></ruby>げる", "当時は": "<ruby>当時<rt>とうじ</rt></ruby>は", "～として知られている": "～として<ruby>知<rt>し</rt></ruby>られている", "～の創始者、～の父": "～の<ruby>創始者<rt>そうししゃ</rt></ruby>、～の<ruby>父<rt>ちち</rt></ruby>", "外国で、海外で": "<ruby>外国<rt>がいこく</rt></ruby>で、<ruby>海外<rt>かいがい</rt></ruby>で", "津田梅子は日本の女子教育の先駆者として知られています。": "<ruby>津田<rt>つだ</rt></ruby><ruby>梅子<rt>うめこ</rt></ruby>は<ruby>日本<rt>にほん</rt></ruby>の<ruby>女子<rt>じょし</rt></ruby><ruby>教育<rt>きょういく</rt></ruby>の<ruby>先駆者<rt>せんくしゃ</rt></ruby>として<ruby>知<rt>し</rt></ruby>られています。", "6歳のとき、彼女はアメリカ合衆国で勉強するよう選ばれました。": "6<ruby>歳<rt>さい</rt></ruby>のとき、<ruby>彼女<rt>かのじょ</rt></ruby>はアメリカ<ruby>合衆国<rt>がっしゅうこく</rt></ruby>で<ruby>勉強<rt>べんきょう</rt></ruby>するよう<ruby>選<rt>えら</rt></ruby>ばれました。", "11年後、彼女は日本に戻りました。": "11<ruby>年後<rt>ねんご</rt></ruby>、<ruby>彼女<rt>かのじょ</rt></ruby>は<ruby>日本<rt>にほん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>りました。", "じきに、彼女は日本人女性には教育や職業の機会がほとんどないことに気づきました。": "じきに、<ruby>彼女<rt>かのじょ</rt></ruby>は<ruby>日本人<rt>にほんじん</rt></ruby><ruby>女性<rt>じょせい</rt></ruby>には<ruby>教育<rt>きょういく</rt></ruby>や<ruby>職業<rt>しょくぎょう</rt></ruby>の<ruby>機会<rt>きかい</rt></ruby>がほとんどないことに<ruby>気<rt>き</rt></ruby>づきました。", "彼女は彼女たちの社会的地位を向上させることが必要だと感じました。": "<ruby>彼女<rt>かのじょ</rt></ruby>は<ruby>彼女<rt>かのじょ</rt></ruby>たちの<ruby>社会的地位<rt>しゃかいてきちい</rt></ruby>を<ruby>向上<rt>こうじょう</rt></ruby>させることが<ruby>必要<rt>ひつよう</rt></ruby>だと<ruby>感<rt>かん</rt></ruby>じました。", "1900年、彼女は学校を設立し、それはのちに日本で最初の女子大学のひとつとなりました。": "1900<ruby>年<rt>ねん</rt></ruby>、<ruby>彼女<rt>かのじょ</rt></ruby>は<ruby>学校<rt>がっこう</rt></ruby>を<ruby>設立<rt>せつりつ</rt></ruby>し、それはのちに<ruby>日本<rt>にほん</rt></ruby>で<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>女子大学<rt>じょしだいがく</rt></ruby>のひとつとなりました。", "渋沢栄一は日本の資本主義の創始者と見なされています。": "<ruby>渋沢<rt>しぶさわ</rt></ruby><ruby>栄一<rt>えいいち</rt></ruby>は<ruby>日本<rt>にほん</rt></ruby>の<ruby>資本主義<rt>しほんしゅぎ</rt></ruby>の<ruby>創始者<rt>そうししゃ</rt></ruby>と<ruby>見<rt>み</rt></ruby>なされています。", "彼は1867年の万国博覧会のためにパリへ行き、ヨーロッパのいくつかの国を訪れました。": "<ruby>彼<rt>かれ</rt></ruby>は1867<ruby>年<rt>ねん</rt></ruby>の<ruby>万国博覧会<rt>ばんこくはくらんかい</rt></ruby>のためにパリへ<ruby>行<rt>い</rt></ruby>き、ヨーロッパのいくつかの<ruby>国<rt>くに</rt></ruby>を<ruby>訪<rt>おとず</rt></ruby>れました。", "彼はそこで西洋の社会と経済体系について学びました。": "<ruby>彼<rt>かれ</rt></ruby>はそこで<ruby>西洋<rt>せいよう</rt></ruby>の<ruby>社会<rt>しゃかい</rt></ruby>と<ruby>経済<rt>けいざい</rt></ruby><ruby>体系<rt>たいけい</rt></ruby>について<ruby>学<rt>まな</rt></ruby>びました。", "日本に戻った後、彼は最初の銀行と何百というトップ企業を作る手助けをしました。": "<ruby>日本<rt>にほん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>った<ruby>後<rt>あと</rt></ruby>、<ruby>彼<rt>かれ</rt></ruby>は<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>銀行<rt>ぎんこう</rt></ruby>と<ruby>何百<rt>なんびゃく</rt></ruby>というトップ<ruby>企業<rt>きぎょう</rt></ruby>を<ruby>作<rt>つく</rt></ruby>る<ruby>手助<rt>てだす</rt></ruby>けをしました。", "彼はまた、教育と国際関係と公共の福祉も支援しました。": "<ruby>彼<rt>かれ</rt></ruby>はまた、<ruby>教育<rt>きょういく</rt></ruby>と<ruby>国際関係<rt>こくさいかんけい</rt></ruby>と<ruby>公共<rt>こうきょう</rt></ruby>の<ruby>福祉<rt>ふくし</rt></ruby>も<ruby>支援<rt>しえん</rt></ruby>しました。", "女性の": "<ruby>女性<rt>じょせい</rt></ruby>の", "機会": "<ruby>機会<rt>きかい</rt></ruby>", "社会的な": "<ruby>社会的<rt>しゃかいてき</rt></ruby>な", "～を（…と）みなす": "～を（…と）みなす", "資本主義": "<ruby>資本主義<rt>しほんしゅぎ</rt></ruby>", "万国博覧会": "<ruby>万国博覧会<rt>ばんこくはくらんかい</rt></ruby>", "ヨーロッパの": "ヨーロッパの", "西洋の": "<ruby>西洋<rt>せいよう</rt></ruby>の", "福祉": "<ruby>福祉<rt>ふくし</rt></ruby>", "～歳のときに": "～<ruby>歳<rt>さい</rt></ruby>のときに", "～とみなされている": "～とみなされている", "何百もの～": "<ruby>何百<rt>なんびゃく</rt></ruby>もの～", "～を設立する": "～を<ruby>設立<rt>せつりつ</rt></ruby>する", "～の先駆者": "～の<ruby>先駆者<rt>せんくしゃ</rt></ruby>", "（タイトル）キャッシュレス社会を推し進める": "（タイトル）キャッシュレス<ruby>社会<rt>しゃかい</rt></ruby>を<ruby>推<rt>お</rt></ruby>し<ruby>進<rt>すす</rt></ruby>める", "紙幣のデザインを変えることは、日本にキャッシュレス化を早めるよう促すかもしれません。": "<ruby>紙幣<rt>しへい</rt></ruby>のデザインを<ruby>変<rt>か</rt></ruby>えることは、<ruby>日本<rt>にほん</rt></ruby>にキャッシュレス<ruby>化<rt>か</rt></ruby>を<ruby>早<rt>はや</rt></ruby>めるよう<ruby>促<rt>うなが</rt></ruby>すかもしれません。", "新紙幣を使用するための機器を調整するのに、企業には多くのお金がかかります。": "<ruby>新紙幣<rt>しんしへい</rt></ruby>を<ruby>使用<rt>しよう</rt></ruby>するための<ruby>機器<rt>きき</rt></ruby>を<ruby>調整<rt>ちょうせい</rt></ruby>するのに、<ruby>企業<rt>きぎょう</rt></ruby>には<ruby>多<rt>おお</rt></ruby>くのお<ruby>金<rt>かね</rt></ruby>がかかります。", "そのうえ、日本では出生率の低下のために労働人口が減少してきています。": "そのうえ、<ruby>日本<rt>にほん</rt></ruby>では<ruby>出生率<rt>しゅっせいりつ</rt></ruby>の<ruby>低下<rt>ていか</rt></ruby>のために<ruby>労働<rt>ろうどう</rt></ruby><ruby>人口<rt>じんこう</rt></ruby>が<ruby>減少<rt>げんしょう</rt></ruby>してきています。", "キャッシュレスシステムは取引を簡単にすることで、多くの仕事を省きます。": "キャッシュレスシステムは<ruby>取引<rt>とりひき</rt></ruby>を<ruby>簡単<rt>かんたん</rt></ruby>にすることで、<ruby>多<rt>おお</rt></ruby>くの<ruby>仕事<rt>しごと</rt></ruby>を<ruby>省<rt>はぶ</rt></ruby>きます。", "それはまた、外国人旅行者が日本を訪れるのを便利にします。彼らは通貨を両替する必要がないからです。": "それはまた、<ruby>外国人旅行者<rt>がいこくじんりょこうしゃ</rt></ruby>が<ruby>日本<rt>にほん</rt></ruby>を<ruby>訪<rt>おとず</rt></ruby>れるのを<ruby>便利<rt>べんり</rt></ruby>にします。<ruby>彼<rt>かれ</rt></ruby>らは<ruby>通貨<rt>つうか</rt></ruby>を<ruby>両替<rt>りょうがえ</rt></ruby>する<ruby>必要<rt>ひつよう</rt></ruby>がないからです。", "キャッシュレス化するために、最大額の紙幣を発行するのをやめた国もあります。": "キャッシュレス<ruby>化<rt>か</rt></ruby>するために、<ruby>最大<rt>さいだい</rt></ruby><ruby>額<rt>がく</rt></ruby>の<ruby>紙幣<rt>しへい</rt></ruby>を<ruby>発行<rt>はっこう</rt></ruby>するのをやめた<ruby>国<rt>くに</rt></ruby>もあります。", "おそらく日本は1万円札を廃止するべきだったでしょう。": "おそらく<ruby>日本<rt>にほん</rt></ruby>は1<ruby>万円札<rt>まんえんさつ</rt></ruby>を<ruby>廃止<rt>はいし</rt></ruby>するべきだったでしょう。", "1万円札がなければ、たくさんの少額紙幣の代わりに、カード1枚やスマートフォン1台を持ち歩くほうがずっと簡単でしょう。": "1<ruby>万円札<rt>まんえんさつ</rt></ruby>がなければ、たくさんの<ruby>少額<rt>しょうがく</rt></ruby><ruby>紙幣<rt>しへい</rt></ruby>の<ruby>代<rt>か</rt></ruby>わりに、カード1<ruby>枚<rt>まい</rt></ruby>やスマートフォン1<ruby>台<rt>だい</rt></ruby>を<ruby>持<rt>も</rt></ruby>ち<ruby>歩<rt>ある</rt></ruby>くほうがずっと<ruby>簡単<rt>かんたん</rt></ruby>でしょう。", "～を押す、推し進める": "～を<ruby>押<rt>お</rt></ruby>す、<ruby>推<rt>お</rt></ruby>し<ruby>進<rt>すす</rt></ruby>める", "キャッシュレスの": "キャッシュレスの", "～を再設計する": "～を<ruby>再設計<rt>さいせっけい</rt></ruby>する", "～を調整する": "～を<ruby>調整<rt>ちょうせい</rt></ruby>する", "労働の、働いている": "<ruby>労働<rt>ろうどう</rt></ruby>の、<ruby>働<rt>はたら</rt></ruby>いている", "出生率": "<ruby>出生率<rt>しゅっせいりつ</rt></ruby>", "取引": "<ruby>取引<rt>とりひき</rt></ruby>", "通貨": "<ruby>通貨<rt>つうか</rt></ruby>", "～を廃止する": "～を<ruby>廃止<rt>はいし</rt></ruby>する", "さらに、そのうえ": "さらに、そのうえ", "～の代わりに": "～の<ruby>代<rt>か</rt></ruby>わりに", "～のために、～が原因で": "～のために、～が<ruby>原因<rt>げんいん</rt></ruby>で", "紙幣": "<ruby>紙幣<rt>しへい</rt></ruby>", "赤と黄色が警告標識によく使われていることに気づいたことがありますか。": "<ruby>赤<rt>あか</rt></ruby>と<ruby>黄色<rt>きいろ</rt></ruby>が<ruby>警告<rt>けいこく</rt></ruby><ruby>標識<rt>ひょうしき</rt></ruby>によく<ruby>使<rt>つか</rt></ruby>われていることに<ruby>気<rt>き</rt></ruby>づいたことがありますか。", "鮮やかで暖かい色は、人々の注意を引くので選ばれます。": "<ruby>鮮<rt>あざ</rt></ruby>やかで<ruby>暖<rt>あたた</rt></ruby>かい<ruby>色<rt>いろ</rt></ruby>は、<ruby>人々<rt>ひとびと</rt></ruby>の<ruby>注意<rt>ちゅうい</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>くので<ruby>選<rt>えら</rt></ruby>ばれます。", "それらは、メッセージがすぐに理解されるべき標識に人々が気づくのを助けます。": "それらは、メッセージがすぐに<ruby>理解<rt>りかい</rt></ruby>されるべき<ruby>標識<rt>ひょうしき</rt></ruby>に<ruby>人々<rt>ひとびと</rt></ruby>が<ruby>気<rt>き</rt></ruby>づくのを<ruby>助<rt>たす</rt></ruby>けます。", "色の選択に加えて、色のコントラストは、メッセージをはっきりとすばやく伝えるのに重要な役割を果たします。": "<ruby>色<rt>いろ</rt></ruby>の<ruby>選択<rt>せんたく</rt></ruby>に<ruby>加<rt>くわ</rt></ruby>えて、<ruby>色<rt>いろ</rt></ruby>のコントラストは、メッセージをはっきりとすばやく<ruby>伝<rt>つた</rt></ruby>えるのに<ruby>重要<rt>じゅうよう</rt></ruby>な<ruby>役割<rt>やくわり</rt></ruby>を<ruby>果<rt>は</rt></ruby>たします。", "例えば、非常口の標識は白い背景に緑色の人の絵を示しています。": "<ruby>例<rt>たと</rt></ruby>えば、<ruby>非常口<rt>ひじょうぐち</rt></ruby>の<ruby>標識<rt>ひょうしき</rt></ruby>は<ruby>白<rt>しろ</rt></ruby>い<ruby>背景<rt>はいけい</rt></ruby>に<ruby>緑色<rt>みどりいろ</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>の<ruby>絵<rt>え</rt></ruby>を<ruby>示<rt>しめ</rt></ruby>しています。", "緑と白の部分のコントラストは、煙や火の中でも、私たちがその人の姿を背景とはっきり区別するのを助けます。": "<ruby>緑<rt>みどり</rt></ruby>と<ruby>白<rt>しろ</rt></ruby>の<ruby>部分<rt>ぶぶん</rt></ruby>のコントラストは、<ruby>煙<rt>けむり</rt></ruby>や<ruby>火<rt>ひ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>でも、<ruby>私<rt>わたし</rt></ruby>たちがその<ruby>人<rt>ひと</rt></ruby>の<ruby>姿<rt>すがた</rt></ruby>を<ruby>背景<rt>はいけい</rt></ruby>とはっきり<ruby>区別<rt>くべつ</rt></ruby>するのを<ruby>助<rt>たす</rt></ruby>けます。", "警告": "<ruby>警告<rt>けいこく</rt></ruby>", "鮮やかな": "<ruby>鮮<rt>あざ</rt></ruby>やかな", "すぐに、ただちに": "すぐに、ただちに", "～を伝える": "～を<ruby>伝<rt>つた</rt></ruby>える", "背景": "<ruby>背景<rt>はいけい</rt></ruby>", "～を区別する": "～を<ruby>区別<rt>くべつ</rt></ruby>する", "煙": "<ruby>煙<rt>けむり</rt></ruby>", "人の注意を引く": "<ruby>人<rt>ひと</rt></ruby>の<ruby>注意<rt>ちゅうい</rt></ruby>を<ruby>引<rt>ひ</rt></ruby>く", "～において役割を果たす": "～において<ruby>役割<rt>やくわり</rt></ruby>を<ruby>果<rt>は</rt></ruby>たす", "AをBと区別する": "AをBと<ruby>区別<rt>くべつ</rt></ruby>する", "～に加えて": "～に<ruby>加<rt>くわ</rt></ruby>えて", "例えば": "<ruby>例<rt>たと</rt></ruby>えば", "色は私たちにさまざまな効果を及ぼします。": "<ruby>色<rt>いろ</rt></ruby>は<ruby>私<rt>わたし</rt></ruby>たちにさまざまな<ruby>効果<rt>こうか</rt></ruby>を<ruby>及<rt>およ</rt></ruby>ぼします。", "白の効果を見てみましょう。": "<ruby>白<rt>しろ</rt></ruby>の<ruby>効果<rt>こうか</rt></ruby>を<ruby>見<rt>み</rt></ruby>てみましょう。", "写真の2つの碁石は同じ大きさに見えますが、実際はそうではありません。": "<ruby>写真<rt>しゃしん</rt></ruby>の2つの<ruby>碁石<rt>ごいし</rt></ruby>は<ruby>同<rt>おな</rt></ruby>じ<ruby>大<rt>おお</rt></ruby>きさに<ruby>見<rt>み</rt></ruby>えますが、<ruby>実際<rt>じっさい</rt></ruby>はそうではありません。", "白い物は実際よりも大きく見えるという事実のため、白い石はわずかに小さく作られています。": "<ruby>白<rt>しろ</rt></ruby>い<ruby>物<rt>もの</rt></ruby>は<ruby>実際<rt>じっさい</rt></ruby>よりも<ruby>大<rt>おお</rt></ruby>きく<ruby>見<rt>み</rt></ruby>えるという<ruby>事実<rt>じじつ</rt></ruby>のため、<ruby>白<rt>しろ</rt></ruby>い<ruby>石<rt>いし</rt></ruby>はわずかに<ruby>小<rt>ちい</rt></ruby>さく<ruby>作<rt>つく</rt></ruby>られています。", "色の効果は、食料品店が新鮮な果物や野菜を売るときにも重要です。": "<ruby>色<rt>いろ</rt></ruby>の<ruby>効果<rt>こうか</rt></ruby>は、<ruby>食料品<rt>しょくりょうひん</rt></ruby><ruby>店<rt>てん</rt></ruby>が<ruby>新鮮<rt>しんせん</rt></ruby>な<ruby>果物<rt>くだもの</rt></ruby>や<ruby>野菜<rt>やさい</rt></ruby>を<ruby>売<rt>う</rt></ruby>るときにも<ruby>重要<rt>じゅうよう</rt></ruby>です。", "例えば、赤は果物の色をより鮮やかに見せるので、オレンジは明るい赤色のネット袋に入れて売られています。": "<ruby>例<rt>たと</rt></ruby>えば、<ruby>赤<rt>あか</rt></ruby>は<ruby>果物<rt>くだもの</rt></ruby>の<ruby>色<rt>いろ</rt></ruby>をより<ruby>鮮<rt>あざ</rt></ruby>やかに<ruby>見<rt>み</rt></ruby>せるので、オレンジは<ruby>明<rt>あか</rt></ruby>るい<ruby>赤色<rt>あかいろ</rt></ruby>のネット<ruby>袋<rt>ふくろ</rt></ruby>に<ruby>入<rt>い</rt></ruby>れて<ruby>売<rt>う</rt></ruby>られています。", "同じ理由で、オクラは緑色のネット袋に入れて売られています。": "<ruby>同<rt>おな</rt></ruby>じ<ruby>理由<rt>りゆう</rt></ruby>で、オクラは<ruby>緑色<rt>みどりいろ</rt></ruby>のネット<ruby>袋<rt>ふくろ</rt></ruby>に<ruby>入<rt>い</rt></ruby>れて<ruby>売<rt>う</rt></ruby>られています。", "このようにして、果物や野菜はより新鮮でおいしそうに見えます。": "このようにして、<ruby>果物<rt>くだもの</rt></ruby>や<ruby>野菜<rt>やさい</rt></ruby>はより<ruby>新鮮<rt>しんせん</rt></ruby>でおいしそうに<ruby>見<rt>み</rt></ruby>えます。", "これが消費者にそれらを買う気にさせます。": "これが<ruby>消費者<rt>しょうひしゃ</rt></ruby>にそれらを<ruby>買<rt>か</rt></ruby>う<ruby>気<rt>き</rt></ruby>にさせます。", "効果": "<ruby>効果<rt>こうか</rt></ruby>", "石": "<ruby>石<rt>いし</rt></ruby>", "わずかに、少し": "わずかに、<ruby>少<rt>すこ</rt></ruby>し", "物体、物": "<ruby>物体<rt>ぶったい</rt></ruby>、<ruby>物<rt>もの</rt></ruby>", "網目、メッシュ": "<ruby>網目<rt>あみめ</rt></ruby>、メッシュ", "オクラ": "オクラ", "～を刺激する": "～を<ruby>刺激<rt>しげき</rt></ruby>する", "～に効果を及ぼす": "～に<ruby>効果<rt>こうか</rt></ruby>を<ruby>及<rt>およ</rt></ruby>ぼす", "このように": "このように", "同じ理由で": "<ruby>同<rt>おな</rt></ruby>じ<ruby>理由<rt>りゆう</rt></ruby>で", "～のように見える": "～のように<ruby>見<rt>み</rt></ruby>える", "～という事実": "～という<ruby>事実<rt>じじつ</rt></ruby>", "実際は": "<ruby>実際<rt>じっさい</rt></ruby>は"};
+
+// ===== 文字列ヘルパー =====
+const untag = s => s.replace(/\{[SVGM]:/g,'').replace(/\}/g,'');           // 色タグを外す（[ ]は残す）
+const plain = s => untag(s).replace(/[\[\]]/g,'');                           // 完全な英文
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function colored(s){ // 色分けHTML
+  return esc(s.replace(/[\[\]]/g,'')).replace(/\{([SVGM]):([^}]*)\}/g, (_,k,t)=>`<span class="cs-${k}">${t}</span>`);
+}
+function jp(t){ return settings.furi && FURI[t] ? FURI[t] : esc(t); }
+
+// ===== 問題の組み立て =====
+const ITEMS = [];
+PARTS.forEach(p => {
+  p.sents.forEach((s,i) => {
+    const id = p.id+'-s'+i; s.part = p.id; s.no = i;
+    if (/\[/.test(s.en)) ITEMS.push({type:'mushi', id:'mu'+id, part:p.id, ord:i, s});
+    if (!s.title && plain(s.en).split(' ').length >= 4) ITEMS.push({type:'re', id:'re'+id, part:p.id, ord:i, s});
+    if (s.key) ITEMS.push({type:'full', id:'fu'+id, part:p.id, ord:i, s});
+    if (s.q4) ITEMS.push({type:'step', id:'st'+id, part:p.id, ord:i, s});
+  });
+  p.vocab.forEach((v,i) => {
+    ITEMS.push({type:'mc', id:'mc'+p.id+'-'+i, part:p.id, ord:100+i, v});
+    ITEMS.push({type:'vw', id:'vw'+p.id+'-'+i, part:p.id, ord:100+i, v});
+  });
+});
+const byId = Object.fromEntries(ITEMS.map(x=>[x.id,x]));
+
+// ===== 設定（localStorageに保存） =====
+const SKEY = 'eicomi2_kimatsu_v2_settings';
+let settings = {rate:0.9, cs:true, furi:false, random:true, auto:true};
+try { Object.assign(settings, JSON.parse(localStorage.getItem(SKEY)) || {}); } catch(e){}
+function saveSettings(){ settings.auto = document.getElementById('autoSpeak').checked; try { localStorage.setItem(SKEY, JSON.stringify(settings)); } catch(e){} }
+function seg(id, opts, key){
+  document.getElementById(id).innerHTML = opts.map(([v,label]) => `<button class="${settings[key]===v?'on':''}" onclick="setOpt('${key}',${JSON.stringify(v)})">${label}</button>`).join('');
+}
+function renderSettings(){
+  seg('segRate', [[0.7,'0.7'],[0.85,'0.85'],[0.9,'0.9'],[0.95,'0.95'],[1,'1.0']], 'rate');
+  seg('segCs', [[true,'ON'],[false,'OFF']], 'cs');
+  seg('segFuri', [[true,'ON'],[false,'OFF']], 'furi');
+  seg('segOrder', [[true,'ランダム'],[false,'教科書順']], 'random');
+  document.getElementById('autoSpeak').checked = settings.auto;
+  document.getElementById('root').classList.toggle('cs-on', settings.cs);
+}
+function setOpt(key, v){
+  settings[key] = v; saveSettings(); renderSettings();
+  if (key==='furi' && document.getElementById('quizArea').style.display==='block') rerender();
+}
+
+// ===== 状態 =====
+let sec = 'all', mode = null, queue = [], qi = 0, score = 0, answered = false, cur = null, mcTally = [0,0,0,0];
+const STORE = 'eicomi2_kimatsu_v2_wrong';
+function loadWrong(){ try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch(e){ return []; } }
+function saveWrong(a){ try { localStorage.setItem(STORE, JSON.stringify(a)); } catch(e){} }
+function addWrong(id){ const a = loadWrong(); if (!a.includes(id)) { a.push(id); saveWrong(a); } }
+function removeWrong(id){ saveWrong(loadWrong().filter(x=>x!==id)); }
+function shuffle(a){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function inSec(it){ return sec==='all' || it.part===sec; }
+const PART_ORDER = Object.fromEntries(PARTS.map((p,i)=>[p.id,i]));
+function textbookOrder(list){ return list.slice().sort((a,b)=> PART_ORDER[a.part]-PART_ORDER[b.part] || a.ord-b.ord); }
+
+// ===== メニュー =====
+function renderTabs(){
+  const tabs = [{id:'all',name:'全範囲',sub:'6-2〜7-2'}].concat(PARTS.map(p=>({id:p.id,name:p.name,sub:p.sub})));
+  document.getElementById('secTabs').innerHTML = tabs.map(t =>
+    `<button class="sec-tab ${t.id===sec?'active':''}" onclick="setSec('${t.id}')">${t.name}<small>${t.sub}</small></button>`).join('');
+}
+function setSec(s){ sec = s; renderTabs(); updateCounts(); }
+function updateCounts(){
+  ['step','mushi','mc','vw','re','full'].forEach(m => {
+    const n = ITEMS.filter(it=>it.type===m && inSec(it)).length;
+    const el = document.getElementById('cnt-'+m);
+    el.textContent = n ? n+'問' : 'この範囲にはありません';
+    el.classList.toggle('empty', !n);
+  });
+  const ns = PARTS.filter(p=>sec==='all'||p.id===sec).reduce((a,p)=>a+p.sents.length,0);
+  document.getElementById('cnt-read').textContent = ns+'文';
+  const w = loadWrong().filter(id=>byId[id] && inSec(byId[id])).length;
+  const el = document.getElementById('cnt-wrong');
+  el.textContent = w ? w+'問' : 'まだありません';
+  el.className = 'mode-count ' + (w ? 'orange' : 'empty');
+}
+function showArea(){
+  document.getElementById('modeScreen').classList.remove('show');
+  document.getElementById('quizArea').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+  document.getElementById('qCard').style.display = 'block';
+  document.getElementById('progWrap').style.display = 'block';
+  window.scrollTo({top:0});
+}
+function startMode(m){
+  let list = m==='wrong' ? loadWrong().map(id=>byId[id]).filter(it=>it && inSec(it))
+                         : ITEMS.filter(it=>it.type===m && inSec(it));
+  if (!list.length) return;
+  mode = m; queue = settings.random ? shuffle(list) : textbookOrder(list); qi = 0; score = 0; mcTally = [0,0,0,0];
+  showArea(); showQ();
+}
+function backToMenu(){
+  if (window.speechSynthesis) speechSynthesis.cancel();
+  document.getElementById('quizArea').style.display = 'none';
+  document.getElementById('modeScreen').classList.add('show');
+  document.getElementById('scoreBadge').style.display = 'none';
+  document.getElementById('qCard').className = 'card question-card';
+  updateCounts();
+}
+
+// ===== 本文を読む =====
+function startRead(){
+  mode = 'read'; showArea();
+  document.getElementById('progWrap').style.display = 'none';
+  document.getElementById('nextBtn').classList.remove('show');
+  renderRead();
+}
+let readHideJa = false;
+function renderRead(){
+  const q = document.getElementById('qCard');
+  q.className = '';
+  const parts = PARTS.filter(p=>sec==='all'||p.id===sec);
+  q.innerHTML = `<div class="card read-item" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="speak-btn" style="margin-top:0" onclick="readHideJa=!readHideJa;renderRead()">${readHideJa?'日本語を表示':'日本語をかくす'}</button>
+      <span style="font-size:12px;color:var(--gray-400)">色分けは上の設定でON/OFF</span></div>` +
+    parts.map(p => `<div style="font-weight:700;color:var(--main);margin:14px 4px 8px">${p.name.replace('L','Lesson ').replace('-',' Part ')}　${esc(p.sub)}</div>` +
+      p.sents.map(s => `<div class="card read-item">
+        ${s.key==='star'?'<span class="star" style="margin:0 0 6px">テストに絶対出す</span>':''}
+        <div class="read-en">${colored(s.en)}</div>
+        <div class="read-ja ${readHideJa?'hide':''}">${jp(s.ja)}</div>
+        ${s.note?`<div class="q-note">${esc(s.note)}</div>`:''}
+        ${speakBtn(plain(s.en))}</div>`).join('')).join('');
+}
+
+function updateProgress(){
+  document.getElementById('progText').textContent = `${qi+1} / ${queue.length}問`;
+  document.getElementById('progScore').textContent = `正解 ${score}`;
+  document.getElementById('progFill').style.width = (qi/queue.length*100)+'%';
+  const b = document.getElementById('scoreBadge'); b.style.display='block'; b.textContent = score+'点';
+}
+const TAGNAME = {step:'🪜 3段階', mushi:'🐛 虫食いつづり', mc:'📝 4択', vw:'✏️ 書く', re:'🔀 並べ替え', full:'🖊️ 全部書く'};
+function tagHtml(it){
+  let h = `<span class="q-tag">${it.part.replace('-',' Part ')}　${TAGNAME[it.type]}</span>`;
+  if (it.s && it.s.key==='star') h += `<span class="q-tag star-tag">★テストに絶対出す</span>`;
+  return h;
+}
+const SHOW = {};
+function showQ(){
+  answered = false; cur = queue[qi];
+  document.getElementById('nextBtn').classList.remove('show');
+  updateProgress();
+  SHOW[cur.type]();
+}
+// ふりがなの切り替え時に、答える前なら画面を作り直す
+function rerender(){ if (mode==='read') return renderRead(); if (!answered && cur && cur.type!=='step') SHOW[cur.type](); else document.querySelectorAll('[data-ja]').forEach(el=>el.innerHTML=jp(el.dataset.ja)); }
+function jaBox(t){ return `<div class="q-ja" data-ja="${esc(t)}">${jp(t)}</div>`; }
+
+function finishAnswer(ok, sayText){
+  answered = true;
+  if (ok) { score++; if (mode==='wrong') removeWrong(cur.id); }
+  else addWrong(cur.id);
+  updateProgress();
+  document.getElementById('progFill').style.width = ((qi+1)/queue.length*100)+'%';
+  const nb = document.getElementById('nextBtn'); nb.classList.add('show');
+  nb.textContent = qi+1 < queue.length ? '次へ →' : '結果を見る';
+  if (sayText && settings.auto) speak(sayText);
+}
+function nextQ(){
+  qi++;
+  if (qi >= queue.length) return showResult();
+  showQ(); window.scrollTo({top:0, behavior:'smooth'});
+}
+function showResult(){
+  document.getElementById('qCard').style.display = 'none';
+  document.getElementById('nextBtn').classList.remove('show');
+  const pct = Math.round(score/queue.length*100);
+  const msg = pct===100 ? '全問正解！この範囲は書けるようになっています。' :
+              pct>=80 ? 'あと少し。間違えた問題は「要復習」に入っています。' :
+              '間違えた問題は「要復習」に入りました。もう一周してみましょう。';
+  const r = document.getElementById('result');
+  r.innerHTML = `<div class="result-score">${score} / ${queue.length}</div><div class="result-msg">${msg}</div>
+    <button class="check-btn" style="background:var(--main)" onclick="startMode('${mode}')">もう一度</button>
+    <button class="check-btn" onclick="backToMenu();startMode('wrong')">要復習へ</button>`;
+  r.style.display = 'block';
+}
+function speakBtn(text){ return `<button class="speak-btn" onclick="speak(this.dataset.t)" data-t="${esc(text)}">🔊 読む</button>`; }
+function answerBlock(s){ return `<div class="ex-text">${colored(s.en)}</div>${s.note?`<div class="q-note">${esc(s.note)}</div>`:''}${speakBtn(plain(s.en))}`; }
+
+// ===== 判定まわり =====
+const norm = t => t.replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/\s+/g,' ').trim();
+const tok = t => norm(t).replace(/[.?!]+$/,'').split(' ').filter(Boolean);
+function diffHtml(user, correct){
+  const a = tok(user), b = tok(correct);
+  const eq = (x,y) => x.replace(/[,]/g,'').toLowerCase() === y.replace(/[,]/g,'').toLowerCase() && x.replace(/[^,]/g,'')===y.replace(/[^,]/g,'');
+  const n=a.length, m=b.length, L = Array.from({length:n+1},()=>Array(m+1).fill(0));
+  for (let i=n-1;i>=0;i--) for (let j=m-1;j>=0;j--) L[i][j] = eq(a[i],b[j]) ? L[i+1][j+1]+1 : Math.max(L[i+1][j], L[i][j+1]);
+  let i=0,j=0, out=[];
+  while (i<n && j<m) {
+    if (eq(a[i],b[j])) { out.push(`<span class="d-ok">${esc(b[j])}</span>`); i++; j++; }
+    else if (L[i+1][j] >= L[i][j+1]) { out.push(`<span class="d-bad">${esc(a[i])}</span>`); i++; }
+    else { out.push(`<span class="d-miss">${esc(b[j])}</span>`); j++; }
+  }
+  while (i<n) out.push(`<span class="d-bad">${esc(a[i++])}</span>`);
+  while (j<m) out.push(`<span class="d-miss">${esc(b[j++])}</span>`);
+  return out.join(' ');
+}
+function sameSentence(user, correct){
+  const a = tok(user), b = tok(correct);
+  if (a.length !== b.length) return false;
+  return a.every((w,k) => k===0 ? w.toLowerCase()===b[k].toLowerCase() : w===b[k]);
+}
+
+// ===== 虫食い =====
+SHOW.mushi = function(){
+  const s = cur.s;
+  const html = esc(untag(s.en)).replace(/\[([^\]]+)\]/g, (_, w) => {
+    const width = Math.max(4, w.length+1);
+    return `<input data-w="${esc(w)}" style="width:${width*0.68+1}em" placeholder="${esc(w[0])}${'・'.repeat(Math.min(w.length-1,12))}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"><span class="hint-len">${w.length}</span>`;
+  });
+  document.getElementById('qCard').innerHTML = `${tagHtml(cur)}${jaBox(s.ja)}
+    <div class="mushi">${html}</div>
+    <button class="check-btn" id="chk" onclick="checkMushi()">答え合わせ</button>
+    <div class="explanation" id="ex"></div>`;
+  const ins = [...document.querySelectorAll('.mushi input')];
+  ins.forEach((el,idx) => el.addEventListener('keydown', e => {
+    if (e.key==='Enter') { e.preventDefault(); if (answered) nextQ(); else if (idx<ins.length-1) ins[idx+1].focus(); else checkMushi(); }
+  }));
+  ins[0] && ins[0].focus();
+};
+function checkMushi(){
+  if (answered) return;
+  const ins = [...document.querySelectorAll('.mushi input')]; let all = true;
+  ins.forEach(el => {
+    const w = el.dataset.w, v = norm(el.value);
+    const ok = v.toLowerCase() === w.toLowerCase() || (v.length && (w[0]+v).toLowerCase() === w.toLowerCase());
+    el.disabled = true;
+    if (ok) { el.value = w; el.classList.add('ok'); }
+    else { all = false; el.classList.add('ng'); if (!v) el.value = '（空欄）'; el.insertAdjacentHTML('afterend', `<span class="fix">${esc(w)}</span>`); }
+  });
+  document.getElementById('chk').style.display = 'none';
+  const ex = document.getElementById('ex');
+  ex.innerHTML = `<div class="ex-correct ${all?'':'wrong-flag'}">${all?'⭕ 全部正しく書けました':'❌ 赤い語のつづりを確認しよう'}</div>${answerBlock(cur.s)}`;
+  ex.classList.add('show');
+  finishAnswer(all, plain(cur.s.en));
+}
+
+// ===== 4択（正解の位置が偏らないように） =====
+function balancedInsert(answer, wrongs){
+  const min = Math.min(...mcTally);
+  const cands = [0,1,2,3].filter(p=>mcTally[p]===min);
+  const pos = cands[Math.floor(Math.random()*cands.length)]; mcTally[pos]++;
+  const opts = shuffle(wrongs); opts.splice(pos,0,answer); return opts;
+}
+function choicesHtml(opts, answer, fn){
+  return `<div class="choices">${opts.map((o,k)=>`<button class="choice-btn" data-ok="${o===answer}" onclick="${fn}(this)"><span class="choice-label">${'ABCD'[k]}</span>${esc(o)}</button>`).join('')}</div>`;
+}
+function markChoices(btn){
+  const ok = btn.dataset.ok==='true';
+  btn.parentNode.querySelectorAll('.choice-btn').forEach(b => { b.disabled = true; if (b.dataset.ok==='true') b.classList.add('correct'); });
+  if (!ok) btn.classList.add('wrong');
+  return ok;
+}
+SHOW.mc = function(){
+  const [ja, en] = cur.v;
+  const pool = ITEMS.filter(it=>it.type==='mc' && it.v[1]!==en);
+  const same = shuffle(pool.filter(it=>it.part===cur.part)).map(it=>it.v[1]);
+  const other = shuffle(pool.filter(it=>it.part!==cur.part)).map(it=>it.v[1]);
+  const wrongs = [...new Set(same.concat(other))].slice(0,3);
+  document.getElementById('qCard').innerHTML = `${tagHtml(cur)}
+    <div class="q-big" data-ja="${esc(ja)}">${jp(ja)}</div>
+    ${choicesHtml(balancedInsert(en, wrongs), en, 'pickMC')}
+    <div class="explanation" id="ex"></div>`;
+};
+function pickMC(btn){
+  if (answered) return;
+  const ok = markChoices(btn);
+  const ex = document.getElementById('ex');
+  ex.innerHTML = `<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 正解は '+esc(cur.v[1])}</div>${speakBtn(cur.v[1])}`;
+  ex.classList.add('show');
+  finishAnswer(ok, cur.v[1]);
+}
+
+// ===== 単語・熟語を書く =====
+SHOW.vw = function(){
+  const [ja, en] = cur.v;
+  document.getElementById('qCard').innerHTML = `${tagHtml(cur)}
+    <div class="q-big" data-ja="${esc(ja)}">${jp(ja)}</div>
+    <div class="q-note">頭文字：${esc(en[0])}　／　${en.split(' ').length}語</div>
+    <input class="write-in" id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="英語で書く">
+    <button class="check-btn" id="chk" onclick="checkVW()">答え合わせ</button>
+    <div class="explanation" id="ex"></div>`;
+  const a = document.getElementById('ans');
+  a.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); answered ? nextQ() : checkVW(); } });
+  a.focus();
+};
+function checkVW(){
+  if (answered) return;
+  const en = cur.v[1], v = norm(document.getElementById('ans').value);
+  const ok = v.toLowerCase() === en.toLowerCase();
+  document.getElementById('ans').disabled = true;
+  document.getElementById('chk').style.display = 'none';
+  const ex = document.getElementById('ex');
+  ex.innerHTML = `<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 正しいつづり'}</div>
+    ${ok?'':`<div class="ex-label">あなたの答え</div><div class="diff-line">${v?esc(v):'（空欄）'}</div><div class="ex-label">正しい答え</div>`}
+    <div class="diff-line d-good">${esc(en)}</div>${speakBtn(en)}`;
+  ex.classList.add('show');
+  finishAnswer(ok, en);
+}
+
+// ===== 並べ替え（部品） =====
+function chunksOf(sentence){
+  const words = plain(sentence).replace(/[.?!]$/,'').split(' ');
+  const target = words.length <= 9 ? words.length : Math.min(10, Math.ceil(words.length/2));
+  const size = words.length / target, out = [];
+  for (let k=0;k<target;k++) out.push(words.slice(Math.round(k*size), Math.round((k+1)*size)).join(' '));
+  return out.filter(Boolean);
+}
+let RE = null;  // {order, picked, onDone}
+function reHtml(s){
+  const order = chunksOf(s.en);
+  let sh, tries = 0;
+  do { sh = shuffle(order.map((c,k)=>k)); tries++; } while (order.length>1 && sh.every((v,k)=>order[v]===order[k]) && tries<30);
+  RE = {order, picked:[]};
+  const end = (plain(s.en).match(/[.?!]$/)||[''])[0];
+  return `<div class="rearrange-target" id="tgt"></div><div style="text-align:right;color:var(--gray-400);font-size:13px;margin-top:4px">文の終わり「${esc(end)}」</div>
+    <div class="rearrange-pool" id="pool">${sh.map(k=>`<button class="word-chip" data-k="${k}" onclick="pickChip(this)">${esc(order[k])}</button>`).join('')}</div>
+    <div class="actions" id="reAct"><button class="action-btn" onclick="undoChip()">↩ 1つ戻す</button><button class="action-btn" onclick="resetChips()">やり直し</button></div>
+    <button class="check-btn" id="chk" onclick="checkChips()" disabled>答え合わせ</button>`;
+}
+function pickChip(b){ if (RE.done) return; RE.picked.push(+b.dataset.k); b.classList.add('in-target'); document.getElementById('tgt').appendChild(b); b.onclick = () => removeChip(b); syncRE(); }
+function removeChip(b){ if (RE.done) return; const i = RE.picked.lastIndexOf(+b.dataset.k); RE.picked.splice(i,1); b.classList.remove('in-target'); b.onclick = () => pickChip(b); document.getElementById('pool').appendChild(b); syncRE(); }
+function undoChip(){ const t = document.getElementById('tgt'); if (t.lastChild) removeChip(t.lastChild); }
+function resetChips(){ while (document.getElementById('tgt').lastChild) undoChip(); }
+function syncRE(){ const full = RE.picked.length===RE.order.length; document.getElementById('chk').disabled = !full; document.getElementById('tgt').classList.toggle('filled', full); }
+function checkChips(){
+  if (RE.done) return; RE.done = true;
+  const kids = [...document.getElementById('tgt').children];
+  const ok = kids.every((c,idx)=>RE.order[+c.dataset.k]===RE.order[idx]);
+  kids.forEach((c,idx) => { c.disabled = true; c.classList.remove('in-target'); c.classList.add(RE.order[+c.dataset.k]===RE.order[idx] ? 'ok' : 'ng'); });
+  document.getElementById('chk').style.display = 'none';
+  document.getElementById('reAct').style.display = 'none';
+  RE.onDone(ok);
+}
+SHOW.re = function(){
+  document.getElementById('qCard').innerHTML = `${tagHtml(cur)}${jaBox(cur.s.ja)}${reHtml(cur.s)}<div class="explanation" id="ex"></div>`;
+  RE.onDone = ok => {
+    const ex = document.getElementById('ex');
+    ex.innerHTML = `<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 正解':'❌ 赤いカードから順番がずれています'}</div>${answerBlock(cur.s)}`;
+    ex.classList.add('show');
+    finishAnswer(ok, plain(cur.s.en));
+  };
+};
+
+// ===== 全文タイピング（部品） =====
+function typeHtml(s){
+  return `${s.note?`<div class="q-note">ヒント：${esc(s.note)}</div>`:''}
+    <textarea class="write-in" id="ans" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="英文をまるごと書く（ピリオドはなくてもOK）"></textarea>
+    <button class="check-btn" id="chkT" onclick="checkType()">答え合わせ</button>`;
+}
+let TYPE_DONE = null;
+function checkType(){
+  const correct = plain(cur.s.en), v = document.getElementById('ans').value;
+  const ok = sameSentence(v, correct);
+  document.getElementById('ans').disabled = true;
+  document.getElementById('chkT').style.display = 'none';
+  const diff = ok ? '' : `<div class="ex-label">あなたの答えとの比べ（赤＝違う語・余分な語、オレンジ＝抜けた語）</div><div class="diff-line">${diffHtml(v, correct)}</div>`;
+  TYPE_DONE(ok, diff);
+}
+SHOW.full = function(){
+  document.getElementById('qCard').innerHTML = `${tagHtml(cur)}${jaBox(cur.s.ja)}${typeHtml(cur.s)}<div class="explanation" id="ex"></div>`;
+  TYPE_DONE = (ok, diff) => {
+    const ex = document.getElementById('ex');
+    ex.innerHTML = `<div class="ex-correct ${ok?'':'wrong-flag'}">${ok?'⭕ 完璧！':'❌ もう少し'}</div>${diff}<div class="ex-label">正しい英文</div>${answerBlock(cur.s)}`;
+    ex.classList.add('show');
+    finishAnswer(ok, plain(cur.s.en));
+  };
+  document.getElementById('ans').focus();
+};
+
+// ===== 3段階ステップアップ =====
+let STEP = null;
+function blankSentence(s){
+  const text = plain(s.en), phrase = s.q4[0];
+  const re = new RegExp('\\b' + phrase.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b');
+  return esc(text.replace(re, '\u0000')).replace('\u0000', '<span class="blank-box">（　　）</span>');
+}
+function stepBar(){
+  const names = ['① 4択','② 並べ替え','③ タイピング'];
+  return `<div class="steps">${names.map((n,k)=>`<div class="step ${k===STEP.k?'now':''} ${STEP.res[k]===true?'done-ok':''} ${STEP.res[k]===false?'done-ng':''}">${n}${STEP.res[k]===true?' ⭕':STEP.res[k]===false?' ❌':''}</div>`).join('')}</div>`;
+}
+SHOW.step = function(){ STEP = {k:0, res:[]}; renderStep(); };
+function renderStep(){
+  const s = cur.s, card = document.getElementById('qCard');
+  const head = `${tagHtml(cur)}${stepBar()}${jaBox(s.ja)}`;
+  if (STEP.k===0) {
+    card.innerHTML = `${head}<div class="q-en">${blankSentence(s)}</div>
+      ${choicesHtml(balancedInsert(s.q4[0], s.q4[1]), s.q4[0], 'pickStep')}<div class="explanation" id="ex"></div>`;
+  } else if (STEP.k===1) {
+    card.innerHTML = `${head}<div class="q-note">今度は文全体を組み立てよう</div>${reHtml(s)}<div class="explanation" id="ex"></div>`;
+    RE.onDone = ok => stepDone(ok, ok?'⭕ 正解':'❌ 赤いカードから順番がずれています', '');
+  } else {
+    card.innerHTML = `${head}<div class="q-note">最後は何も見ないで、英文をまるごと書こう</div>${typeHtml(s)}<div class="explanation" id="ex"></div>`;
+    TYPE_DONE = (ok, diff) => stepDone(ok, ok?'⭕ 完璧！':'❌ もう少し', diff);
+    document.getElementById('ans').focus();
+  }
+}
+function pickStep(btn){
+  if (STEP.res[0]!==undefined) return;
+  const ok = markChoices(btn);
+  stepDone(ok, ok?'⭕ 正解':'❌ 正解は「'+esc(cur.s.q4[0])+'」', '');
+}
+function stepDone(ok, msg, extra){
+  STEP.res[STEP.k] = ok;
+  const bar = document.querySelector('.steps'); bar.outerHTML = stepBar();
+  const ex = document.getElementById('ex');
+  const last = STEP.k===2;
+  ex.innerHTML = `<div class="ex-correct ${ok?'':'wrong-flag'}">${msg}</div>${extra}${(STEP.k>0)?answerBlock(cur.s):''}
+    ${last?'':`<button class="check-btn" style="background:var(--main)" onclick="STEP.k++;renderStep();window.scrollTo({top:0,behavior:'smooth'})">次のステップへ →</button>`}`;
+  ex.classList.add('show');
+  if (STEP.k>0 && settings.auto) speak(plain(cur.s.en));
+  if (last) {
+    const all = STEP.res.every(r=>r===true);
+    finishAnswer(all, null);
+    if (!all) ex.insertAdjacentHTML('afterbegin', `<div class="q-note" style="color:var(--red);margin:0 0 6px">どこかのステップで間違えたので「要復習」に入りました。</div>`);
+  }
+}
+
+// ===== 読み上げ =====
+let voice = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  const sel = document.getElementById('voiceSel');
+  if (!vs.length) { sel.innerHTML = '<option>英語の声が見つかりません</option>'; return; }
+  let saved = null; try { saved = localStorage.getItem('eicomi2_voice'); } catch(e){}
+  voice = vs.find(v=>v.name===saved) || vs.find(v=>/en-US/i.test(v.lang)) || vs[0];
+  sel.innerHTML = vs.map(v=>`<option value="${esc(v.name)}" ${v===voice?'selected':''}>${esc(v.name)} (${v.lang})</option>`).join('');
+}
+function setVoice(name){ voice = speechSynthesis.getVoices().find(v=>v.name===name) || voice; try { localStorage.setItem('eicomi2_voice', name); } catch(e){} }
+function speak(text){
+  if (!('speechSynthesis' in window) || !text) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace('¥10,000','ten thousand yen'));
+  u.lang = 'en-US'; u.rate = settings.rate; if (voice) u.voice = voice;
+  speechSynthesis.speak(u);
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+else document.getElementById('voiceSel').innerHTML = '<option>この端末は読み上げ非対応</option>';
+
+document.addEventListener('keydown', e => { if (e.key==='Enter' && answered && !['TEXTAREA','INPUT'].includes(document.activeElement.tagName)) nextQ(); });
+renderTabs(); renderSettings(); updateCounts();
+</script>
+</body>
+</html>
