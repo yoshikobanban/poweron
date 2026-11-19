@@ -437,7 +437,7 @@ function startMode(m){
   showArea(); showQ();
 }
 function backToMenu(){
-  if (window.speechSynthesis) speechSynthesis.cancel();
+  stopRead();
   document.getElementById('quizArea').style.display = 'none';
   document.getElementById('modeScreen').classList.add('show');
   document.getElementById('scoreBadge').style.display = 'none';
@@ -460,8 +460,10 @@ function renderRead(){
   q.innerHTML = `<div class="card read-item" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <button class="speak-btn" style="margin-top:0" onclick="readHideJa=!readHideJa;renderRead()">${readHideJa?'日本語を表示':'日本語をかくす'}</button>
       <span style="font-size:12px;color:var(--gray-400)">色分けは上の設定でON/OFF</span></div>` +
-    parts.map(p => `<div style="font-weight:700;color:var(--main);margin:14px 4px 8px">${p.name.replace('L','Lesson ').replace('-',' Part ')}　${esc(p.sub)}</div>` +
-      p.sents.map(s => `<div class="card read-item">
+    parts.map(p => `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 4px 8px"><span style="font-weight:700;color:var(--main)">${p.name.replace('L','Lesson ').replace('-',' Part ')}　${esc(p.sub)}</span>
+        <button class="speak-btn" style="margin-top:0;background:var(--main);color:white;border-color:var(--main)" onclick="readPart('${p.id}')">▶ Part全体を続けて読む</button>
+        <button class="speak-btn" style="margin-top:0" onclick="stopRead()">■ 止める</button></div>` +
+      p.sents.map(s => `<div class="card read-item" id="rd-${p.id}-${s.no}">
         ${s.key==='star'?'<span class="star" style="margin:0 0 6px">テストに絶対出す</span>':''}
         <div class="read-en">${colored(s.en)}</div>
         <div class="read-ja ${readHideJa?'hide':''}">${jp(s.ja)}</div>
@@ -760,6 +762,26 @@ function stepDone(ok, msg, extra){
     finishAnswer(all, null);
     if (!all) ex.insertAdjacentHTML('afterbegin', `<div class="q-note" style="color:var(--red);margin:0 0 6px">どこかのステップで間違えたので「要復習」に入りました。</div>`);
   }
+}
+
+// ===== 本文を続けて読む =====
+let readToken = 0;
+function stopRead(){ readToken++; if (window.speechSynthesis) speechSynthesis.cancel(); document.querySelectorAll('.read-item').forEach(el=>el.style.outline=''); }
+function readPart(pid){
+  stopRead(); const my = readToken;
+  const p = PARTS.find(x=>x.id===pid); let i = 0;
+  const step = () => {
+    if (my!==readToken) return;
+    document.querySelectorAll('.read-item').forEach(el=>el.style.outline='');
+    if (i >= p.sents.length) return;
+    const s = p.sents[i], el = document.getElementById('rd-'+pid+'-'+s.no);
+    if (el) { el.style.outline = '3px solid var(--orange)'; el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    const u = new SpeechSynthesisUtterance(plain(s.en).replace('¥10,000','ten thousand yen'));
+    u.lang = 'en-US'; u.rate = settings.rate; if (voice) u.voice = voice;
+    u.onend = () => { i++; setTimeout(step, 400); };
+    speechSynthesis.speak(u);
+  };
+  step();
 }
 
 // ===== 読み上げ =====
