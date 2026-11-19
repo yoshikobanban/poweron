@@ -765,42 +765,49 @@ function stepDone(ok, msg, extra){
 }
 
 // ===== 本文を続けて読む =====
-let readToken = 0;
-function stopRead(){ readToken++; if (window.speechSynthesis) speechSynthesis.cancel(); document.querySelectorAll('.read-item').forEach(el=>el.style.outline=''); }
+let readToken = 0; let READ_Q = [];
+function stopRead(){ readToken++; READ_Q = []; if (window.speechSynthesis) speechSynthesis.cancel(); document.querySelectorAll('.read-item').forEach(el=>el.style.outline=''); }
 function readPart(pid){
   stopRead(); const my = readToken;
-  const p = PARTS.find(x=>x.id===pid); let i = 0;
-  const step = () => {
-    if (my!==readToken) return;
-    document.querySelectorAll('.read-item').forEach(el=>el.style.outline='');
-    if (i >= p.sents.length) return;
-    const s = p.sents[i], el = document.getElementById('rd-'+pid+'-'+s.no);
-    if (el) { el.style.outline = '3px solid var(--orange)'; el.scrollIntoView({behavior:'smooth', block:'center'}); }
-    const u = new SpeechSynthesisUtterance(plain(s.en).replace('¥10,000','ten thousand yen'));
-    u.lang = 'en-US'; u.rate = settings.rate; if (voice) u.voice = voice;
-    u.onend = () => { i++; setTimeout(step, 400); };
-    speechSynthesis.speak(u);
-  };
-  step();
+  const p = PARTS.find(x=>x.id===pid);
+  // 全部の文を一度に予約する（Chrome・iPhoneで途中で止まりにくい）
+  p.sents.forEach((s, i) => {
+    const u = makeUtter(plain(s.en));
+    u.onstart = () => {
+      if (my!==readToken) return;
+      document.querySelectorAll('.read-item').forEach(el=>el.style.outline='');
+      const el = document.getElementById('rd-'+pid+'-'+s.no);
+      if (el) { el.style.outline = '3px solid var(--orange)'; el.scrollIntoView({behavior:'smooth', block:'center'}); }
+    };
+    if (i === p.sents.length-1) u.onend = () => { if (my===readToken) document.querySelectorAll('.read-item').forEach(el=>el.style.outline=''); };
+    READ_Q.push(u); speechSynthesis.speak(u);
+  });
 }
 
 // ===== 読み上げ =====
 let voice = null;
+const PREFERRED_VOICES = ['Samantha', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Alex', 'Karen', 'Daniel', 'Google UK English Female'];
+const NOVELTY_VOICES = ['Albert','Bad News','Bahh','Bells','Boing','Bubbles','Cellos','Good News','Jester','Organ','Superstar','Trinoids','Whisper','Wobble','Zarvox','Junior','Ralph','Fred','Kathy','Grandma','Grandpa','Rocko','Shelley','Eddy','Flo','Reed','Sandy'];
 function pickVoice(){
-  const vs = speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));
+  const vs = speechSynthesis.getVoices().filter(v => /^en[-_]/i.test(v.lang) && !NOVELTY_VOICES.some(n => v.name.startsWith(n)));
   const sel = document.getElementById('voiceSel');
-  if (!vs.length) { sel.innerHTML = '<option>英語の声が見つかりません</option>'; return; }
-  let saved = null; try { saved = localStorage.getItem('eicomi2_voice'); } catch(e){}
-  voice = vs.find(v=>v.name===saved) || vs.find(v=>/en-US/i.test(v.lang)) || vs[0];
-  sel.innerHTML = vs.map(v=>`<option value="${esc(v.name)}" ${v===voice?'selected':''}>${esc(v.name)} (${v.lang})</option>`).join('');
+  if (!vs.length) { sel.innerHTML = '<option>（端末の標準の声）</option>'; return; }
+  let saved = null; try { saved = localStorage.getItem('eicomi2_voice2'); } catch(e){}
+  voice = vs.find(v=>v.name===saved) || PREFERRED_VOICES.map(n => vs.find(v => v.name.startsWith(n))).find(v => v)
+       || vs.find(v=>/en[-_]US/i.test(v.lang)) || vs[0];
+  sel.innerHTML = vs.map(v=>`<option value="${esc(v.name)}" ${v===voice?'selected':''}>${esc(v.name.replace(/\s*\(.*\)/, ''))}</option>`).join('');
 }
-function setVoice(name){ voice = speechSynthesis.getVoices().find(v=>v.name===name) || voice; try { localStorage.setItem('eicomi2_voice', name); } catch(e){} }
+function setVoice(name){ voice = speechSynthesis.getVoices().find(v=>v.name===name) || voice; try { localStorage.setItem('eicomi2_voice2', name); } catch(e){} }
+let lastUtter = null;  // iPhoneで読み上げが途中で止まらないように保持
+function makeUtter(text){
+  const u = new SpeechSynthesisUtterance(text.replace('¥10,000','ten thousand yen'));
+  u.lang = voice ? voice.lang : 'en-US'; u.rate = settings.rate; if (voice) u.voice = voice;
+  lastUtter = u; return u;
+}
 function speak(text){
   if (!('speechSynthesis' in window) || !text) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text.replace('¥10,000','ten thousand yen'));
-  u.lang = 'en-US'; u.rate = settings.rate; if (voice) u.voice = voice;
-  speechSynthesis.speak(u);
+  speechSynthesis.speak(makeUtter(text));
 }
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 else document.getElementById('voiceSel').innerHTML = '<option>この端末は読み上げ非対応</option>';
